@@ -68,7 +68,8 @@ apply plugin: 'com.episode6.hackit.deployable.addons.groovydocs'
 ```
 
 
-Finally, deploy using the uploadArchives task
+Finally, deploy using
+`./gradlew uploadArchives` or the new deploy alias `./gradlew deploy`
 
 ### License
 MIT: https://github.com/episode6/chop/blob/master/LICENSE

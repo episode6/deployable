@@ -34,6 +34,9 @@ class DeployablePlugin implements Plugin<Project> {
     project.plugins.apply(MavenPlugin)
     project.plugins.apply(SigningPlugin)
 
+    // add deploy alias for uploadArchives task (because it's more fun to type)
+    project.task("deploy", dependsOn: project.uploadArchives) {}
+
     project.afterEvaluate {
       project.uploadArchives {
         repositories {
