@@ -48,6 +48,13 @@ signing.password=<keyPassword>
 signing.secretKeyRingFile=<pathToKeyringFile>
 ```
 
+You can optionally override the repository urls by adding the following to your `gradle.properties`
+```
+NEXUS_RELEASE_REPOSITORY_URL=https://oss.sonatype.org/service/local/staging/deploy/maven2/
+NEXUS_SNAPSHOT_REPOSITORY_URL=https://oss.sonatype.org/content/repositories/snapshots/
+```
+
+
 In each deployable sub-module apply the plugin to `build.gradle`
 ```groovy
 // to deploy a JAR
@@ -57,11 +64,12 @@ apply plugin: 'com.episode6.hackit.deployable.jar'
 apply plugin: 'com.episode6.hackit.deployable.aar'
 ```
 
-You can optionally override the repository urls by adding the following to your `gradle.properties`
+If this is a groovy project you'll want to pair the deployable.jar plugin with the groovydocs addon
+```groovy
+apply plugin: 'com.episode6.hackit.deployable.jar'
+apply plugin: 'com.episode6.hackit.deployable.addons.groovydocs'
 ```
-NEXUS_RELEASE_REPOSITORY_URL=https://oss.sonatype.org/service/local/staging/deploy/maven2/
-NEXUS_SNAPSHOT_REPOSITORY_URL=https://oss.sonatype.org/content/repositories/snapshots/
-```
+
 
 Finally, deploy using the uploadArchives task
 

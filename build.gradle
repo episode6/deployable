@@ -3,10 +3,14 @@ apply plugin: 'groovy'
 group = "com.episode6.hackit.deployable"
 version = "0.0.1-SNAPSHOT"
 
-apply plugin: new GroovyScriptEngine(
-    [file('src/main/groovy').absolutePath, file('src/main/resources').absolutePath].toArray(new String[2]),
-    this.class.classLoader
-).loadScriptByName('com/episode6/hackit/deployable/DeployableJarPlugin.groovy')
+GroovyScriptEngine scriptEngine = new GroovyScriptEngine([
+      file('src/main/groovy').absolutePath,
+      file('src/main/resources').absolutePath
+    ].toArray(new String[2]),
+    this.class.classLoader)
+
+apply plugin: scriptEngine.loadScriptByName('com/episode6/hackit/deployable/DeployableJarPlugin.groovy')
+apply plugin: scriptEngine.loadScriptByName('com/episode6/hackit/deployable/addons/GroovyDocAddonPlugin.groovy')
 
 repositories {
   jcenter()
@@ -18,11 +22,3 @@ dependencies {
   testCompile group: 'junit', name: 'junit', version: '4.11'
 }
 
-task groovydocJar(type: Jar, dependsOn: groovydoc) {
-  classifier 'groovydoc'
-  from groovydoc
-}
-
-artifacts {
-  archives groovydocJar
-}
