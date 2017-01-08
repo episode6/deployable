@@ -1,0 +1,100 @@
+apply plugin: 'groovy'
+apply plugin: 'maven'
+apply plugin: 'signing'
+
+group = "com.episode6.hackit.deployable"
+version = "0.0.1-SNAPSHOT"
+
+repositories {
+  jcenter()
+}
+
+dependencies {
+  compile localGroovy()
+  compile gradleApi()
+  testCompile group: 'junit', name: 'junit', version: '4.11'
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+  classifier = 'javadoc'
+  from javadoc
+}
+
+task sourcesJar(type: Jar) {
+  from sourceSets.main.allSource
+  classifier = 'sources'
+}
+
+artifacts {
+  archives jar
+  archives javadocJar
+  archives sourcesJar
+}
+
+afterEvaluate { project ->
+  uploadArchives {
+    repositories {
+      mavenDeployer {
+        beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+
+        repository(url: getReleaseRepositoryUrl()) {
+          authentication(userName: project.NEXUS_USERNAME, password: project.NEXUS_PASSWORD)
+        }
+        snapshotRepository(url: getSnapshotRepositoryUrl()) {
+          authentication(userName: project.NEXUS_USERNAME, password: project.NEXUS_PASSWORD)
+        }
+
+        pom.project {
+          name name
+          packaging "jar"
+          description POM_DESCRIPTION
+          url POM_URL
+
+          scm {
+            url POM_SCM_URL
+            connection POM_SCM_CONNECTION
+            developerConnection POM_SCM_DEV_CONNECTION
+          }
+
+          licenses {
+            license {
+              name POM_LICENCE_NAME
+              url POM_LICENCE_URL
+              distribution POM_LICENCE_DIST
+            }
+          }
+
+          developers {
+            developer {
+              id POM_DEVELOPER_ID
+              name POM_DEVELOPER_NAME
+            }
+          }
+        }
+      }
+    }
+  }
+
+  project.signing {
+    required { isReleaseBuild() && gradle.taskGraph.hasTask("uploadArchives") }
+    sign configurations.archives
+  }
+}
+
+def isReleaseBuild() {
+  return version.contains("SNAPSHOT") == false
+}
+
+def getReleaseRepositoryUrl() {
+  if (hasProperty("NEXUS_RELEASE_REPOSITORY_URL")) {
+    return NEXUS_RELEASE_REPOSITORY_URL
+  }
+  return "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
+}
+
+def getSnapshotRepositoryUrl() {
+  if (hasProperty("NEXUS_SNAPSHOT_REPOSITORY_URL")) {
+    return NEXUS_SNAPSHOT_REPOSITORY_URL
+  }
+  return "https://oss.sonatype.org/content/repositories/snapshots/"
+}
