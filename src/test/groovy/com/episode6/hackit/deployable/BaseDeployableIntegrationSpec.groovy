@@ -1,7 +1,7 @@
 package com.episode6.hackit.deployable
 
-import com.episode6.hackit.deployable.keyring.KeyRingInfo
-import com.episode6.hackit.deployable.keyring.KeyRings
+import com.episode6.hackit.deployable.util.keyring.KeyRingInfo
+import com.episode6.hackit.deployable.util.keyring.KeyRings
 import org.junit.Rule
 import org.junit.rules.TemporaryFolder
 import spock.lang.Specification

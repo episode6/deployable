@@ -1,4 +1,4 @@
-package com.episode6.hackit.deployable.keyring
+package com.episode6.hackit.deployable.util.keyring
 
 import org.bouncycastle.openpgp.PGPKeyRingGenerator
 import org.bouncycastle.openpgp.PGPPublicKeyRing

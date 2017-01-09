@@ -1,4 +1,4 @@
-package com.episode6.hackit.deployable.keyring
+package com.episode6.hackit.deployable.util.keyring
 
 import org.bouncycastle.bcpg.HashAlgorithmTags
 import org.bouncycastle.bcpg.SymmetricKeyAlgorithmTags

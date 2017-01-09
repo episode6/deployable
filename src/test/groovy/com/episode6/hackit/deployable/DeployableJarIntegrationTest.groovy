@@ -1,5 +1,6 @@
 package com.episode6.hackit.deployable
 
+import com.episode6.hackit.deployable.util.RequiredPropertiesGenerator
 import org.gradle.testkit.runner.GradleRunner
 import org.gradle.testkit.runner.TaskOutcome
 

@@ -1,6 +1,6 @@
-package com.episode6.hackit.deployable
+package com.episode6.hackit.deployable.util
 
-import com.episode6.hackit.deployable.keyring.KeyRingInfo
+import com.episode6.hackit.deployable.util.keyring.KeyRingInfo
 
 /**
  * Generates the contents of grandle.properties for tests
