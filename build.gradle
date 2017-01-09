@@ -25,6 +25,7 @@ dependencies {
     exclude module: 'groovy-all'
   }
   testCompile gradleTestKit()
+  testCompile("org.bouncycastle:bcpg-jdk15on:1.56")
 }
 
 test {
