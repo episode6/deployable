@@ -11,7 +11,7 @@ class DeployableJarIntegrationTest extends BaseDeployableIntegrationSpec {
 
   def "verify deploy task"() {
     given:
-    gradlePropertiesFile << RequiredPropertiesGenerator.generateGradleProperties(m2Folder, keyRingInfo)
+    gradlePropertiesFile << RequiredPropertiesGenerator.generateGradleProperties(m2Folder, keyRingBundle)
     buildFile << """
 plugins {
  id 'java'

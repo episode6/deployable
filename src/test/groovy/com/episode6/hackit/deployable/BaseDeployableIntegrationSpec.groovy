@@ -1,6 +1,6 @@
 package com.episode6.hackit.deployable
 
-import com.episode6.hackit.deployable.util.keyring.KeyRingInfo
+import com.episode6.hackit.deployable.util.keyring.KeyRingBundle
 import com.episode6.hackit.deployable.util.keyring.KeyRings
 import org.junit.Rule
 import org.junit.rules.TemporaryFolder
@@ -17,7 +17,7 @@ class BaseDeployableIntegrationSpec extends Specification {
   File gradlePropertiesFile
   File m2Folder
 
-  KeyRingInfo keyRingInfo
+  KeyRingBundle keyRingBundle
 
   def setup() {
     buildFile = testProjectDir.newFile("build.gradle")
@@ -26,7 +26,7 @@ class BaseDeployableIntegrationSpec extends Specification {
     m2Folder = testProjectDir.newFolder("m2")
     m2Folder.mkdirs()
 
-    keyRingInfo = KeyRings.generateKeyRingsForMaven(
+    keyRingBundle = KeyRings.generateKeyRingsForMaven(
         testProjectDir.newFolder("gpg"),
         "test@example.com",
         "fakePassword")

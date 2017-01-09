@@ -43,7 +43,7 @@ class KeyRings {
       HashAlgorithmTags.SHA512,
       HashAlgorithmTags.SHA224]
 
-  static KeyRingInfo generateKeyRingsForMaven(
+  static KeyRingBundle generateKeyRingsForMaven(
       File keyringDirectory,
       String uid,
       String password) {
@@ -115,7 +115,7 @@ class KeyRings {
         secretKeyRing,
         "secring.gpg")
 
-    return new KeyRingInfo(
+    return new KeyRingBundle(
         keyringDirectory,
         uid,
         password,

@@ -1,13 +1,13 @@
 package com.episode6.hackit.deployable.util
 
-import com.episode6.hackit.deployable.util.keyring.KeyRingInfo
+import com.episode6.hackit.deployable.util.keyring.KeyRingBundle
 
 /**
  * Generates the contents of grandle.properties for tests
  */
 class RequiredPropertiesGenerator {
 
-  static String generateGradleProperties(File mavenRepoDir, KeyRingInfo keyRingInfo) {
+  static String generateGradleProperties(File mavenRepoDir, KeyRingBundle keyRingInfo) {
     return """
 POM_DESCRIPTION=Test Description
 POM_URL=https://example.com

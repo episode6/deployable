@@ -7,7 +7,7 @@ import org.bouncycastle.openpgp.PGPSecretKeyRing
 /**
  * An object containing details about PGP Keyrings.
  */
-class KeyRingInfo {
+class KeyRingBundle {
   File keyringDirectory
 
   String uid
@@ -24,7 +24,7 @@ class KeyRingInfo {
   File secretKeyringFile
 
 
-  KeyRingInfo(
+  KeyRingBundle(
       File keyringDirectory,
       String uid,
       String password,
