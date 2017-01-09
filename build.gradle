@@ -6,6 +6,7 @@ repositories {
 }
 
 apply plugin: 'groovy'
+apply plugin: 'java-gradle-plugin'
 
 // Apply this plugin to itself so we don't need to duplicate the deploy logic.
 GroovyScriptEngine scriptEngine = new GroovyScriptEngine([

@@ -21,7 +21,10 @@ class DeployablePluginTest extends Specification {
   def "look for deploy task"() {
     given:
     buildFile << """
-apply plugin: 'java'
+plugins {
+ id 'java'
+ id 'com.episode6.hackit.deployable.jar'
+}
 
 task hi() {
   doLast {
@@ -33,6 +36,7 @@ task hi() {
     when:
     def result = GradleRunner.create()
       .withProjectDir(testProjectDir.root)
+      .withPluginClasspath()
       .withArguments("hi")
       .build()
 
