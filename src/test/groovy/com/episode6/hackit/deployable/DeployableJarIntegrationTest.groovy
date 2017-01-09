@@ -1,5 +1,7 @@
 package com.episode6.hackit.deployable
 
+import com.episode6.hackit.deployable.keyring.KeyRingInfo
+import com.episode6.hackit.deployable.keyring.KeyRings
 import org.gradle.testkit.runner.GradleRunner
 import org.gradle.testkit.runner.TaskOutcome
 import org.junit.Rule
@@ -26,7 +28,7 @@ class DeployableJarIntegrationTest extends Specification {
     m2Folder = testProjectDir.newFolder("m2")
     m2Folder.mkdirs()
 
-    keyRingInfo = KeyRingUtil.generateKeyRings(
+    keyRingInfo = KeyRings.generateKeyRingsForMaven(
         testProjectDir.newFolder("gpg"),
         "test@example.com",
         SIGNING_PASSWORD)

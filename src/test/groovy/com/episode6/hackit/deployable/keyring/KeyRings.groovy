@@ -1,4 +1,4 @@
-package com.episode6.hackit.deployable
+package com.episode6.hackit.deployable.keyring
 
 import org.bouncycastle.bcpg.HashAlgorithmTags
 import org.bouncycastle.bcpg.SymmetricKeyAlgorithmTags
@@ -27,9 +27,9 @@ import org.bouncycastle.openpgp.operator.bc.BcPGPKeyPair
 import java.security.SecureRandom
 
 /**
- *
+ * Utility class to generate maven-compatible keyrings for testing
  */
-class KeyRingUtil {
+class KeyRings {
 
   static int[] SYMMETRIC_KEY_ALOGS = [
       SymmetricKeyAlgorithmTags.AES_256,
@@ -43,7 +43,7 @@ class KeyRingUtil {
       HashAlgorithmTags.SHA512,
       HashAlgorithmTags.SHA224]
 
-  static KeyRingInfo generateKeyRings(
+  static KeyRingInfo generateKeyRingsForMaven(
       File keyringDirectory,
       String uid,
       String password) {
@@ -116,6 +116,7 @@ class KeyRingUtil {
         "secring.gpg")
 
     return new KeyRingInfo(
+        keyringDirectory,
         uid,
         password,
         keyRingGenerator,
@@ -125,7 +126,6 @@ class KeyRingUtil {
         secretKeyRing,
         publicKeyringFile,
         secretKeyringFile)
-
   }
 
   private static File createKeyringFile(File keyringDir, PGPKeyRing keyRing, String fileName) {
