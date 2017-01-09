@@ -6,6 +6,9 @@ Some quick and dirty gradle plugins to ease the pain of deploying jars and aars 
 Add Deployable to the classpath in your root `build.gradle`
 ```groovy
 buildscript {
+  repositories {
+    jcenter()
+  }
   dependencies {
     classpath 'com.episode6.hackit.deployable:deployable:0.0.0.1-SNAPSHOT'
   }

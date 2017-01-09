@@ -19,6 +19,18 @@ apply plugin: scriptEngine.loadScriptByName('com/episode6/hackit/deployable/addo
 dependencies {
   compile localGroovy()
   compile gradleApi()
-  testCompile group: 'junit', name: 'junit', version: '4.11'
+
+  testCompile("org.spockframework:spock-core:1.1-groovy-2.4-rc-2")  {
+    exclude module: 'groovy-all'
+  }
+  testCompile gradleTestKit()
 }
+
+test {
+  testLogging {
+    showStandardStreams = true
+  }
+}
+
+
 
