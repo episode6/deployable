@@ -15,7 +15,7 @@ class BaseDeployableIntegrationSpec extends Specification {
 
   File buildFile
   File gradlePropertiesFile
-  File m2Folder
+  File mavenDir
 
   KeyRingBundle keyRingBundle
 
@@ -23,8 +23,8 @@ class BaseDeployableIntegrationSpec extends Specification {
     buildFile = testProjectDir.newFile("build.gradle")
     gradlePropertiesFile = testProjectDir.newFile("gradle.properties")
 
-    m2Folder = testProjectDir.newFolder("m2")
-    m2Folder.mkdirs()
+    mavenDir = testProjectDir.newFolder("mavenOut")
+    mavenDir.mkdirs()
 
     keyRingBundle = KeyRings.generateKeyRingsForMaven(
         testProjectDir.newFolder("gpg"),
