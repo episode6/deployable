@@ -1,42 +1,16 @@
 package com.episode6.hackit.deployable
 
-import com.episode6.hackit.deployable.keyring.KeyRingInfo
-import com.episode6.hackit.deployable.keyring.KeyRings
 import org.gradle.testkit.runner.GradleRunner
 import org.gradle.testkit.runner.TaskOutcome
-import org.junit.Rule
-import org.junit.rules.TemporaryFolder
-import spock.lang.Specification
 
 /**
  * Tests DeployableJarPlugin.groovy
  */
-class DeployableJarIntegrationTest extends Specification {
-
-  static final String SIGNING_PASSWORD = "fakePassword"
-
-  @Rule final TemporaryFolder testProjectDir = new TemporaryFolder()
-  File buildFile
-  File gradleProperties
-  File m2Folder
-  KeyRingInfo keyRingInfo
-
-  def setup() {
-    buildFile = testProjectDir.newFile("build.gradle")
-    gradleProperties = testProjectDir.newFile("gradle.properties")
-
-    m2Folder = testProjectDir.newFolder("m2")
-    m2Folder.mkdirs()
-
-    keyRingInfo = KeyRings.generateKeyRingsForMaven(
-        testProjectDir.newFolder("gpg"),
-        "test@example.com",
-        SIGNING_PASSWORD)
-  }
+class DeployableJarIntegrationTest extends BaseDeployableIntegrationSpec {
 
   def "verify deploy task"() {
     given:
-    gradleProperties << RequiredPropertiesGenerator.generateGradleProperties(m2Folder, keyRingInfo)
+    gradlePropertiesFile << RequiredPropertiesGenerator.generateGradleProperties(m2Folder, keyRingInfo)
     buildFile << """
 plugins {
  id 'java'
