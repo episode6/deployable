@@ -5,7 +5,7 @@ import org.gradle.api.Project
 /**
  *
  */
-class BaseExtension implements GroovyInterceptable {
+class BaseExtension {
 
   protected final Project project
   protected final String namespace
@@ -44,6 +44,13 @@ class BaseExtension implements GroovyInterceptable {
 
   protected String qualifyPropertyName(String propertyName) {
     return "${namespace}.${propertyName}"
+  }
+
+  def applyClosure(Closure closure) {
+    closure.setDelegate(this)
+    closure.setResolveStrategy(Closure.DELEGATE_ONLY)
+    closure.call()
+    return this
   }
 }
 

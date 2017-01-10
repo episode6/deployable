@@ -55,20 +55,16 @@ class DeployablePluginExtension {
     }
 
     ScmExtension scm(Closure closure) {
-      project.configure(scm, closure)
-      return scm
+      return scm.applyClosure(closure)
     }
 
     LicenceExtension licence(Closure closure) {
-      project.configure(licence, closure)
-      return licence
+      return licence.applyClosure(closure)
     }
 
     DeveloperExtension developer(Closure closure) {
-      project.configure(developer, closure)
-      return developer
+      return developer.applyClosure(closure)
     }
-
   }
 
   static class NexusExtension extends BaseExtension {
@@ -114,12 +110,10 @@ class DeployablePluginExtension {
   }
 
   PomExtension pom(Closure closure) {
-    project.configure(pom, closure)
-    return pom
+    return pom.applyClosure(closure)
   }
 
   NexusExtension nexus(Closure closure) {
-    project.configure(pom, closure)
-    return pom
+    return nexus.applyClosure(closure)
   }
 }
