@@ -3,27 +3,30 @@ package com.episode6.hackit.deployable
 import org.gradle.api.Project
 
 /**
- *
+ * A base class to simplify nested objects in a plugin extension
+ * that can be defined either directly or via Closures
  */
-class BaseExtension {
+abstract class NestedExtension {
 
   protected final Project project
   protected final String namespace
 
-  BaseExtension(Project project, String parentNamespace, String newName) {
+  NestedExtension(Project project, String parentNamespace, String newName) {
     this.project = project
     this.namespace = "${parentNamespace}.${newName}"
   }
 
+  /**
+   * Magic method handles using prop names as setter methods (passing
+   * either a String or a Closure)
+   */
   @Override
   Object invokeMethod(String name, Object args) {
-    System.out.println("unknown method: ${name}")
     if (hasProperty(name) && args instanceof Object[] && ((Object[])args).length == 1) {
       Object arg = ((Object[])args)[0]
-      System.out.println("hasProperty: ${name} with arg: ${arg.getClass().getSimpleName()}")
       if (arg instanceof Closure) {
         Object propertyValue = metaClass.getProperty(this, name)
-        if (propertyValue instanceof BaseExtension) {
+        if (propertyValue instanceof NestedExtension) {
           return propertyValue.applyClosure(arg)
         }
       }
@@ -36,10 +39,16 @@ class BaseExtension {
     throw new MissingMethodException(name, this.getClass(), args, false)
   }
 
+  /**
+   * Magic method handles getting of properties. If the local property
+   * is null, we check for a matching, fully-qualified project property.
+   * If neither if found, we through (except when the property's get method
+   * is explicitly overridden.
+   */
   @Override
   Object getProperty(String propName) {
     Object obj = metaClass.getProperty(this, propName)
-    if (obj instanceof BaseExtension || obj != null || propName == "namespace" || propName == "project") {
+    if (obj instanceof NestedExtension || obj != null || propName == "namespace" || propName == "project") {
       return obj
     }
 
@@ -66,6 +75,9 @@ class BaseExtension {
     return "${namespace}.${propertyName}"
   }
 
+  /**
+   * apply a given closure to $this
+   */
   def applyClosure(Closure closure) {
     closure.setDelegate(this)
     closure.setResolveStrategy(Closure.DELEGATE_ONLY)

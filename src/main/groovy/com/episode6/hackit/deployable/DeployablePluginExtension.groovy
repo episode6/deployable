@@ -10,9 +10,9 @@ class DeployablePluginExtension {
 
   private final Project project
 
-  static class PomExtension extends BaseExtension {
+  static class PomExtension extends NestedExtension {
 
-    static class ScmExtension extends BaseExtension {
+    static class ScmExtension extends NestedExtension {
       String url = null
       String connection = null
       String developerConnection = null
@@ -22,7 +22,7 @@ class DeployablePluginExtension {
       }
     }
 
-    static class LicenceExtension extends BaseExtension {
+    static class LicenceExtension extends NestedExtension {
       String name = null
       String url = null
       String distribution = null
@@ -32,7 +32,7 @@ class DeployablePluginExtension {
       }
     }
 
-    static class DeveloperExtension extends BaseExtension {
+    static class DeveloperExtension extends NestedExtension {
       String id
       String name
 
@@ -56,7 +56,7 @@ class DeployablePluginExtension {
     }
   }
 
-  static class NexusExtension extends BaseExtension {
+  static class NexusExtension extends NestedExtension {
     String username = null
     String password = null
     String releaseRepoUrl = null
