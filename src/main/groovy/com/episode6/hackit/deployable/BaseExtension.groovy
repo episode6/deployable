@@ -15,6 +15,14 @@ class BaseExtension {
     this.namespace = "${parentNamespace}.${newName}"
   }
 
+  @Override
+  Object invokeMethod(String name, Object args) {
+    if (hasProperty(name) && args instanceof Object[] && ((Object[])args).length == 1) {
+      metaClass.setProperty(this, name, ((Object[])args)[0])
+    } else {
+      throw new RuntimeException("Could not find method: ${name}, args: ${args}")
+    }
+  }
 
   @Override
   public Object getProperty(String propName) {

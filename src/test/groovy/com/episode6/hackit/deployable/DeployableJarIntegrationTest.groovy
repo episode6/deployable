@@ -28,7 +28,7 @@ deployable {
     }
   }
   nexus {
-    snapshotRepoUrl = "http://idevsix.com"
+    snapshotRepoUrl "http://idevsix.com"
   }
 }
  """
