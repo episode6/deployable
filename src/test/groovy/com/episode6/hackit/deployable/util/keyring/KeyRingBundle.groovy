@@ -22,28 +22,4 @@ class KeyRingBundle {
 
   File publicKeyringFile
   File secretKeyringFile
-
-
-  KeyRingBundle(
-      File keyringDirectory,
-      String uid,
-      String password,
-      PGPKeyRingGenerator keyRingGenerator,
-      long masterKeyId,
-      String masterKeyIdHex,
-      PGPPublicKeyRing publicKeyRing,
-      PGPSecretKeyRing secretKeyRing,
-      File publicKeyringFile,
-      File secretKeyringFile) {
-    this.keyringDirectory = keyringDirectory
-    this.uid = uid
-    this.password = password
-    this.keyRingGenerator = keyRingGenerator
-    this.masterKeyId = masterKeyId
-    this.masterKeyIdHex = masterKeyIdHex
-    this.publicKeyRing = publicKeyRing
-    this.secretKeyRing = secretKeyRing
-    this.publicKeyringFile = publicKeyringFile
-    this.secretKeyringFile = secretKeyringFile
-  }
 }
