@@ -20,6 +20,17 @@ plugins {
 
 group = 'com.example.groupid'
 version = '0.0.1-SNAPSHOT'
+
+deployable {
+  pom {
+    developer {
+      name = "testDeveloperName"
+    }
+  }
+  nexus {
+    username "fakeName"
+  }
+}
  """
 
     when:

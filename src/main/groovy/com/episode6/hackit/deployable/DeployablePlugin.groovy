@@ -3,6 +3,7 @@ package com.episode6.hackit.deployable
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.artifacts.maven.MavenDeployment
+import org.gradle.api.plugins.ExtensionContainer
 import org.gradle.api.plugins.MavenPlugin
 import org.gradle.plugins.signing.SigningPlugin
 
@@ -16,23 +17,15 @@ class DeployablePlugin implements Plugin<Project> {
     return project.version.contains("SNAPSHOT") == false
   }
 
-  def getReleaseRepositoryUrl(Project project) {
-    if (project.hasProperty("NEXUS_RELEASE_REPOSITORY_URL")) {
-      return project.NEXUS_RELEASE_REPOSITORY_URL
-    }
-    return "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
-  }
-
-  def getSnapshotRepositoryUrl(Project project) {
-    if (project.hasProperty("NEXUS_SNAPSHOT_REPOSITORY_URL")) {
-      return project.NEXUS_SNAPSHOT_REPOSITORY_URL
-    }
-    return "https://oss.sonatype.org/content/repositories/snapshots/"
-  }
-
   void apply(Project project) {
     project.plugins.apply(MavenPlugin)
     project.plugins.apply(SigningPlugin)
+
+    DeployablePluginExtension deployable = project.extensions.create(
+        "deployable",
+        DeployablePluginExtension,
+        project)
+
 
     // add deploy alias for uploadArchives task (because it's more fun to type)
     project.task("deploy", dependsOn: project.uploadArchives) {}
@@ -43,37 +36,37 @@ class DeployablePlugin implements Plugin<Project> {
           mavenDeployer {
             beforeDeployment { MavenDeployment deployment -> project.signing.signPom(deployment) }
 
-            repository(url: getReleaseRepositoryUrl(project)) {
-              authentication(userName: project.NEXUS_USERNAME, password: project.NEXUS_PASSWORD)
+            repository(url: deployable.nexus.releaseRepoUrl) {
+              authentication(userName: deployable.nexus.username, password: deployable.nexus.password)
             }
-            snapshotRepository(url: getSnapshotRepositoryUrl(project)) {
-              authentication(userName: project.NEXUS_USERNAME, password: project.NEXUS_PASSWORD)
+            snapshotRepository(url: deployable.nexus.snapshotRepoUrl) {
+              authentication(userName: deployable.nexus.username, password: deployable.nexus.password)
             }
 
             pom.project {
               name project.name
               packaging pomPackaging
-              description project.POM_DESCRIPTION
-              url project.POM_URL
+              description deployable.pom.description
+              url deployable.pom.url
 
               scm {
-                url project.POM_SCM_URL
-                connection project.POM_SCM_CONNECTION
-                developerConnection project.POM_SCM_DEV_CONNECTION
+                url deployable.pom.scm.url
+                connection deployable.pom.scm.connection
+                developerConnection deployable.pom.scm.developerConnection
               }
 
               licenses {
                 license {
-                  name project.POM_LICENCE_NAME
-                  url project.POM_LICENCE_URL
-                  distribution project.POM_LICENCE_DIST
+                  name deployable.pom.licence.name
+                  url deployable.pom.licence.url
+                  distribution deployable.pom.licence.distribution
                 }
               }
 
               developers {
                 developer {
-                  id project.POM_DEVELOPER_ID
-                  name project.POM_DEVELOPER_NAME
+                  id deployable.pom.developer.id
+                  name deployable.pom.developer.name
                 }
               }
             }

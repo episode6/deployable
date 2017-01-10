@@ -116,16 +116,16 @@ class KeyRings {
         "secring.gpg")
 
     return new KeyRingBundle(
-        keyringDirectory,
-        uid,
-        password,
-        keyRingGenerator,
-        masterKeyId,
-        masterKeyIdHex,
-        publicKeyRing,
-        secretKeyRing,
-        publicKeyringFile,
-        secretKeyringFile)
+        keyringDirectory: keyringDirectory,
+        uid: uid,
+        password: password,
+        keyRingGenerator: keyRingGenerator,
+        masterKeyId: masterKeyId,
+        masterKeyIdHex: masterKeyIdHex.toUpperCase(),
+        publicKeyRing: publicKeyRing,
+        secretKeyRing: secretKeyRing,
+        publicKeyringFile: publicKeyringFile,
+        secretKeyringFile: secretKeyringFile)
   }
 
   private static File createKeyringFile(File keyringDir, PGPKeyRing keyRing, String fileName) {
