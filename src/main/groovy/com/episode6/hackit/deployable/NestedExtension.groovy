@@ -48,7 +48,7 @@ abstract class NestedExtension {
   @Override
   Object getProperty(String propName) {
     Object obj = metaClass.getProperty(this, propName)
-    if (obj instanceof NestedExtension || obj != null || propName == "namespace" || propName == "project") {
+    if (obj instanceof NestedExtension || obj != null) {
       return obj
     }
 
