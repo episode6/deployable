@@ -26,22 +26,22 @@ allprojects {
 
 Add the common pom elements to your root `gradle.properties`
 ```
-POM_DESCRIPTION=Gradle plugins to ease the pain of creating deployable jars and aars
-POM_URL=https://github.com/episode6/deployable
-POM_SCM_URL=extensible
-POM_SCM_CONNECTION=scm:https://github.com/episode6/deployable.git
-POM_SCM_DEV_CONNECTION=scm:https://github.com/episode6/deployable.git
-POM_LICENCE_NAME=The MIT License (MIT)
-POM_LICENCE_URL=https://github.com/episode6/deployable/blob/master/LICENSE
-POM_LICENCE_DIST=repo
-POM_DEVELOPER_ID=episode6
-POM_DEVELOPER_NAME=episode6, Inc.
+deployable.pom.description=Gradle plugins to ease the pain of creating deployable jars and aars
+deployable.pom.url=https://github.com/episode6/deployable
+deployable.pom.scm.url=extensible
+deployable.pom.scm.connection=scm:https://github.com/episode6/deployable.git
+deployable.pom.scm.developerConnection=scm:https://github.com/episode6/deployable.git
+deployable.pom.licence.name=The MIT License (MIT)
+deployable.pom.licence.url=https://github.com/episode6/deployable/blob/master/LICENSE
+deployable.pom.licence.distribution=repo
+deployable.pom.developer.id=episode6
+deployable.pom.developer.name=episode6, Inc.
 ```
 
 In your computer's `~/.gradle/gradle.properties` add your nexus login info and signing key info
 ```
-NEXUS_USERNAME=<username>
-NEXUS_PASSWORD=<password>
+deployable.nexus.username=<username>
+deployable.nexus.password=<password>
 
 signing.keyId=<keyId>
 signing.password=<keyPassword>
@@ -50,10 +50,9 @@ signing.secretKeyRingFile=<pathToKeyringFile>
 
 You can optionally override the repository urls by adding the following to your `gradle.properties`
 ```
-NEXUS_RELEASE_REPOSITORY_URL=https://oss.sonatype.org/service/local/staging/deploy/maven2/
-NEXUS_SNAPSHOT_REPOSITORY_URL=https://oss.sonatype.org/content/repositories/snapshots/
+deployable.nexus.releaseRepoUrl=https://oss.sonatype.org/service/local/staging/deploy/maven2/
+deployable.nexus.snapshotRepoUrl=https://oss.sonatype.org/content/repositories/snapshots/
 ```
-
 
 In each deployable sub-module apply the plugin to `build.gradle`
 ```groovy
@@ -68,6 +67,39 @@ If this is a groovy project you'll want to pair the deployable.jar plugin with t
 ```groovy
 apply plugin: 'com.episode6.hackit.deployable.jar'
 apply plugin: 'com.episode6.hackit.deployable.addons.groovydocs'
+```
+
+Most of deployable's properties can alternatively be set or overridden directly in your `build.gradle`
+```groovy
+apply plugin: 'java'
+apply plugin: 'com.episode6.hackit.deployable.jar'
+
+deployable {
+    pom {
+        description "ProjectDescription"
+        url "http://projectUrl"
+        scm {
+            url "extensible"
+            connection "scm:http://connection"
+            developerConnection "scm:http://developerConnection"
+        }
+        licence {
+            name "Licence Name"
+            url "http://licenceUrl"
+            distrobution "repo"
+        }
+        developer {
+            id "developerId"
+            name "developerName"
+        }
+    }
+    nexus {
+        username "username"
+        password "password"
+        snapshotRepoUrl "https://shapshotRepo"
+        releaseRepoURl "https://releaseRepo"
+    }
+}
 ```
 
 
