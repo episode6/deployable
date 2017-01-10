@@ -121,7 +121,7 @@ class KeyRings {
         password,
         keyRingGenerator,
         masterKeyId,
-        masterKeyIdHex,
+        masterKeyIdHex.toUpperCase(),
         publicKeyRing,
         secretKeyRing,
         publicKeyringFile,

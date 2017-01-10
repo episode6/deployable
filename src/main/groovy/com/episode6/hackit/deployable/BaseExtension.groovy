@@ -17,15 +17,27 @@ class BaseExtension {
 
   @Override
   Object invokeMethod(String name, Object args) {
+    System.out.println("unknown method: ${name}")
     if (hasProperty(name) && args instanceof Object[] && ((Object[])args).length == 1) {
-      metaClass.setProperty(this, name, ((Object[])args)[0])
-    } else {
-      throw new RuntimeException("Could not find method: ${name}, args: ${args}")
+      Object arg = ((Object[])args)[0]
+      System.out.println("hasProperty: ${name} with arg: ${arg.getClass().getSimpleName()}")
+      if (arg instanceof Closure) {
+        Object propertyValue = metaClass.getProperty(this, name)
+        if (propertyValue instanceof BaseExtension) {
+          return propertyValue.applyClosure(arg)
+        }
+      }
+      if (arg instanceof String) {
+        metaClass.setProperty(this, name, arg)
+        return
+      }
     }
+
+    throw new MissingMethodException(name, this.getClass(), args, false)
   }
 
   @Override
-  public Object getProperty(String propName) {
+  Object getProperty(String propName) {
     Object obj = metaClass.getProperty(this, propName)
     if (obj instanceof BaseExtension || obj != null || propName == "namespace" || propName == "project") {
       return obj

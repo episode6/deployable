@@ -11,8 +11,6 @@ class DeployablePluginExtension {
   private final Project project
 
   static class PomExtension extends BaseExtension {
-    String description = null
-    String url = null
 
     static class ScmExtension extends BaseExtension {
       String url = null
@@ -43,6 +41,9 @@ class DeployablePluginExtension {
       }
     }
 
+    String description = null
+    String url = null
+
     ScmExtension scm
     LicenceExtension licence
     DeveloperExtension developer
@@ -52,18 +53,6 @@ class DeployablePluginExtension {
       scm = new ScmExtension(project, namespace)
       licence = new LicenceExtension(project, namespace)
       developer = new DeveloperExtension(project, namespace)
-    }
-
-    ScmExtension scm(Closure closure) {
-      return scm.applyClosure(closure)
-    }
-
-    LicenceExtension licence(Closure closure) {
-      return licence.applyClosure(closure)
-    }
-
-    DeveloperExtension developer(Closure closure) {
-      return developer.applyClosure(closure)
     }
   }
 
