@@ -1,9 +1,9 @@
 package com.episode6.hackit.deployable
 
+import com.episode6.hackit.deployable.extension.DeployablePluginExtension
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.artifacts.maven.MavenDeployment
-import org.gradle.api.plugins.ExtensionContainer
 import org.gradle.api.plugins.MavenPlugin
 import org.gradle.plugins.signing.SigningPlugin
 

@@ -15,7 +15,7 @@ GroovyScriptEngine scriptEngine = new GroovyScriptEngine([
     ].toArray(new String[2]),
     this.class.classLoader)
 apply plugin: scriptEngine.loadScriptByName('com/episode6/hackit/deployable/DeployableJarPlugin.groovy')
-apply plugin: scriptEngine.loadScriptByName('com/episode6/hackit/deployable/addons/GroovyDocAddonPlugin.groovy')
+apply plugin: scriptEngine.loadScriptByName('com/episode6/hackit/deployable/addon/GroovyDocAddonPlugin.groovy')
 
 dependencies {
   compile localGroovy()

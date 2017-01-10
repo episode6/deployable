@@ -1,4 +1,4 @@
-package com.episode6.hackit.deployable.addons
+package com.episode6.hackit.deployable.addon
 
 import org.gradle.api.Plugin
 import org.gradle.api.Project

@@ -66,7 +66,7 @@ apply plugin: 'com.episode6.hackit.deployable.aar'
 If this is a groovy project you'll want to pair the deployable.jar plugin with the groovydocs addon
 ```groovy
 apply plugin: 'com.episode6.hackit.deployable.jar'
-apply plugin: 'com.episode6.hackit.deployable.addons.groovydocs'
+apply plugin: 'com.episode6.hackit.deployable.addon.groovydocs'
 ```
 
 Most of deployable's properties can alternatively be set or overridden directly in your `build.gradle`
