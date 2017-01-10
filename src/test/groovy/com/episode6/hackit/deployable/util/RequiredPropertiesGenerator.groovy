@@ -9,22 +9,22 @@ class RequiredPropertiesGenerator {
 
   static String generateGradleProperties(File mavenRepoDir, KeyRingBundle keyRingInfo) {
     return """
-POM_DESCRIPTION=Test Description
-POM_URL=https://example.com
-POM_SCM_URL=extensible
-POM_SCM_CONNECTION=scm:https://scm_connection.com
-POM_SCM_DEV_CONNECTION=scm:https://scm_dev_connection.com
-POM_LICENCE_NAME=The MIT License (MIT)
-POM_LICENCE_URL=https://licence.com
-POM_LICENCE_DIST=repo
-POM_DEVELOPER_ID=DeveloperId
-POM_DEVELOPER_NAME=DeveloperName
+deployable.pom.description=Test Description
+deployable.pom.url=https://example.com
+deployable.pom.scm.url=extensible
+deployable.pom.scm.connection=scm:https://scm_connection.com
+deployable.pom.scm.developerConnection=scm:https://scm_dev_connection.com
+deployable.pom.licence.name=The MIT License (MIT)
+deployable.pom.licence.url=https://licence.com
+deployable.pom.licence.distribution=repo
+deployable.pom.developer.id=DeveloperId
+deployable.pom.developer.name=DeveloperName
 
-NEXUS_USERNAME=nexusUsername
-NEXUS_PASSWORD=nexusPassword
+deployable.nexus.username=nexusUsername
+deployable.nexus.password=nexusPassword
 
-NEXUS_RELEASE_REPOSITORY_URL=file://localhost${mavenRepoDir.absolutePath}
-NEXUS_SNAPSHOT_REPOSITORY_URL=file://localhost${mavenRepoDir.absolutePath}
+deployable.nexus.releaseRepoUrl=file://localhost${mavenRepoDir.absolutePath}
+deployable.nexus.snapshotRepoUrl=file://localhost${mavenRepoDir.absolutePath}
 
 signing.keyId=${keyRingInfo.masterKeyIdHex}
 signing.password=${keyRingInfo.password}
