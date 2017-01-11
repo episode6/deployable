@@ -29,8 +29,7 @@ abstract class NestedExtension {
         if (propertyValue instanceof NestedExtension) {
           return propertyValue.applyClosure(arg)
         }
-      }
-      if (arg instanceof String) {
+      } else {
         metaClass.setProperty(this, name, arg)
         return
       }
