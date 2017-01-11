@@ -1,5 +1,6 @@
 package com.episode6.hackit.deployable
 
+import com.episode6.hackit.deployable.util.TestingProperties
 import org.junit.Rule
 import org.junit.rules.TemporaryFolder
 import spock.lang.Specification
@@ -14,6 +15,7 @@ class BaseDeployableIntegrationSpec extends Specification {
   File buildFile
   File gradlePropertiesFile
   File mavenDir
+  TestingProperties testingProperties
 
   def setup() {
     buildFile = testProjectDir.newFile("build.gradle")
@@ -21,5 +23,8 @@ class BaseDeployableIntegrationSpec extends Specification {
 
     mavenDir = testProjectDir.newFolder("mavenOut")
     mavenDir.mkdirs()
+
+    testingProperties = new TestingProperties()
+    testingProperties.applyLocalMavenRepo(mavenDir)
   }
 }

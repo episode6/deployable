@@ -83,6 +83,13 @@ abstract class NestedExtension {
     return missingProps
   }
 
+  /**
+   * VisibleForTesting
+   */
+  String getNamespace() {
+    return namespace
+  }
+
   protected Object getOptionalProjectProperty(String propertyName) {
     String fullyQualifiedPropertyName = qualifyPropertyName(propertyName)
     if (project.hasProperty(fullyQualifiedPropertyName)) {

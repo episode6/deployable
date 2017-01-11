@@ -1,7 +1,5 @@
 package com.episode6.hackit.deployable
 
-import com.episode6.hackit.deployable.util.RequiredPropertiesGenerator
-import com.episode6.hackit.deployable.util.keyring.KeyRings
 import org.gradle.testkit.runner.GradleRunner
 import org.gradle.testkit.runner.TaskOutcome
 
@@ -12,7 +10,7 @@ class DeployableJarIntegrationTest extends BaseDeployableIntegrationSpec {
 
   def "verify deploy task"() {
     given:
-    gradlePropertiesFile << RequiredPropertiesGenerator.generateGradleProperties(mavenDir, KeyRings.sharedBundle())
+    gradlePropertiesFile << testingProperties.getInGradlePropertiesFormat()
     buildFile << """
 plugins {
  id 'java'
@@ -22,16 +20,6 @@ plugins {
 group = 'com.example.groupid'
 version = '0.0.1-SNAPSHOT'
 
-deployable {
-  pom {
-    developer {
-      name = "testDeveloperName"
-    }
-  }
-  nexus {
-    username "fakeName"
-  }
-}
  """
 
     when:
