@@ -26,12 +26,24 @@ class DeployablePlugin implements Plugin<Project> {
         DeployablePluginExtension,
         project)
 
+    project.task("validateDeployable") {
+      doLast {
+        List<String> missingProps = deployable.findMissingProps()
+        if (!missingProps.isEmpty()) {
+          throw new MissingPropertyException("Missing the following required properties: ${missingProps}")
+        }
+      }
+    }
+
+    project.install.dependsOn project.validateDeployable
 
     // add deploy alias for uploadArchives task (because it's more fun to type)
     project.task("deploy", dependsOn: project.uploadArchives) {}
 
     project.afterEvaluate {
       project.uploadArchives {
+        dependsOn project.validateDeployable
+
         repositories {
           mavenDeployer {
             beforeDeployment { MavenDeployment deployment -> project.signing.signPom(deployment) }

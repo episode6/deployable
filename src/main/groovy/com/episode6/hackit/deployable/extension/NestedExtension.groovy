@@ -59,6 +59,20 @@ abstract class NestedExtension {
     return getOptionalProjectProperty(propName)
   }
 
+  List<String> findMissingProps() {
+    List<String> missingProps = new LinkedList<>()
+    getProperties().keySet().each { key ->
+      // explicitly call getProperty so we check getOptionalProjectProperty as well
+      Object value = getProperty(key)
+      if (value == null) {
+        missingProps.add(qualifyPropertyName(key))
+      } else if (value instanceof NestedExtension) {
+        missingProps.addAll(value.findMissingProps())
+      }
+    }
+    return missingProps
+  }
+
   protected Object getOptionalProjectProperty(String propertyName) {
     String fullyQualifiedPropertyName = qualifyPropertyName(propertyName)
     if (project.hasProperty(fullyQualifiedPropertyName)) {
