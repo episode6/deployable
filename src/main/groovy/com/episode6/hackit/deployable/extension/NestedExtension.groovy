@@ -4,7 +4,8 @@ import org.gradle.api.Project
 
 /**
  * A base class to simplify nested objects in a plugin extension
- * that can be defined either directly or via Closures
+ * that can be defined either directly, via Closures or via namespaces
+ * gradle.properties
  */
 abstract class NestedExtension {
 
@@ -73,7 +74,7 @@ abstract class NestedExtension {
   /**
    * apply a given closure to $this
    */
-  def applyClosure(Closure closure) {
+  Object applyClosure(Closure closure) {
     closure.setDelegate(this)
     closure.setResolveStrategy(Closure.DELEGATE_FIRST)
     closure.call()
