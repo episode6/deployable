@@ -11,9 +11,13 @@ abstract class NestedExtension {
   protected final Project project
   protected final String namespace
 
-  NestedExtension(Project project, String parentNamespace, String newName) {
+  NestedExtension(Project project, String namespace) {
     this.project = project
-    this.namespace = "${parentNamespace}.${newName}"
+    this.namespace = namespace
+  }
+
+  NestedExtension(Project project, String parentNamespace, String newName) {
+    this(project, "${parentNamespace}.${newName}")
   }
 
   /**
@@ -51,7 +55,7 @@ abstract class NestedExtension {
       return obj
     }
 
-    return getProjectPropertyOrThrow(propName)
+    return getOptionalProjectProperty(propName)
   }
 
   protected Object getOptionalProjectProperty(String propertyName) {
@@ -60,14 +64,6 @@ abstract class NestedExtension {
       return project.findProperty(fullyQualifiedPropertyName)
     }
     return null
-  }
-
-  protected Object getProjectPropertyOrThrow(String propertyName) {
-    String fullyQualifiedPropertyName = qualifyPropertyName(propertyName)
-    if (project.hasProperty(fullyQualifiedPropertyName)) {
-      return project.findProperty(fullyQualifiedPropertyName)
-    }
-    throw new RuntimeException("No value found for property: ${fullyQualifiedPropertyName}")
   }
 
   protected String qualifyPropertyName(String propertyName) {

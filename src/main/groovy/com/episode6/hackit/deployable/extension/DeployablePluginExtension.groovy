@@ -3,13 +3,9 @@ package com.episode6.hackit.deployable.extension
 import org.gradle.api.Project
 
 /**
- *
+ * Root deployable plugin extension
  */
-class DeployablePluginExtension {
-  private static final NAMESPACE = "deployable"
-
-  private final Project project
-
+class DeployablePluginExtension extends NestedExtension {
   static class PomExtension extends NestedExtension {
 
     static class ScmExtension extends NestedExtension {
@@ -93,9 +89,9 @@ class DeployablePluginExtension {
   NexusExtension nexus
 
   DeployablePluginExtension(Project project) {
-    this.project = project
-    pom = new PomExtension(project, NAMESPACE)
-    nexus = new NexusExtension(project, NAMESPACE)
+    super(project, "deployable")
+    pom = new PomExtension(project, namespace)
+    nexus = new NexusExtension(project, namespace)
   }
 
   PomExtension pom(Closure closure) {
