@@ -1,5 +1,6 @@
 package com.episode6.hackit.deployable.util.keyring
 
+import groovy.transform.Memoized
 import org.bouncycastle.bcpg.HashAlgorithmTags
 import org.bouncycastle.bcpg.SymmetricKeyAlgorithmTags
 import org.bouncycastle.bcpg.sig.Features
@@ -30,6 +31,16 @@ import java.security.SecureRandom
  * Utility class to generate maven-compatible keyrings for testing
  */
 class KeyRings {
+
+  @Memoized
+  static KeyRingBundle sharedBundle() {
+    File folder = new File("build/tmp/shared-testing-keyring")
+    if (folder.exists()) {
+      folder.deleteDir()
+    }
+    folder.mkdirs()
+    return generateKeyRingsForMaven(folder, "test@example.com", "fakePassword")
+  }
 
   static int[] SYMMETRIC_KEY_ALOGS = [
       SymmetricKeyAlgorithmTags.AES_256,

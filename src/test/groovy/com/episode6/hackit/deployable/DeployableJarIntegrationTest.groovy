@@ -1,6 +1,7 @@
 package com.episode6.hackit.deployable
 
 import com.episode6.hackit.deployable.util.RequiredPropertiesGenerator
+import com.episode6.hackit.deployable.util.keyring.KeyRings
 import org.gradle.testkit.runner.GradleRunner
 import org.gradle.testkit.runner.TaskOutcome
 
@@ -11,7 +12,7 @@ class DeployableJarIntegrationTest extends BaseDeployableIntegrationSpec {
 
   def "verify deploy task"() {
     given:
-    gradlePropertiesFile << RequiredPropertiesGenerator.generateGradleProperties(mavenDir, keyRingBundle)
+    gradlePropertiesFile << RequiredPropertiesGenerator.generateGradleProperties(mavenDir, KeyRings.sharedBundle())
     buildFile << """
 plugins {
  id 'java'
