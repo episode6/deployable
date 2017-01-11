@@ -8,11 +8,17 @@ import com.episode6.hackit.deployable.util.keyring.KeyRings
 /**
  *
  */
-class TestingProperties {
-  DeployablePluginExtension deployable = new DeployablePluginExtension(null)
-  KeyRingBundle keyRingBundle = KeyRings.sharedBundle()
+class TestProperties {
+  DeployablePluginExtension deployable
+  KeyRingBundle keyrings
 
-  TestingProperties() {
+  TestProperties(DeployablePluginExtension deployable, KeyRingBundle keyrings) {
+    this.deployable = deployable
+    this.keyrings = keyrings
+  }
+
+  TestProperties() {
+    this(new DeployablePluginExtension(null), KeyRings.sharedBundle())
     deployable {
       pom {
         description "Test POM Description"
@@ -45,11 +51,11 @@ class TestingProperties {
     return deployable.applyClosure(closure)
   }
 
-  void applyLocalMavenRepo(File mavenRepoDir) {
+  void applyMavenRepos(File releaseMavenRepoFile, File snapshotMavenRepoFile) {
     deployable {
       nexus {
-        releaseRepoUrl "file://localhost${mavenRepoDir.absolutePath}"
-        snapshotRepoUrl "file://localhost${mavenRepoDir.absolutePath}"
+        releaseRepoUrl "file://localhost${releaseMavenRepoFile.absolutePath}"
+        snapshotRepoUrl "file://localhost${snapshotMavenRepoFile.absolutePath}"
       }
     }
   }
@@ -78,15 +84,15 @@ class TestingProperties {
   }
 
   private StringBuilder buildGradlePropertiesForKeyringBundle(StringBuilder stringBuilder) {
-    if (keyRingBundle == null) {
+    if (keyrings == null) {
       return stringBuilder
     }
     stringBuilder.append("signing.keyId=")
-      .append(keyRingBundle.masterKeyIdHex)
+      .append(keyrings.masterKeyIdHex)
       .append("\nsigning.password=")
-      .append(keyRingBundle.password)
+      .append(keyrings.password)
       .append("\nsigning.secretKeyRingFile=")
-      .append(keyRingBundle.secretKeyringFile.absolutePath)
+      .append(keyrings.secretKeyringFile.absolutePath)
       .append("\n")
   }
 }

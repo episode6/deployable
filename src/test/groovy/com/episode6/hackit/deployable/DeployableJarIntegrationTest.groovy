@@ -1,17 +1,28 @@
 package com.episode6.hackit.deployable
 
+import com.episode6.hackit.deployable.util.IntegrationTestProject
 import org.gradle.testkit.runner.GradleRunner
 import org.gradle.testkit.runner.TaskOutcome
+import org.junit.Rule
+import org.junit.rules.TemporaryFolder
 
 /**
  * Tests DeployableJarPlugin.groovy
  */
-class DeployableJarIntegrationTest extends BaseDeployableIntegrationSpec {
+class DeployableJarIntegrationTest {
+
+  @Rule final TemporaryFolder testProjectDir = new TemporaryFolder()
+
+  IntegrationTestProject testProject
+
+  def setup() {
+    testProject = new IntegrationTestProject(testProjectDir)
+  }
 
   def "verify deploy task"() {
     given:
-    gradlePropertiesFile << testingProperties.getInGradlePropertiesFormat()
-    buildFile << """
+    testProject.rootGradlePropertiesFile << testProject.testProperties.getInGradlePropertiesFormat()
+    testProject.rootGradleBuildFile << """
 plugins {
  id 'java'
  id 'com.episode6.hackit.deployable.jar'
