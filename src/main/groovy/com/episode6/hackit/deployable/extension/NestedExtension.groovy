@@ -27,8 +27,8 @@ abstract class NestedExtension {
    */
   @Override
   Object invokeMethod(String name, Object args) {
-    if (hasProperty(name) && args instanceof Object[] && ((Object[])args).length == 1) {
-      Object arg = ((Object[])args)[0]
+    if (hasProperty(name) && args instanceof Object[] && args.length == 1) {
+      Object arg = args[0]
       if (arg instanceof Closure) {
         Object propertyValue = metaClass.getProperty(this, name)
         if (propertyValue instanceof NestedExtension) {
@@ -59,6 +59,16 @@ abstract class NestedExtension {
     return getOptionalProjectProperty(propName)
   }
 
+  /**
+   * apply a given closure to $this
+   */
+  Object applyClosure(Closure closure) {
+    closure.setDelegate(this)
+    closure.setResolveStrategy(Closure.DELEGATE_FIRST)
+    closure.call()
+    return this
+  }
+
   List<String> findMissingProps() {
     List<String> missingProps = new LinkedList<>()
     getProperties().keySet().each { key ->
@@ -83,16 +93,6 @@ abstract class NestedExtension {
 
   protected String qualifyPropertyName(String propertyName) {
     return "${namespace}.${propertyName}"
-  }
-
-  /**
-   * apply a given closure to $this
-   */
-  Object applyClosure(Closure closure) {
-    closure.setDelegate(this)
-    closure.setResolveStrategy(Closure.DELEGATE_FIRST)
-    closure.call()
-    return this
   }
 }
 
