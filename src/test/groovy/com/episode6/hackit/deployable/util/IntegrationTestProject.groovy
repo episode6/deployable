@@ -3,7 +3,7 @@ package com.episode6.hackit.deployable.util
 import org.junit.rules.TemporaryFolder
 
 /**
- *
+ * Hold information about the project-under-test
  */
 class IntegrationTestProject {
 
