@@ -1,4 +1,4 @@
-package com.episode6.hackit.deployable.util
+package com.episode6.hackit.deployable.testutil
 
 import org.junit.rules.TemporaryFolder
 

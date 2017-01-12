@@ -1,6 +1,6 @@
 package com.episode6.hackit.deployable
 
-import com.episode6.hackit.deployable.util.IntegrationTestProject
+import com.episode6.hackit.deployable.testutil.IntegrationTestProject
 import org.gradle.testkit.runner.GradleRunner
 import org.gradle.testkit.runner.TaskOutcome
 import org.junit.Rule

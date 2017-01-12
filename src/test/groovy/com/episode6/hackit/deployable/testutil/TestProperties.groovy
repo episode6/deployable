@@ -1,9 +1,9 @@
-package com.episode6.hackit.deployable.util
+package com.episode6.hackit.deployable.testutil
 
 import com.episode6.hackit.deployable.extension.DeployablePluginExtension
 import com.episode6.hackit.deployable.extension.NestedExtension
-import com.episode6.hackit.deployable.util.keyring.KeyRingBundle
-import com.episode6.hackit.deployable.util.keyring.KeyRings
+import com.episode6.hackit.deployable.testutil.keyring.KeyRingBundle
+import com.episode6.hackit.deployable.testutil.keyring.KeyRings
 
 /**
  *

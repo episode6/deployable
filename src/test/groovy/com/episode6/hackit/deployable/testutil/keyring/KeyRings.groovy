@@ -1,4 +1,4 @@
-package com.episode6.hackit.deployable.util.keyring
+package com.episode6.hackit.deployable.testutil.keyring
 
 import groovy.transform.Memoized
 import org.bouncycastle.bcpg.HashAlgorithmTags
