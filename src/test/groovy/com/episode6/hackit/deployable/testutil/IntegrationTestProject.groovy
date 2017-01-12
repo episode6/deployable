@@ -30,20 +30,24 @@ class IntegrationTestProject {
 
     testProperties = new TestProperties()
     testProperties.applyMavenRepos(releaseMavenRepoDir, snapshotMavenRepoDir)
+
+    File.metaClass.newFile = { String... paths ->
+      if (paths.length < 1) {
+        throw new IllegalArgumentException("can't create file with empty path")
+      }
+
+      String fileName = paths[paths.length-1]
+      File transDir = delegate
+      for (int i = 0; i < paths.length-1; i++) {
+        transDir = new File(transDir, paths[i])
+        transDir.mkdir()
+      }
+      return new File(transDir, fileName)
+    }
   }
 
-  File newFile(Object... paths) {
-    if (paths.length < 1) {
-      throw new IllegalArgumentException("can't create file with empty path")
-    }
-
-    String fileName = paths[paths.length-1]
-    File transDir = buildFolder.getRoot()
-    for (int i = 0; i < paths.length-1; i++) {
-      transDir = new File(transDir, paths[i])
-      transDir.mkdir()
-    }
-    return new File(transDir, fileName)
+  File newFile(String... paths) {
+    return buildFolder.getRoot().newFile(paths)
   }
 
   File createNonEmptyJavaFile(String... packageSegments) {
@@ -52,7 +56,7 @@ class IntegrationTestProject {
     paths.addAll(packageSegments)
     paths.add("SampleClass.java")
 
-    File nonEmptyJavaFile = newFile(paths.toArray())
+    File nonEmptyJavaFile = newFile((String[])paths.toArray())
     nonEmptyJavaFile << """
 package ${packageSegments.join(".")};
 
@@ -72,7 +76,7 @@ public class SampleClass {
     paths.addAll(packageSegments)
     paths.add("SampleClass.groovy")
 
-    File nonEmptyGroovyFile = newFile(paths.toArray())
+    File nonEmptyGroovyFile = newFile((String[])paths.toArray())
     nonEmptyGroovyFile << """
 package ${packageSegments.join(".")}
 
