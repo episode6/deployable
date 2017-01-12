@@ -9,8 +9,8 @@ import org.gradle.api.Project
  */
 abstract class NestedExtension {
 
-  protected final Project project
-  protected final String namespace
+  private final Project project
+  private final String namespace
 
   NestedExtension(Project project, String namespace) {
     this.project = project
@@ -22,7 +22,7 @@ abstract class NestedExtension {
   }
 
   NestedExtension(NestedExtension parent, String newName) {
-    this(parent.project, parent.namespace, newName)
+    this(parent.getProject(), parent.getNamespace(), newName)
   }
 
   /**
@@ -87,9 +87,10 @@ abstract class NestedExtension {
     return missingProps
   }
 
-  /**
-   * VisibleForTesting
-   */
+  Project getProject() {
+    return project
+  }
+
   String getNamespace() {
     return namespace
   }
