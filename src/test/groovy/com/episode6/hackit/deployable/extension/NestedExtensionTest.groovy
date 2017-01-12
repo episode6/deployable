@@ -132,19 +132,70 @@ class NestedExtensionTest extends Specification {
 
     and:
     String outerStringParam = testContainer.outerTest.stringParam
-    int outerIntParam = testContainer.outerTest.intParam
+    Integer outerIntParam = testContainer.outerTest.intParam
     String innerStringParam1 = testContainer.outerTest.innerTest1.stringParam
-    int innerIntParam1 = testContainer.outerTest.innerTest1.intParam
+    Integer innerIntParam1 = testContainer.outerTest.innerTest1.intParam
     String innerInnerStringParam1 = testContainer.outerTest.innerTest1.innerInnerTest1.stringParam
-    int innerInnerIntParam1 = testContainer.outerTest.innerTest1.innerInnerTest1.intParam
+    Integer innerInnerIntParam1 = testContainer.outerTest.innerTest1.innerInnerTest1.intParam
     String innerInnerStringParam2 = testContainer.outerTest.innerTest1.innerInnerTest2.stringParam
-    int innerInnerIntParam2 = testContainer.outerTest.innerTest1.innerInnerTest2.intParam
+    Integer innerInnerIntParam2 = testContainer.outerTest.innerTest1.innerInnerTest2.intParam
     String innerStringParam2 = testContainer.outerTest.innerTest2.stringParam
-    int innerIntParam2 = testContainer.outerTest.innerTest2.intParam
+    Integer innerIntParam2 = testContainer.outerTest.innerTest2.intParam
     String innerInnerStringParam3 = testContainer.outerTest.innerTest2.innerInnerTest1.stringParam
-    int innerInnerIntParam3 = testContainer.outerTest.innerTest2.innerInnerTest1.intParam
+    Integer innerInnerIntParam3 = testContainer.outerTest.innerTest2.innerInnerTest1.intParam
     String innerInnerStringParam4 = testContainer.outerTest.innerTest2.innerInnerTest2.stringParam
-    int innerInnerIntParam4 = testContainer.outerTest.innerTest2.innerInnerTest2.intParam
+    Integer innerInnerIntParam4 = testContainer.outerTest.innerTest2.innerInnerTest2.intParam
+
+    then:
+    outerStringParam == "outerStringParam"
+    outerIntParam == 12
+    innerStringParam1 == "innerStringParam1"
+    innerIntParam1 == 13
+    innerInnerStringParam1 == "innerInnerStringParam1"
+    innerInnerIntParam1 == 14
+    innerInnerStringParam2 == "innerInnerStringParam2"
+    innerInnerIntParam2 == 15
+    innerStringParam2 == "innerStringParam2"
+    innerIntParam2 == 16
+    innerInnerStringParam3 == "innerInnerStringParam3"
+    innerInnerIntParam3 == 17
+    innerInnerStringParam4 == "innerInnerStringParam4"
+    innerInnerIntParam4 == 18
+  }
+
+  def "verify project properties queried via getters"() {
+    when:
+    14 * project.hasProperty(_) >> true
+    1 * project.findProperty("outerTest.stringParam") >> "outerStringParam"
+    1 * project.findProperty("outerTest.intParam") >> 12
+    1 * project.findProperty("outerTest.innerTest1.stringParam") >> "innerStringParam1"
+    1 * project.findProperty("outerTest.innerTest1.intParam") >> 13
+    1 * project.findProperty("outerTest.innerTest1.innerInnerTest1.stringParam") >> "innerInnerStringParam1"
+    1 * project.findProperty("outerTest.innerTest1.innerInnerTest1.intParam") >> 14
+    1 * project.findProperty("outerTest.innerTest1.innerInnerTest2.stringParam") >> "innerInnerStringParam2"
+    1 * project.findProperty("outerTest.innerTest1.innerInnerTest2.intParam") >> 15
+    1 * project.findProperty("outerTest.innerTest2.stringParam") >> "innerStringParam2"
+    1 * project.findProperty("outerTest.innerTest2.intParam") >> 16
+    1 * project.findProperty("outerTest.innerTest2.innerInnerTest1.stringParam") >> "innerInnerStringParam3"
+    1 * project.findProperty("outerTest.innerTest2.innerInnerTest1.intParam") >> 17
+    1 * project.findProperty("outerTest.innerTest2.innerInnerTest2.stringParam") >> "innerInnerStringParam4"
+    1 * project.findProperty("outerTest.innerTest2.innerInnerTest2.intParam") >> 18
+
+    and:
+    String outerStringParam = testContainer.outerTest.getStringParam()
+    Integer outerIntParam = testContainer.outerTest.getIntParam()
+    String innerStringParam1 = testContainer.outerTest.innerTest1.getStringParam()
+    Integer innerIntParam1 = testContainer.outerTest.innerTest1.getIntParam()
+    String innerInnerStringParam1 = testContainer.outerTest.innerTest1.innerInnerTest1.getStringParam()
+    Integer innerInnerIntParam1 = testContainer.outerTest.innerTest1.innerInnerTest1.getIntParam()
+    String innerInnerStringParam2 = testContainer.outerTest.innerTest1.innerInnerTest2.getStringParam()
+    Integer innerInnerIntParam2 = testContainer.outerTest.innerTest1.innerInnerTest2.getIntParam()
+    String innerStringParam2 = testContainer.outerTest.innerTest2.getStringParam()
+    Integer innerIntParam2 = testContainer.outerTest.innerTest2.getIntParam()
+    String innerInnerStringParam3 = testContainer.outerTest.innerTest2.innerInnerTest1.getStringParam()
+    Integer innerInnerIntParam3 = testContainer.outerTest.innerTest2.innerInnerTest1.getIntParam()
+    String innerInnerStringParam4 = testContainer.outerTest.innerTest2.innerInnerTest2.getStringParam()
+    Integer innerInnerIntParam4 = testContainer.outerTest.innerTest2.innerInnerTest2.getIntParam()
 
     then:
     outerStringParam == "outerStringParam"

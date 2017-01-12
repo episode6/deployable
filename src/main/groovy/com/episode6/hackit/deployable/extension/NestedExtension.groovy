@@ -7,7 +7,7 @@ import org.gradle.api.Project
  * that can be defined either directly, via Closures or via namespaces
  * gradle.properties
  */
-abstract class NestedExtension {
+abstract class NestedExtension implements GroovyInterceptable {
 
   private final Project project
   private final String namespace
@@ -31,6 +31,10 @@ abstract class NestedExtension {
    */
   @Override
   Object invokeMethod(String name, Object args) {
+    MetaMethod method = metaClass.getMetaMethod(name, args)
+    if (method != null) {
+      return NestedExtensionHelper.handleRealMethod(this, method, args)
+    }
     if (hasProperty(name) && args instanceof Object[] && args.length == 1) {
       Object arg = args[0]
       if (arg instanceof Closure) {
