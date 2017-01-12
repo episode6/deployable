@@ -8,7 +8,7 @@ import org.junit.rules.TemporaryFolder
 import spock.lang.Specification
 
 /**
- * Tests the GroovyDocAddonPlugin
+ * Tests {@link GroovyDocAddonPlugin}
  */
 class DeployableGroovyAddonIntegrationTest extends Specification {
 

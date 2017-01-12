@@ -8,7 +8,7 @@ import org.junit.rules.TemporaryFolder
 import spock.lang.Specification
 
 /**
- * Tests DeployableAarPlugin.groovy
+ * Tests {@link DeployableAarPlugin}
  */
 class DeployableAarIntegrationTest extends Specification {
 
