@@ -1,4 +1,4 @@
-package com.episode6.hackit.deployable
+package com.episode6.hackit.deployable.addon
 
 import com.episode6.hackit.deployable.util.IntegrationTestProject
 import org.gradle.testkit.runner.GradleRunner
