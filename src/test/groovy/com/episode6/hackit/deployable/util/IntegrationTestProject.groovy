@@ -65,4 +65,24 @@ public class SampleClass {
 """
     return nonEmptyJavaFile
   }
+
+  File createNonEmptyGroovyFile(String... packageSegments) {
+    List<String> paths = new ArrayList<>()
+    paths.addAll(["src", "main", "groovy"])
+    paths.addAll(packageSegments)
+    paths.add("SampleClass.groovy")
+
+    File nonEmptyGroovyFile = newFile(paths.toArray())
+    nonEmptyGroovyFile << """
+package ${packageSegments.join(".")}
+
+/**
+ * A sample class for testing
+ */
+class SampleClass {
+
+}
+"""
+    return nonEmptyGroovyFile
+  }
 }
