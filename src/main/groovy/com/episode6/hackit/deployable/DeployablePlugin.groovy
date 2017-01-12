@@ -35,7 +35,10 @@ class DeployablePlugin implements Plugin<Project> {
       }
     }
 
-    project.install.dependsOn project.validateDeployable
+    if (project.tasks.findByPath("install") != null) {
+      project.install.dependsOn project.validateDeployable
+    }
+
 
     // add deploy alias for uploadArchives task (because it's more fun to type)
     project.task("deploy", dependsOn: project.uploadArchives) {}

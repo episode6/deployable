@@ -8,9 +8,9 @@ import org.junit.rules.TemporaryFolder
 import spock.lang.Specification
 
 /**
- * Tests DeployableJarPlugin.groovy
+ * Tests DeployableAarPlugin.groovy
  */
-class DeployableJarIntegrationTest extends Specification {
+class DeployableAarIntegrationTest extends Specification {
 
   @Rule final TemporaryFolder testProjectDir = new TemporaryFolder()
 
@@ -18,16 +18,46 @@ class DeployableJarIntegrationTest extends Specification {
 
   def setup() {
     testProject = new IntegrationTestProject(testProjectDir)
+    testProject.rootGradleSettingFile << """
+rootProject.name = 'testlib'
+"""
+
     testProject.rootGradleBuildFile << """
-plugins {
- id 'java'
- id 'com.episode6.hackit.deployable.jar'
+buildscript {
+  repositories {
+    jcenter()
+  }
+  dependencies {
+    classpath 'com.android.tools.build:gradle:2.2.3'
+  }
 }
+
+plugins {
+ id 'com.episode6.hackit.deployable.aar'
+}
+
+apply plugin: 'com.android.library'
 
 group = 'com.example.groupid'
 version = '0.0.1-SNAPSHOT'
 
+android {
+  compileSdkVersion 19
+  buildToolsVersion "25.0.2"
+}
+
  """
+
+    File srcMainDir = testProject.buildFolder.newFolder("src", "main")
+    srcMainDir.mkdirs()
+    File androidManifest = new File(srcMainDir, "AndroidManifest.xml")
+    androidManifest << """
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.example.groupid.testlib">
+    <application>
+    </application>
+</manifest>
+"""
   }
 
   def "verify deploy tasks"() {
@@ -46,23 +76,5 @@ version = '0.0.1-SNAPSHOT'
     result.task(":signArchives").outcome == TaskOutcome.SUCCESS
     result.task(":uploadArchives").outcome == TaskOutcome.SUCCESS
     result.task(":deploy").outcome == TaskOutcome.SUCCESS
-    result.task(":install") == null
-  }
-
-  def "verify install tasks"() {
-    given:
-    testProject.rootGradlePropertiesFile << testProject.testProperties.getInGradlePropertiesFormat()
-
-    when:
-    def result = GradleRunner.create()
-        .withProjectDir(testProjectDir.root)
-        .withPluginClasspath()
-        .withArguments("install")
-        .build()
-
-    then:
-    result.task(":validateDeployable").outcome == TaskOutcome.SUCCESS
-    result.task(":install").outcome == TaskOutcome.SUCCESS
-    result.task(":uploadArchives") == null
   }
 }
