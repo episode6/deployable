@@ -21,6 +21,10 @@ abstract class NestedExtension {
     this(project, "${parentNamespace}.${newName}")
   }
 
+  NestedExtension(NestedExtension parent, String newName) {
+    this(parent.project, parent.namespace, newName)
+  }
+
   /**
    * Magic method handles using prop names as setter methods (passing
    * either a String or a Closure)

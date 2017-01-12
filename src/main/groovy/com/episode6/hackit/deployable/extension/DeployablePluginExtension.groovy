@@ -13,8 +13,8 @@ class DeployablePluginExtension extends NestedExtension {
       String connection = null
       String developerConnection = null
 
-      ScmExtension(Project project, String parentNamespace) {
-        super(project, parentNamespace, "scm")
+      ScmExtension(NestedExtension parent) {
+        super(parent, "scm")
       }
     }
 
@@ -23,8 +23,8 @@ class DeployablePluginExtension extends NestedExtension {
       String url = null
       String distribution = null
 
-      LicenceExtension(Project project, String parentNamespace) {
-        super(project, parentNamespace, "licence")
+      LicenceExtension(NestedExtension parent) {
+        super(parent, "licence")
       }
     }
 
@@ -32,8 +32,8 @@ class DeployablePluginExtension extends NestedExtension {
       String id
       String name
 
-      DeveloperExtension(Project project, String parentNamespace) {
-        super(project, parentNamespace, "developer")
+      DeveloperExtension(NestedExtension parent) {
+        super(parent, "developer")
       }
     }
 
@@ -44,11 +44,11 @@ class DeployablePluginExtension extends NestedExtension {
     LicenceExtension licence
     DeveloperExtension developer
 
-    PomExtension(Project project, String parentNamespace) {
-      super(project, parentNamespace, "pom")
-      scm = new ScmExtension(project, namespace)
-      licence = new LicenceExtension(project, namespace)
-      developer = new DeveloperExtension(project, namespace)
+    PomExtension(NestedExtension parent) {
+      super(parent, "pom")
+      scm = new ScmExtension(this)
+      licence = new LicenceExtension(this)
+      developer = new DeveloperExtension(this)
     }
   }
 
@@ -58,8 +58,8 @@ class DeployablePluginExtension extends NestedExtension {
     String releaseRepoUrl = null
     String snapshotRepoUrl = null
 
-    NexusExtension(Project project, String parentNamespace) {
-      super(project, parentNamespace, "nexus")
+    NexusExtension(NestedExtension parent) {
+      super(parent, "nexus")
     }
 
     String getReleaseRepoUrl() {
@@ -90,8 +90,8 @@ class DeployablePluginExtension extends NestedExtension {
 
   DeployablePluginExtension(Project project) {
     super(project, "deployable")
-    pom = new PomExtension(project, namespace)
-    nexus = new NexusExtension(project, namespace)
+    pom = new PomExtension(this)
+    nexus = new NexusExtension(this)
   }
 
   PomExtension pom(Closure closure) {
