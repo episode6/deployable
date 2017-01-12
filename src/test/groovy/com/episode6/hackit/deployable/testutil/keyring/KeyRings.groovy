@@ -105,6 +105,9 @@ class KeyRings {
 
     long masterKeyId = masterKeyPair.keyID
     String masterKeyIdHex = Integer.toUnsignedString((int)(masterKeyId - ((masterKeyId >> 32) << 32)), 16)
+    while (masterKeyIdHex.length() < 8) {
+      masterKeyIdHex = "0".concat(masterKeyIdHex)
+    }
 
     keyringDirectory.mkdirs()
     PGPPublicKeyRing publicKeyRing = keyRingGenerator.generatePublicKeyRing()
