@@ -18,10 +18,18 @@ class DeployableAarIntegrationTest extends Specification {
 
   def setup() {
     testProject = new IntegrationTestProject(testProjectDir)
+    testProject.rootGradlePropertiesFile << testProject.testProperties.getInGradlePropertiesFormat()
+    testProject.createNonEmptyJavaFile("com", "example", "groupid", "testlib")
     testProject.rootGradleSettingFile << """
 rootProject.name = 'testlib'
 """
-
+    testProject.newFile("src", "main", "AndroidManifest.xml") << """
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.example.groupid.testlib">
+    <application>
+    </application>
+</manifest>
+"""
     testProject.rootGradleBuildFile << """
 buildscript {
   repositories {
@@ -47,23 +55,9 @@ android {
 }
 
  """
-
-    File srcMainDir = testProject.buildFolder.newFolder("src", "main")
-    srcMainDir.mkdirs()
-    File androidManifest = new File(srcMainDir, "AndroidManifest.xml")
-    androidManifest << """
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.groupid.testlib">
-    <application>
-    </application>
-</manifest>
-"""
   }
 
-  def "verify deploy tasks"() {
-    given:
-    testProject.rootGradlePropertiesFile << testProject.testProperties.getInGradlePropertiesFormat()
-
+  def "verify deploy tasks (aar)"() {
     when:
     def result = GradleRunner.create()
       .withProjectDir(testProjectDir.root)
@@ -76,5 +70,19 @@ android {
     result.task(":signArchives").outcome == TaskOutcome.SUCCESS
     result.task(":uploadArchives").outcome == TaskOutcome.SUCCESS
     result.task(":deploy").outcome == TaskOutcome.SUCCESS
+  }
+
+  def "verify aar-specific tasks"() {
+    when:
+    def result = GradleRunner.create()
+        .withProjectDir(testProjectDir.root)
+        .withPluginClasspath()
+        .withArguments("signArchives")
+        .build()
+
+    then:
+    result.task(":androidJavadocs").outcome == TaskOutcome.SUCCESS
+    result.task(":androidJavadocsJar").outcome == TaskOutcome.SUCCESS
+    result.task(":androidSourcesJar").outcome == TaskOutcome.SUCCESS
   }
 }

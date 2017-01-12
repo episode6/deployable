@@ -18,6 +18,8 @@ class DeployableJarIntegrationTest extends Specification {
 
   def setup() {
     testProject = new IntegrationTestProject(testProjectDir)
+    testProject.createNonEmptyJavaFile( "com", "example", "groupid", "testlib")
+    testProject.rootGradlePropertiesFile << testProject.testProperties.getInGradlePropertiesFormat()
     testProject.rootGradleBuildFile << """
 plugins {
  id 'java'
@@ -30,10 +32,7 @@ version = '0.0.1-SNAPSHOT'
  """
   }
 
-  def "verify deploy tasks"() {
-    given:
-    testProject.rootGradlePropertiesFile << testProject.testProperties.getInGradlePropertiesFormat()
-
+  def "verify deploy tasks (jar)"() {
     when:
     def result = GradleRunner.create()
       .withProjectDir(testProjectDir.root)
@@ -49,10 +48,7 @@ version = '0.0.1-SNAPSHOT'
     result.task(":install") == null
   }
 
-  def "verify install tasks"() {
-    given:
-    testProject.rootGradlePropertiesFile << testProject.testProperties.getInGradlePropertiesFormat()
-
+  def "verify install tasks (jar)"() {
     when:
     def result = GradleRunner.create()
         .withProjectDir(testProjectDir.root)
@@ -62,7 +58,23 @@ version = '0.0.1-SNAPSHOT'
 
     then:
     result.task(":validateDeployable").outcome == TaskOutcome.SUCCESS
+    result.task(":signArchives").outcome == TaskOutcome.SUCCESS
     result.task(":install").outcome == TaskOutcome.SUCCESS
     result.task(":uploadArchives") == null
+  }
+
+  def "verify jar specific tasks"() {
+   when:
+   def result = GradleRunner.create()
+       .withProjectDir(testProjectDir.root)
+       .withPluginClasspath()
+       .withArguments("signArchives")
+       .build()
+
+    then:
+    result.task(":jar").outcome == TaskOutcome.SUCCESS
+    result.task(":javadoc").outcome == TaskOutcome.SUCCESS
+    result.task(":javadocJar").outcome == TaskOutcome.SUCCESS
+    result.task(":sourcesJar").outcome == TaskOutcome.SUCCESS
   }
 }

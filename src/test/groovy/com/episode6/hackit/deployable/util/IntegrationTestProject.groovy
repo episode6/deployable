@@ -31,4 +31,38 @@ class IntegrationTestProject {
     testProperties = new TestProperties()
     testProperties.applyMavenRepos(releaseMavenRepoDir, snapshotMavenRepoDir)
   }
+
+  File newFile(Object... paths) {
+    if (paths.length < 1) {
+      throw new IllegalArgumentException("can't create file with empty path")
+    }
+
+    String fileName = paths[paths.length-1]
+    File transDir = buildFolder.getRoot()
+    for (int i = 0; i < paths.length-1; i++) {
+      transDir = new File(transDir, paths[i])
+      transDir.mkdir()
+    }
+    return new File(transDir, fileName)
+  }
+
+  File createNonEmptyJavaFile(String... packageSegments) {
+    List<String> paths = new ArrayList<>()
+    paths.addAll(["src", "main", "java"])
+    paths.addAll(packageSegments)
+    paths.add("SampleClass.java")
+
+    File nonEmptyJavaFile = newFile(paths.toArray())
+    nonEmptyJavaFile << """
+package ${packageSegments.join(".")};
+
+/**
+ * A sample class for testing
+ */
+public class SampleClass {
+
+}
+"""
+    return nonEmptyJavaFile
+  }
 }
