@@ -90,7 +90,10 @@ class DeployablePlugin implements Plugin<Project> {
       }
 
       project.signing {
-        required { isReleaseBuild(project) && project.gradle.taskGraph.hasTask("uploadArchives") }
+        required {
+          isReleaseBuild(project) &&
+              (project.gradle.taskGraph.hasTask("uploadArchives") ||
+                  project.gradle.taskGraph.hasTask("uploadArchives")) }
         sign project.configurations.archives
       }
     }
