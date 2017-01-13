@@ -30,20 +30,7 @@ class IntegrationTestProject {
 
     testProperties = new TestProperties()
     testProperties.applyMavenRepos(releaseMavenRepoDir, snapshotMavenRepoDir)
-
-    File.metaClass.newFile = { String... paths ->
-      if (paths.length < 1) {
-        throw new IllegalArgumentException("can't create file with empty path")
-      }
-
-      String fileName = paths[paths.length-1]
-      File transDir = delegate
-      for (int i = 0; i < paths.length-1; i++) {
-        transDir = new File(transDir, paths[i])
-        transDir.mkdir()
-      }
-      return new File(transDir, fileName)
-    }
+    TestingCategories.initIfNeeded()
   }
 
   File newFile(String... paths) {
