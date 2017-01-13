@@ -26,7 +26,7 @@ class MavenOutputVerifier {
   }
 
   def verifyRootMavenMetaData() {
-    File conatinerFolder = getRepo().newFolderFromPackage("${groupId}.${artifactId}")
+    File conatinerFolder = getRepo().newFolderFromPackage(groupId).newFolder(artifactId)
     def mavenMetaData = new XmlSlurper().parse(conatinerFolder.newFile("maven-metadata.xml"))
 
     assert mavenMetaData.groupId.text() == groupId
@@ -37,7 +37,7 @@ class MavenOutputVerifier {
   }
 
   def verifyVersionSpecificMavenMetaData() {
-    File conatinerFolder = getRepo().newFolderFromPackage("${groupId}.${artifactId}").newFolder(versionName)
+    File conatinerFolder = getRepo().newFolderFromPackage(groupId).newFolder(artifactId, versionName)
     def mavenMetaData = new XmlSlurper().parse(conatinerFolder.newFile("maven-metadata.xml"))
 
     assert mavenMetaData.groupId.text() == groupId
