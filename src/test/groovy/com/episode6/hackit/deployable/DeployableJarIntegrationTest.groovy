@@ -1,6 +1,7 @@
 package com.episode6.hackit.deployable
 
 import com.episode6.hackit.deployable.testutil.IntegrationTestProject
+import com.episode6.hackit.deployable.testutil.MavenOutputVerifier
 import org.gradle.testkit.runner.GradleRunner
 import org.gradle.testkit.runner.TaskOutcome
 import org.junit.Rule
@@ -85,6 +86,10 @@ version = '0.0.1-SNAPSHOT'
     given:
     File TEMPMAVENDIR = new File("build/m2/snapshot")
     TEMPMAVENDIR.mkdirs()
+    MavenOutputVerifier mavenOutputVerifier = new MavenOutputVerifier(
+        groupId: "com.example.groupid",
+        artifactId: "testlib",
+        versionName: "0.0.1-SNAPSHOT")
     testProject.rootGradleBuildFile << """
 
 deployable {
@@ -102,15 +107,6 @@ deployable {
         .build()
 
     then:
-    true
-    File mavenOutputRoot = TEMPMAVENDIR.newFile("com", "example", "groupid", "testlib")
-    File mavenMetaDataXml = mavenOutputRoot.newFile("maven-metadata.xml")
-    def mavenMetaData = new XmlSlurper().parse(mavenMetaDataXml)
-    mavenMetaData.groupId.text() == "com.example.groupid"
-    mavenMetaData.artifactId.text() == "testlib"
-    mavenMetaData.versioning.versions.size() == 1
-    mavenMetaData.versioning.versions.version.text() == "0.0.1-SNAPSHOT"
-    mavenMetaData.versioning.lastUpdated != null
-
+    mavenOutputVerifier.verifyAll(TEMPMAVENDIR)
   }
 }
