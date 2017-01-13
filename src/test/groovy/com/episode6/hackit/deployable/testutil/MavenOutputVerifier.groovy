@@ -19,6 +19,14 @@ class MavenOutputVerifier {
     return !versionName.contains("SNAPSHOT")
   }
 
+  File getRepo() {
+    return isRelease() ? releaseRepo : snapshotRepo
+  }
+
+  File getMavenProjectDir() {
+    return getRepo().newFolderFromPackage(groupId).newFolder(artifactId)
+  }
+
   def verifyAll() {
     verifyRootMavenMetaData()
     verifyVersionSpecificMavenMetaData()
@@ -26,8 +34,7 @@ class MavenOutputVerifier {
   }
 
   def verifyRootMavenMetaData() {
-    File conatinerFolder = getRepo().newFolderFromPackage(groupId).newFolder(artifactId)
-    def mavenMetaData = new XmlSlurper().parse(conatinerFolder.newFile("maven-metadata.xml"))
+    def mavenMetaData = new XmlSlurper().parse(getMavenProjectDir().newFile("maven-metadata.xml"))
 
     assert mavenMetaData.groupId.text() == groupId
     assert mavenMetaData.artifactId.text() == artifactId
@@ -37,8 +44,7 @@ class MavenOutputVerifier {
   }
 
   def verifyVersionSpecificMavenMetaData() {
-    File conatinerFolder = getRepo().newFolderFromPackage(groupId).newFolder(artifactId, versionName)
-    def mavenMetaData = new XmlSlurper().parse(conatinerFolder.newFile("maven-metadata.xml"))
+    def mavenMetaData = new XmlSlurper().parse(getMavenProjectDir().newFile(versionName, "maven-metadata.xml"))
 
     assert mavenMetaData.groupId.text() == groupId
     assert mavenMetaData.artifactId.text() == artifactId
@@ -47,9 +53,5 @@ class MavenOutputVerifier {
     assert mavenMetaData.versioning.snapshot.timestamp != null
     assert mavenMetaData.versioning.snapshot.buildNumber.text() == "1"
     assert mavenMetaData.versioning.lastUpdated != null
-  }
-
-  private File getRepo() {
-    return isRelease() ? releaseRepo : snapshotRepo
   }
 }
