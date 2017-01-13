@@ -30,6 +30,10 @@ class MavenOutputVerifier {
   }
 
   File getPom() {
+    if (isRelease()) {
+      return getMavenProjectDir().newFile(versionName, "${artifactId}-${versionName}.pom")
+    }
+
     def versionSpecificMavenMetaData = getMavenProjectDir().newFile(versionName, "maven-metadata.xml").asXml()
     String snapshotTimestamp = versionSpecificMavenMetaData.versioning.snapshot.timestamp.text()
     String snapshotBuildNumber = versionSpecificMavenMetaData.versioning.snapshot.buildNumber.text()
@@ -52,9 +56,17 @@ class MavenOutputVerifier {
     assert mavenMetaData.versioning.versions.size() == 1
     assert mavenMetaData.versioning.versions.version.text() == versionName
     assert mavenMetaData.versioning.lastUpdated != null
+
+    if (isRelease()) {
+      assert mavenMetaData.versioning.release.text() == versionName
+    }
   }
 
   def verifyVersionSpecificMavenMetaData() {
+    if (isRelease()) {
+      // this file is only generated for snaphots
+      return true
+    }
     println getMavenProjectDir().newFile(versionName, "maven-metadata.xml").text
     def mavenMetaData = getMavenProjectDir().newFile(versionName, "maven-metadata.xml").asXml()
 
