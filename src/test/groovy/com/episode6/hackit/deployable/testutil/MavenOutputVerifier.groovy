@@ -1,5 +1,7 @@
 package com.episode6.hackit.deployable.testutil
 
+import com.episode6.hackit.deployable.extension.DeployablePluginExtension
+
 /**
  *
  */
@@ -27,13 +29,22 @@ class MavenOutputVerifier {
     return getRepo().newFolderFromPackage(groupId).newFolder(artifactId)
   }
 
-  def verifyAll() {
+  File getPom() {
+    def versionSpecificMavenMetaData = getMavenProjectDir().newFile(versionName, "maven-metadata.xml").asXml()
+    String snapshotTimestamp = versionSpecificMavenMetaData.versioning.snapshot.timestamp.text()
+    String snapshotBuildNumber = versionSpecificMavenMetaData.versioning.snapshot.buildNumber.text()
+    return getMavenProjectDir().newFile(versionName, "${artifactId}-${versionName.replace("-SNAPSHOT", "")}-${snapshotTimestamp}-${snapshotBuildNumber}.pom")
+  }
+
+  def verifyAll(DeployablePluginExtension.PomExtension expectedPom) {
     verifyRootMavenMetaData()
     verifyVersionSpecificMavenMetaData()
+    verifyPomData(expectedPom)
     return true
   }
 
   def verifyRootMavenMetaData() {
+    println getMavenProjectDir().newFile("maven-metadata.xml").text
     def mavenMetaData = getMavenProjectDir().newFile("maven-metadata.xml").asXml()
 
     assert mavenMetaData.groupId.text() == groupId
@@ -44,6 +55,7 @@ class MavenOutputVerifier {
   }
 
   def verifyVersionSpecificMavenMetaData() {
+    println getMavenProjectDir().newFile(versionName, "maven-metadata.xml").text
     def mavenMetaData = getMavenProjectDir().newFile(versionName, "maven-metadata.xml").asXml()
 
     assert mavenMetaData.groupId.text() == groupId
@@ -54,4 +66,29 @@ class MavenOutputVerifier {
     assert mavenMetaData.versioning.snapshot.buildNumber.text() == "1"
     assert mavenMetaData.versioning.lastUpdated != null
   }
+
+  def verifyPomData(DeployablePluginExtension.PomExtension expectedPom) {
+    println getPom().text
+    def pom = getPom().asXml()
+
+    assert pom.name() == "project"
+    assert pom.modelVersion.text() == "4.0.0"
+    assert pom.groupId.text() == groupId
+    assert pom.artifactId.text() == artifactId
+    assert pom.version.text() == versionName
+    assert pom.name.text() == artifactId
+    assert pom.description.text() == expectedPom.description
+    assert pom.url.text() == expectedPom.url
+    assert pom.licenses.size() == 1
+    assert pom.licenses.license.name.text() == expectedPom.licence.name
+    assert pom.licenses.license.url.text() == expectedPom.licence.url
+    assert pom.licenses.license.distribution.text() == expectedPom.licence.distribution
+    assert pom.developers.size() == 1
+    assert pom.developers.developer.id.text() == expectedPom.developer.id
+    assert pom.developers.developer.name.text() == expectedPom.developer.name
+    assert pom.scm.connection.text() == expectedPom.scm.connection
+    assert pom.scm.developerConnection.text() == expectedPom.scm.developerConnection
+    assert pom.scm.url.text() == expectedPom.scm.url
+  }
+
 }

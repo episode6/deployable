@@ -108,6 +108,6 @@ deployable {
         .build()
 
     then:
-    mavenOutputVerifier.verifyAll()
+    mavenOutputVerifier.verifyAll(testProject.testProperties.deployable.pom)
   }
 }
