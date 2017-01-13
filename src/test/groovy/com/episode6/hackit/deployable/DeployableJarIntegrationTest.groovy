@@ -89,7 +89,8 @@ version = '0.0.1-SNAPSHOT'
     MavenOutputVerifier mavenOutputVerifier = new MavenOutputVerifier(
         groupId: "com.example.groupid",
         artifactId: "testlib",
-        versionName: "0.0.1-SNAPSHOT")
+        versionName: "0.0.1-SNAPSHOT",
+        snapshotRepo: TEMPMAVENDIR)
     testProject.rootGradleBuildFile << """
 
 deployable {
@@ -107,6 +108,6 @@ deployable {
         .build()
 
     then:
-    mavenOutputVerifier.verifyAll(TEMPMAVENDIR)
+    mavenOutputVerifier.verifyAll()
   }
 }
