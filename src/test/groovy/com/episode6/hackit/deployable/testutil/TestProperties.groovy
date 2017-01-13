@@ -29,9 +29,9 @@ class TestProperties {
           connection "scm:https://scm_connection.com"
           developerConnection "scm:https://scm_dev_connection.com"
         }
-        licence {
+        license {
           name "The MIT License (MIT)"
-          url "https://licence.com"
+          url "https://license.com"
           distribution "repo"
         }
         developer {

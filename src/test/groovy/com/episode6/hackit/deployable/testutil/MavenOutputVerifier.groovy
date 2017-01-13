@@ -80,9 +80,9 @@ class MavenOutputVerifier {
     assert pom.description.text() == expectedPom.description
     assert pom.url.text() == expectedPom.url
     assert pom.licenses.size() == 1
-    assert pom.licenses.license.name.text() == expectedPom.licence.name
-    assert pom.licenses.license.url.text() == expectedPom.licence.url
-    assert pom.licenses.license.distribution.text() == expectedPom.licence.distribution
+    assert pom.licenses.license.name.text() == expectedPom.license.name
+    assert pom.licenses.license.url.text() == expectedPom.license.url
+    assert pom.licenses.license.distribution.text() == expectedPom.license.distribution
     assert pom.developers.size() == 1
     assert pom.developers.developer.id.text() == expectedPom.developer.id
     assert pom.developers.developer.name.text() == expectedPom.developer.name

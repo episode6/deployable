@@ -18,13 +18,13 @@ class DeployablePluginExtension extends NestedExtension {
       }
     }
 
-    static class LicenceExtension extends NestedExtension {
+    static class LicenseExtension extends NestedExtension {
       String name = null
       String url = null
       String distribution = null
 
-      LicenceExtension(NestedExtension parent) {
-        super(parent, "licence")
+      LicenseExtension(NestedExtension parent) {
+        super(parent, "license")
       }
     }
 
@@ -41,13 +41,13 @@ class DeployablePluginExtension extends NestedExtension {
     String url = null
 
     ScmExtension scm
-    LicenceExtension licence
+    LicenseExtension license
     DeveloperExtension developer
 
     PomExtension(NestedExtension parent) {
       super(parent, "pom")
       scm = new ScmExtension(this)
-      licence = new LicenceExtension(this)
+      license = new LicenseExtension(this)
       developer = new DeveloperExtension(this)
     }
   }

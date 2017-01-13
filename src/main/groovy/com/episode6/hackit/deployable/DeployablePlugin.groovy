@@ -72,9 +72,9 @@ class DeployablePlugin implements Plugin<Project> {
 
               licenses {
                 license {
-                  name deployable.pom.licence.name
-                  url deployable.pom.licence.url
-                  distribution deployable.pom.licence.distribution
+                  name deployable.pom.license.name
+                  url deployable.pom.license.url
+                  distribution deployable.pom.license.distribution
                 }
               }
 

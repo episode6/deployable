@@ -31,9 +31,9 @@ deployable.pom.url=https://github.com/episode6/deployable
 deployable.pom.scm.url=extensible
 deployable.pom.scm.connection=scm:https://github.com/episode6/deployable.git
 deployable.pom.scm.developerConnection=scm:https://github.com/episode6/deployable.git
-deployable.pom.licence.name=The MIT License (MIT)
-deployable.pom.licence.url=https://github.com/episode6/deployable/blob/master/LICENSE
-deployable.pom.licence.distribution=repo
+deployable.pom.license.name=The MIT License (MIT)
+deployable.pom.license.url=https://github.com/episode6/deployable/blob/master/LICENSE
+deployable.pom.license.distribution=repo
 deployable.pom.developer.id=episode6
 deployable.pom.developer.name=episode6, Inc.
 ```
@@ -83,9 +83,9 @@ deployable {
             connection "scm:http://connection"
             developerConnection "scm:http://developerConnection"
         }
-        licence {
-            name "Licence Name"
-            url "http://licenceUrl"
+        license {
+            name "License Name"
+            url "http://licenseUrl"
             distrobution "repo"
         }
         developer {
