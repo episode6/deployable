@@ -39,5 +39,9 @@ class TestingCategories {
     File.metaClass.newFolderFromPackage = { String packageName ->
       return delegate.newFolder((String[])packageName.tokenize('.').toArray())
     }
+
+    File.metaClass.asXml = {
+      return new XmlSlurper().parse(delegate)
+    }
   }
 }

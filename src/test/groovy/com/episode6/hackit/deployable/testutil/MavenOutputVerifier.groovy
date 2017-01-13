@@ -34,7 +34,7 @@ class MavenOutputVerifier {
   }
 
   def verifyRootMavenMetaData() {
-    def mavenMetaData = new XmlSlurper().parse(getMavenProjectDir().newFile("maven-metadata.xml"))
+    def mavenMetaData = getMavenProjectDir().newFile("maven-metadata.xml").asXml()
 
     assert mavenMetaData.groupId.text() == groupId
     assert mavenMetaData.artifactId.text() == artifactId
@@ -44,7 +44,7 @@ class MavenOutputVerifier {
   }
 
   def verifyVersionSpecificMavenMetaData() {
-    def mavenMetaData = new XmlSlurper().parse(getMavenProjectDir().newFile(versionName, "maven-metadata.xml"))
+    def mavenMetaData = getMavenProjectDir().newFile(versionName, "maven-metadata.xml").asXml()
 
     assert mavenMetaData.groupId.text() == groupId
     assert mavenMetaData.artifactId.text() == artifactId
