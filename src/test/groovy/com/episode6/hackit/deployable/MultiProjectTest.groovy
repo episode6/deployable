@@ -3,6 +3,7 @@ package com.episode6.hackit.deployable
 import com.episode6.hackit.deployable.testutil.IntegrationTestProject
 import com.episode6.hackit.deployable.testutil.MavenOutputVerifier
 import org.gradle.testkit.runner.GradleRunner
+import org.gradle.testkit.runner.TaskOutcome
 import org.junit.Rule
 import org.junit.rules.TemporaryFolder
 import spock.lang.Specification
@@ -112,6 +113,7 @@ include ':javalib', ':groovylib', ':androidlib'
     testProject.createNonEmptyJavaFile("${groupId}.javalib", "SampleJavaClass", javalib)
     testProject.createNonEmptyGroovyFile("${groupId}.groovylib", "SampleGroovyClass", groovylib)
     testProject.createNonEmptyJavaFile("${groupId}.androidlib", "SampleAndroidClass", androidlib)
+    androidlib.newFile("src", "main", "AndroidManifest.xml") << simpleAndroidManifest(groupId, "androidlib")
 
     MavenOutputVerifier javalibVerifier = new MavenOutputVerifier(
         groupId: groupId,
@@ -134,6 +136,9 @@ include ':javalib', ':groovylib', ':androidlib'
         .build()
 
     then:
+    result.task(":javalib:deploy").outcome == TaskOutcome.SUCCESS
+    result.task(":groovylib:deploy").outcome == TaskOutcome.SUCCESS
+    result.task(":androidlib:deploy").outcome == TaskOutcome.SUCCESS
 
     where:
     groupId                              | versionName
