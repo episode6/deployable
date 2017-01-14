@@ -19,10 +19,14 @@ class DeployableJarIntegrationTest extends Specification {
 
   def setup() {
     testProject = new IntegrationTestProject(testProjectDir)
-    testProject.createNonEmptyJavaFile("com.example.groupid.testlib")
-    testProject.rootGradlePropertiesFile << testProject.testProperties.getInGradlePropertiesFormat()
+  }
+
+  def "verify jar deploy tasks and output"(String groupId, String artifactId, String versionName) {
+    given:
+    testProject.rootGradlePropertiesFile << testProject.testProperties.inGradlePropertiesFormat
+    testProject.createNonEmptyJavaFile("${groupId}.${artifactId}")
     testProject.rootGradleSettingFile << """
-rootProject.name = 'testlib'
+rootProject.name = '${artifactId}'
 """
     testProject.rootGradleBuildFile << """
 plugins {
@@ -30,29 +34,59 @@ plugins {
  id 'com.episode6.hackit.deployable.jar'
 }
 
-group = 'com.example.groupid'
-version = '0.0.1-SNAPSHOT'
+group = '${groupId}'
+version = '${versionName}'
 
  """
-  }
+    MavenOutputVerifier mavenOutputVerifier = new MavenOutputVerifier(
+        groupId: groupId,
+        artifactId: artifactId,
+        versionName: versionName,
+        testProject: testProject)
 
-  def "verify deploy tasks (jar)"() {
     when:
     def result = GradleRunner.create()
-      .withProjectDir(testProjectDir.root)
-      .withPluginClasspath()
-      .withArguments("deploy")
-      .build()
+        .withProjectDir(testProjectDir.root)
+        .withPluginClasspath()
+        .withArguments("deploy")
+        .build()
 
     then:
+    result.task(":jar").outcome == TaskOutcome.SUCCESS
+    result.task(":javadoc").outcome == TaskOutcome.SUCCESS
+    result.task(":javadocJar").outcome == TaskOutcome.SUCCESS
+    result.task(":sourcesJar").outcome == TaskOutcome.SUCCESS
     result.task(":validateDeployable").outcome == TaskOutcome.SUCCESS
     result.task(":signArchives").outcome == TaskOutcome.SUCCESS
     result.task(":uploadArchives").outcome == TaskOutcome.SUCCESS
     result.task(":deploy").outcome == TaskOutcome.SUCCESS
     result.task(":install") == null
+    mavenOutputVerifier.verifyAll()
+
+    where:
+    groupId                 | artifactId    | versionName
+    "com.snapshot.example"  | "snapshotlib" | "0.0.1-SNAPSHOT"
+    "com.release.example"   | "releaselib"  | "0.0.1"
   }
 
-  def "verify install tasks (jar)"() {
+  def "verify jar install tasks"(String groupId, String artifactId, String versionName) {
+    given:
+    testProject.rootGradlePropertiesFile << testProject.testProperties.inGradlePropertiesFormat
+    testProject.createNonEmptyJavaFile("${groupId}.${artifactId}")
+    testProject.rootGradleSettingFile << """
+rootProject.name = '${artifactId}'
+"""
+    testProject.rootGradleBuildFile << """
+plugins {
+ id 'java'
+ id 'com.episode6.hackit.deployable.jar'
+}
+
+group = '${groupId}'
+version = '${versionName}'
+
+ """
+
     when:
     def result = GradleRunner.create()
         .withProjectDir(testProjectDir.root)
@@ -65,43 +99,9 @@ version = '0.0.1-SNAPSHOT'
     result.task(":signArchives").outcome == TaskOutcome.SUCCESS
     result.task(":install").outcome == TaskOutcome.SUCCESS
     result.task(":uploadArchives") == null
-  }
 
-  def "verify jar specific tasks"() {
-   when:
-   def result = GradleRunner.create()
-       .withProjectDir(testProjectDir.root)
-       .withPluginClasspath()
-       .withArguments("signArchives")
-       .build()
-
-    then:
-    result.task(":jar").outcome == TaskOutcome.SUCCESS
-    result.task(":javadoc").outcome == TaskOutcome.SUCCESS
-    result.task(":javadocJar").outcome == TaskOutcome.SUCCESS
-    result.task(":sourcesJar").outcome == TaskOutcome.SUCCESS
-  }
-
-  def "verify uploaded files"() {
-    given:
-    File TEMPMAVENDIR = new File("build/m2/snapshot")
-    testProject.snapshotMavenRepoDir = TEMPMAVENDIR
-    testProject.rootGradlePropertiesFile.delete()
-    testProject.rootGradlePropertiesFile << testProject.testProperties.getInGradlePropertiesFormat()
-    MavenOutputVerifier mavenOutputVerifier = new MavenOutputVerifier(
-        groupId: "com.example.groupid",
-        artifactId: "testlib",
-        versionName: "0.0.1-SNAPSHOT",
-        testProject: testProject)
-
-    when:
-    def result = GradleRunner.create()
-        .withProjectDir(testProjectDir.root)
-        .withPluginClasspath()
-        .withArguments("deploy")
-        .build()
-
-    then:
-    mavenOutputVerifier.verifyAll()
+    where:
+    groupId                 | artifactId    | versionName
+    "com.snapshot.example"  | "snapshotlib" | "0.0.1-SNAPSHOT"
   }
 }
