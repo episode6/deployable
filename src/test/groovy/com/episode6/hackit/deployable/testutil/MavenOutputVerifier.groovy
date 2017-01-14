@@ -34,15 +34,15 @@ class MavenOutputVerifier {
     return getMavenProjectDir().newFolder(versionName)
   }
 
-  File getPom() {
-    return getMavenVersionDir().newFile(getArtifactFileName("pom"))
+  File getArtifactFile(String extension, String descriptor = null) {
+    return getMavenVersionDir().newFile(getArtifactFileName(extension, descriptor))
   }
 
   boolean verifyAll() {
     return verifyRootMavenMetaData() &&
         verifyVersionSpecificMavenMetaData() &&
         verifyPomData() &&
-        verifySignatureOfFile(getPom())
+        verifySignatureOfFile(getArtifactFile("pom"))
   }
 
   boolean verifyRootMavenMetaData() {
@@ -79,7 +79,7 @@ class MavenOutputVerifier {
 
   boolean verifyPomData() {
     DeployablePluginExtension.PomExtension expectedPom = testProject.testProperties.deployable.pom
-    def pom = getPom().asXml()
+    def pom = getArtifactFile("pom").asXml()
 
     assert pom.name() == "project"
     assert pom.modelVersion.text() == "4.0.0"
@@ -126,14 +126,15 @@ class MavenOutputVerifier {
     return result
   }
 
-  private String getArtifactFileName(String extension) {
+  private String getArtifactFileName(String extension, String descriptor = null) {
+    String endOfFileName = descriptor == null ? ".${extension}" : "-${descriptor}.${extension}"
     if (isRelease()) {
-      return "${artifactId}-${versionName}.${extension}"
+      return "${artifactId}-${versionName}${endOfFileName}"
     }
 
     def versionSpecificMavenMetaData = getMavenVersionDir().newFile("maven-metadata.xml").asXml()
     String snapshotTimestamp = versionSpecificMavenMetaData.versioning.snapshot.timestamp.text()
     String snapshotBuildNumber = versionSpecificMavenMetaData.versioning.snapshot.buildNumber.text()
-    return "${artifactId}-${versionName.replace("-SNAPSHOT", "")}-${snapshotTimestamp}-${snapshotBuildNumber}.${extension}"
+    return "${artifactId}-${versionName.replace("-SNAPSHOT", "")}-${snapshotTimestamp}-${snapshotBuildNumber}${endOfFileName}"
   }
 }
