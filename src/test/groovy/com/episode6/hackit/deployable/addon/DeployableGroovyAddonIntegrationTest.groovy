@@ -68,6 +68,7 @@ dependencies {
     result.task(":deploy").outcome == TaskOutcome.SUCCESS
     result.task(":install") == null
     mavenOutputVerifier.verifyAll()
+    mavenOutputVerifier.verifyJarFile("groovydoc")
 
     where:
     groupId                 | artifactId    | versionName
