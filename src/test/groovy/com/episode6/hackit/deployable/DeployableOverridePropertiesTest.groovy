@@ -10,11 +10,11 @@ import org.junit.rules.TemporaryFolder
 import spock.lang.Specification
 
 /**
- * Tests some features of Deployable params
+ * Tests overriding deployable's gradle.properties in the build file
  */
-class DeployableParamTest extends Specification {
+class DeployableOverridePropertiesTest extends Specification {
 
-  private static String overrideAllSettingsBuildFile(
+  private static String overridePropertiesBuildFile(
       String groupId,
       String versionName,
       DeployablePluginExtension deployable) {
@@ -111,7 +111,7 @@ deployable {
     }
 
     // write the build file with the overridden properties in it
-    testProject.rootGradleBuildFile << overrideAllSettingsBuildFile(groupId, versionName, testProject.testProperties.deployable)
+    testProject.rootGradleBuildFile << overridePropertiesBuildFile(groupId, versionName, testProject.testProperties.deployable)
 
     when:
     def result = GradleRunner.create()
