@@ -18,7 +18,7 @@ class MavenOutputVerifier {
   String artifactId
   String versionName
 
-  TestProjectTrait testProject
+  IntegrationTestProject testProject
 
   boolean isRelease() {
     return !versionName.contains("SNAPSHOT")
