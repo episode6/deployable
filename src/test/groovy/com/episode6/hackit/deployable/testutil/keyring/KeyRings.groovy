@@ -134,17 +134,22 @@ class KeyRings {
   static verifySignatureOfFile(KeyRingBundle keyRings, File file) {
     File signatureFile = new File(file.absolutePath + ".asc")
     PGPPublicKey publicKey = keyRings.publicKeyRing.getPublicKey()
-    InputStream decoderStream = PGPUtil.getDecoderStream(signatureFile.newInputStream())
-    PGPObjectFactory objectFactory = new PGPObjectFactory(decoderStream, new BcKeyFingerprintCalculator())
-    PGPSignatureList signatureList = objectFactory.nextObject()
-    PGPSignature signature = signatureList.get(0)
-    InputStream literalDataStream = file.newInputStream()
+
+    InputStream signatureInputStream = PGPUtil.getDecoderStream(signatureFile.newInputStream())
+    InputStream literalDataInputStreamStream = file.newInputStream()
+
+    PGPObjectFactory objectFactory = new PGPObjectFactory(signatureInputStream, new BcKeyFingerprintCalculator())
+    PGPSignature signature = objectFactory.nextObject().get(0)
+
     signature.init(new BcPGPContentVerifierBuilderProvider(), publicKey)
     int ch
-    while ((ch = literalDataStream.read()) >= 0) {
+    while ((ch = literalDataInputStreamStream.read()) >= 0) {
       signature.update((byte)ch)
     }
-    literalDataStream.close()
+
+    literalDataInputStreamStream.close()
+    signatureInputStream.close()
+
     assert signature.verify()
     return true
   }
