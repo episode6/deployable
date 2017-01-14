@@ -45,6 +45,12 @@ class IntegrationTestProject {
     return buildFolder.getRoot().newFile(paths)
   }
 
+  void setRootProjectName(String rootProjectName) {
+    rootGradleSettingFile << """
+rootProject.name = '${rootProjectName}'
+"""
+  }
+
   File createNonEmptyJavaFile(String packageName, String className = "SampleClass") {
     File dir = buildFolder.getRoot().newFolder("src", "main", "java").newFolderFromPackage(packageName)
     File nonEmptyJavaFile = dir.newFile("${className}.java")
