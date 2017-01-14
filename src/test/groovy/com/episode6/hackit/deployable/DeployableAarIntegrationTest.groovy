@@ -19,7 +19,7 @@ class DeployableAarIntegrationTest extends Specification {
   def setup() {
     testProject = new IntegrationTestProject(testProjectDir)
     testProject.rootGradlePropertiesFile << testProject.testProperties.getInGradlePropertiesFormat()
-    testProject.createNonEmptyJavaFile("com", "example", "groupid", "testlib")
+    testProject.createNonEmptyJavaFile("com.example.groupid.testlib")
     testProject.rootGradleSettingFile << """
 rootProject.name = 'testlib'
 """

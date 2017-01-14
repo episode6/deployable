@@ -18,7 +18,7 @@ class DeployableGroovyAddonIntegrationTest extends Specification {
 
   def setup() {
     testProject = new IntegrationTestProject(testProjectDir)
-    testProject.createNonEmptyGroovyFile( "com", "example", "groupid", "testlib")
+    testProject.createNonEmptyGroovyFile("com.example.groupid.testlib")
     testProject.rootGradlePropertiesFile << testProject.testProperties.getInGradlePropertiesFormat()
     testProject.rootGradleBuildFile << """
 plugins {

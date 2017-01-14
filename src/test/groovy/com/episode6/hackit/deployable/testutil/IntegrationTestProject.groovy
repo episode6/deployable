@@ -45,40 +45,32 @@ class IntegrationTestProject {
     return buildFolder.getRoot().newFile(paths)
   }
 
-  File createNonEmptyJavaFile(String... packageSegments) {
-    List<String> paths = new ArrayList<>()
-    paths.addAll(["src", "main", "java"])
-    paths.addAll(packageSegments)
-    paths.add("SampleClass.java")
-
-    File nonEmptyJavaFile = newFile((String[])paths.toArray())
+  File createNonEmptyJavaFile(String packageName, String className = "SampleClass") {
+    File dir = buildFolder.getRoot().newFolder("src", "main", "java").newFolderFromPackage(packageName)
+    File nonEmptyJavaFile = dir.newFile("${className}.java")
     nonEmptyJavaFile << """
-package ${packageSegments.join(".")};
+package ${packageName};
 
 /**
  * A sample class for testing
  */
-public class SampleClass {
+public class ${className} {
 
 }
 """
     return nonEmptyJavaFile
   }
 
-  File createNonEmptyGroovyFile(String... packageSegments) {
-    List<String> paths = new ArrayList<>()
-    paths.addAll(["src", "main", "groovy"])
-    paths.addAll(packageSegments)
-    paths.add("SampleClass.groovy")
-
-    File nonEmptyGroovyFile = newFile((String[])paths.toArray())
+  File createNonEmptyGroovyFile(String packageName, String className = "SampleClass") {
+    File dir = buildFolder.getRoot().newFolder("src", "main", "groovy").newFolderFromPackage(packageName)
+    File nonEmptyGroovyFile = dir.newFile("${className}.groovy")
     nonEmptyGroovyFile << """
-package ${packageSegments.join(".")}
+package ${packageName}
 
 /**
  * A sample class for testing
  */
-class SampleClass {
+class ${className} {
 
 }
 """

@@ -19,7 +19,7 @@ class DeployableJarIntegrationTest extends Specification {
 
   def setup() {
     testProject = new IntegrationTestProject(testProjectDir)
-    testProject.createNonEmptyJavaFile( "com", "example", "groupid", "testlib")
+    testProject.createNonEmptyJavaFile("com.example.groupid.testlib")
     testProject.rootGradlePropertiesFile << testProject.testProperties.getInGradlePropertiesFormat()
     testProject.rootGradleSettingFile << """
 rootProject.name = 'testlib'
