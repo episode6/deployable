@@ -12,7 +12,7 @@ import spock.lang.Specification
 /**
  * Tests overriding deployable's gradle.properties in the build file
  */
-class DeployableOverridePropertiesTest extends Specification {
+class OverridePropertiesTest extends Specification {
 
   private static String overridePropertiesBuildFile(
       String groupId,

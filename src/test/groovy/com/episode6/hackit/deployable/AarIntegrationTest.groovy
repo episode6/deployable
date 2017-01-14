@@ -11,7 +11,7 @@ import spock.lang.Specification
 /**
  * Tests {@link DeployableAarPlugin}
  */
-class DeployableAarIntegrationTest extends Specification {
+class AarIntegrationTest extends Specification {
 
   private static String simpleManifest(String groupId, String artifactId) {
     return """

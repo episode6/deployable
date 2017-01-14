@@ -1,4 +1,4 @@
-package com.episode6.hackit.deployable
+package com.episode6.hackit.deployable.addon
 
 import com.episode6.hackit.deployable.testutil.IntegrationTestProject
 import com.episode6.hackit.deployable.testutil.MavenOutputVerifier
@@ -9,19 +9,24 @@ import org.junit.rules.TemporaryFolder
 import spock.lang.Specification
 
 /**
- * Tests {@link DeployableJarPlugin}
+ * Tests {@link GroovyDocAddonPlugin}
  */
-class DeployableJarIntegrationTest extends Specification {
+class GroovyAddonIntegrationTest extends Specification {
 
   private static String simpleBuildFile(String groupId, String versionName) {
     return """
 plugins {
- id 'java'
+ id 'groovy'
  id 'com.episode6.hackit.deployable.jar'
+ id 'com.episode6.hackit.deployable.addon.groovydocs'
 }
 
 group = '${groupId}'
 version = '${versionName}'
+
+dependencies {
+  compile localGroovy()
+}
  """
   }
 
@@ -33,12 +38,12 @@ version = '${versionName}'
     testProject = new IntegrationTestProject(testProjectDir)
   }
 
-  def "verify jar deploy tasks and output"(String groupId, String artifactId, String versionName) {
+  def "verify groovy deploy tasks and output"(String groupId, String artifactId, String versionName) {
     given:
     testProject.rootProjectName = artifactId
     testProject.rootGradlePropertiesFile << testProject.testProperties.inGradlePropertiesFormat
     testProject.rootGradleBuildFile << simpleBuildFile(groupId, versionName)
-    testProject.createNonEmptyJavaFile("${groupId}.${artifactId}")
+    testProject.createNonEmptyGroovyFile("${groupId}.${artifactId}")
     MavenOutputVerifier mavenOutputVerifier = new MavenOutputVerifier(
         groupId: groupId,
         artifactId: artifactId,
@@ -54,8 +59,8 @@ version = '${versionName}'
 
     then:
     result.task(":jar").outcome == TaskOutcome.SUCCESS
-    result.task(":javadoc").outcome == TaskOutcome.SUCCESS
-    result.task(":javadocJar").outcome == TaskOutcome.SUCCESS
+    result.task(":groovydoc").outcome == TaskOutcome.SUCCESS
+    result.task(":groovydocJar").outcome == TaskOutcome.SUCCESS
     result.task(":sourcesJar").outcome == TaskOutcome.SUCCESS
     result.task(":validateDeployable").outcome == TaskOutcome.SUCCESS
     result.task(":signArchives").outcome == TaskOutcome.SUCCESS
@@ -63,19 +68,20 @@ version = '${versionName}'
     result.task(":deploy").outcome == TaskOutcome.SUCCESS
     result.task(":install") == null
     mavenOutputVerifier.verifyAll()
+    mavenOutputVerifier.verifyJarFile("groovydoc")
 
     where:
     groupId                 | artifactId    | versionName
-    "com.snapshot.example"  | "snapshotlib" | "0.0.1-SNAPSHOT"
-    "com.release.example"   | "releaselib"  | "0.0.2"
+    "com.snapshot.example"  | "snapshotlib" | "0.0.4-SNAPSHOT"
+    "com.release.example"   | "releaselib"  | "0.0.5"
   }
 
-  def "verify jar install tasks"(String groupId, String artifactId, String versionName) {
+  def "verify groovy install tasks"(String groupId, String artifactId, String versionName) {
     given:
     testProject.rootProjectName = artifactId
     testProject.rootGradlePropertiesFile << testProject.testProperties.inGradlePropertiesFormat
     testProject.rootGradleBuildFile << simpleBuildFile(groupId, versionName)
-    testProject.createNonEmptyJavaFile("${groupId}.${artifactId}")
+    testProject.createNonEmptyGroovyFile("${groupId}.${artifactId}")
 
     when:
     def result = GradleRunner.create()
@@ -86,8 +92,8 @@ version = '${versionName}'
 
     then:
     result.task(":jar").outcome == TaskOutcome.SUCCESS
-    result.task(":javadoc").outcome == TaskOutcome.SUCCESS
-    result.task(":javadocJar").outcome == TaskOutcome.SUCCESS
+    result.task(":groovydoc").outcome == TaskOutcome.SUCCESS
+    result.task(":groovydocJar").outcome == TaskOutcome.SUCCESS
     result.task(":sourcesJar").outcome == TaskOutcome.SUCCESS
     result.task(":validateDeployable").outcome == TaskOutcome.SUCCESS
     result.task(":signArchives").outcome == TaskOutcome.SUCCESS
@@ -96,6 +102,6 @@ version = '${versionName}'
 
     where:
     groupId                 | artifactId    | versionName
-    "com.snapshot.example"  | "snapshotlib" | "0.0.3-SNAPSHOT"
+    "com.snapshot.example"  | "snapshotlib" | "0.0.6-SNAPSHOT"
   }
 }
