@@ -13,29 +13,18 @@ import spock.lang.Specification
  */
 class DeployableAarIntegrationTest extends Specification {
 
-  @Rule final TemporaryFolder testProjectDir = new TemporaryFolder()
-
-  IntegrationTestProject testProject
-
-  def setup() {
-    testProject = new IntegrationTestProject(testProjectDir)
-  }
-
-  def "verify aar deploy tasks and output"(String groupId, String artifactId, String versionName) {
-    given:
-    testProject.rootGradlePropertiesFile << testProject.testProperties.getInGradlePropertiesFormat()
-    testProject.createNonEmptyJavaFile("${groupId}.${artifactId}")
-    testProject.rootGradleSettingFile << """
-rootProject.name = '${artifactId}'
-"""
-    testProject.newFile("src", "main", "AndroidManifest.xml") << """
+  private static String simpleManifest(String groupId, String artifactId) {
+    return """
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="${groupId}.${artifactId}">
     <application>
     </application>
 </manifest>
 """
-    testProject.rootGradleBuildFile << """
+  }
+
+  private static String simpleBuildFile(String groupId, String versionName) {
+    return """
 buildscript {
   repositories {
     jcenter()
@@ -58,8 +47,24 @@ android {
   compileSdkVersion 19
   buildToolsVersion "25.0.2"
 }
-
  """
+  }
+
+  @Rule final TemporaryFolder testProjectDir = new TemporaryFolder()
+
+  IntegrationTestProject testProject
+
+  def setup() {
+    testProject = new IntegrationTestProject(testProjectDir)
+  }
+
+  def "verify aar deploy tasks and output"(String groupId, String artifactId, String versionName) {
+    given:
+    testProject.rootProjectName = artifactId
+    testProject.rootGradlePropertiesFile << testProject.testProperties.getInGradlePropertiesFormat()
+    testProject.rootGradleBuildFile << simpleBuildFile(groupId, versionName)
+    testProject.createNonEmptyJavaFile("${groupId}.${artifactId}")
+    testProject.newFile("src", "main", "AndroidManifest.xml") << simpleManifest(groupId, artifactId)
     MavenOutputVerifier mavenOutputVerifier = new MavenOutputVerifier(
         groupId: groupId,
         artifactId: artifactId,
