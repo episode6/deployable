@@ -72,8 +72,8 @@ dependencies {
 
     where:
     groupId                 | artifactId    | versionName
-    "com.snapshot.example"  | "snapshotlib" | "0.0.1-SNAPSHOT"
-    "com.release.example"   | "releaselib"  | "0.0.1"
+    "com.snapshot.example"  | "snapshotlib" | "0.0.4-SNAPSHOT"
+    "com.release.example"   | "releaselib"  | "0.0.5"
   }
 
   def "verify groovy install tasks"(String groupId, String artifactId, String versionName) {
@@ -102,6 +102,6 @@ dependencies {
 
     where:
     groupId                 | artifactId    | versionName
-    "com.snapshot.example"  | "snapshotlib" | "0.0.1-SNAPSHOT"
+    "com.snapshot.example"  | "snapshotlib" | "0.0.6-SNAPSHOT"
   }
 }

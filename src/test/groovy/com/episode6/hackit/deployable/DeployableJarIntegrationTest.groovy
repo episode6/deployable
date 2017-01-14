@@ -67,7 +67,7 @@ version = '${versionName}'
     where:
     groupId                 | artifactId    | versionName
     "com.snapshot.example"  | "snapshotlib" | "0.0.1-SNAPSHOT"
-    "com.release.example"   | "releaselib"  | "0.0.1"
+    "com.release.example"   | "releaselib"  | "0.0.2"
   }
 
   def "verify jar install tasks"(String groupId, String artifactId, String versionName) {
@@ -96,6 +96,6 @@ version = '${versionName}'
 
     where:
     groupId                 | artifactId    | versionName
-    "com.snapshot.example"  | "snapshotlib" | "0.0.1-SNAPSHOT"
+    "com.snapshot.example"  | "snapshotlib" | "0.0.3-SNAPSHOT"
   }
 }

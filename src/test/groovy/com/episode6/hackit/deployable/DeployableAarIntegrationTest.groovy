@@ -89,7 +89,7 @@ android {
     mavenOutputVerifier.verifyAll("aar")
 
     where:
-    groupId                 | artifactId    | versionName
+    groupId                         | artifactId    | versionName
     "com.android.snapshot.example"  | "snapshotlib" | "0.0.1-SNAPSHOT"
     "com.android.release.example"   | "releaselib"  | "0.0.1"
   }
