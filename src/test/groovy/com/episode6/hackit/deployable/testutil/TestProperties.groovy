@@ -51,13 +51,12 @@ class TestProperties {
     return deployable.applyClosure(closure)
   }
 
-  void applyMavenRepos(File releaseMavenRepoFile, File snapshotMavenRepoFile) {
-    deployable {
-      nexus {
-        releaseRepoUrl "file://localhost${releaseMavenRepoFile.absolutePath}"
-        snapshotRepoUrl "file://localhost${snapshotMavenRepoFile.absolutePath}"
-      }
-    }
+  void setReleaseRepo(File releaseMavenRepoFile) {
+    deployable.nexus.releaseRepoUrl = "file://localhost${releaseMavenRepoFile.absolutePath}"
+  }
+
+  void setSnapshotRepo(File snapshotMavenRepoFile) {
+    deployable.nexus.snapshotRepoUrl = "file://localhost${snapshotMavenRepoFile.absolutePath}"
   }
 
   String getInGradlePropertiesFormat() {

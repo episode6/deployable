@@ -85,20 +85,14 @@ version = '0.0.1-SNAPSHOT'
   def "verify uploaded files"() {
     given:
     File TEMPMAVENDIR = new File("build/m2/snapshot")
-    TEMPMAVENDIR.mkdirs()
+    testProject.snapshotMavenRepoDir = TEMPMAVENDIR
+    testProject.rootGradlePropertiesFile.delete()
+    testProject.rootGradlePropertiesFile << testProject.testProperties.getInGradlePropertiesFormat()
     MavenOutputVerifier mavenOutputVerifier = new MavenOutputVerifier(
         groupId: "com.example.groupid",
         artifactId: "testlib",
         versionName: "0.0.1-SNAPSHOT",
-        snapshotRepo: TEMPMAVENDIR)
-    testProject.rootGradleBuildFile << """
-
-deployable {
-  nexus {
-    snapshotRepoUrl "file://localhost${TEMPMAVENDIR.absolutePath}"
-  }
-}
-"""
+        testProject: testProject)
 
     when:
     def result = GradleRunner.create()
@@ -108,6 +102,6 @@ deployable {
         .build()
 
     then:
-    mavenOutputVerifier.verifyAll(testProject.testProperties.deployable.pom)
+    mavenOutputVerifier.verifyAll()
   }
 }

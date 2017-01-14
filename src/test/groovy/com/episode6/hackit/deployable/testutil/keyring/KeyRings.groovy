@@ -12,7 +12,10 @@ import org.bouncycastle.openpgp.operator.PBESecretKeyEncryptor
 import org.bouncycastle.openpgp.operator.PGPContentSignerBuilder
 import org.bouncycastle.openpgp.operator.PGPDigestCalculator
 import org.bouncycastle.openpgp.operator.PGPDigestCalculatorProvider
-import org.bouncycastle.openpgp.operator.bc.*
+import org.bouncycastle.openpgp.operator.bc.BcPBESecretKeyEncryptorBuilder
+import org.bouncycastle.openpgp.operator.bc.BcPGPContentSignerBuilder
+import org.bouncycastle.openpgp.operator.bc.BcPGPDigestCalculatorProvider
+import org.bouncycastle.openpgp.operator.bc.BcPGPKeyPair
 
 import java.security.SecureRandom
 
@@ -129,29 +132,6 @@ class KeyRings {
         secretKeyRing: secretKeyRing,
         publicKeyringFile: publicKeyringFile,
         secretKeyringFile: secretKeyringFile)
-  }
-
-  static verifySignatureOfFile(KeyRingBundle keyRings, File file) {
-    File signatureFile = new File(file.absolutePath + ".asc")
-    PGPPublicKey publicKey = keyRings.publicKeyRing.getPublicKey()
-
-    InputStream signatureInputStream = PGPUtil.getDecoderStream(signatureFile.newInputStream())
-    InputStream literalDataInputStreamStream = file.newInputStream()
-
-    PGPObjectFactory objectFactory = new PGPObjectFactory(signatureInputStream, new BcKeyFingerprintCalculator())
-    PGPSignature signature = objectFactory.nextObject().get(0)
-
-    signature.init(new BcPGPContentVerifierBuilderProvider(), publicKey)
-    int ch
-    while ((ch = literalDataInputStreamStream.read()) >= 0) {
-      signature.update((byte)ch)
-    }
-
-    literalDataInputStreamStream.close()
-    signatureInputStream.close()
-
-    assert signature.verify()
-    return true
   }
 
   private static File createKeyringFile(File keyringDir, PGPKeyRing keyRing, String fileName) {

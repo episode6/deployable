@@ -19,17 +19,26 @@ class IntegrationTestProject {
 
   IntegrationTestProject(TemporaryFolder buildFolder) {
     this.buildFolder = buildFolder
+    testProperties = new TestProperties()
+
     rootGradleBuildFile = buildFolder.newFile("build.gradle")
     rootGradlePropertiesFile = buildFolder.newFile("gradle.properties")
     rootGradleSettingFile = buildFolder.newFile("settings.gradle")
 
-    snapshotMavenRepoDir = buildFolder.newFolder("mavenSnapshot")
-    snapshotMavenRepoDir.mkdirs()
-    releaseMavenRepoDir = buildFolder.newFolder("mavenRelease")
-    releaseMavenRepoDir.mkdirs()
+    setSnapshotMavenRepoDir(buildFolder.newFolder("mavenSnapshot"))
+    setReleaseMavenRepoDir(buildFolder.newFolder("mavenRelease"))
+  }
 
-    testProperties = new TestProperties()
-    testProperties.applyMavenRepos(releaseMavenRepoDir, snapshotMavenRepoDir)
+  void setSnapshotMavenRepoDir(File snapshotMavenRepoDir) {
+    snapshotMavenRepoDir.mkdirs()
+    testProperties.setSnapshotRepo(snapshotMavenRepoDir)
+    this.snapshotMavenRepoDir = snapshotMavenRepoDir
+  }
+
+  void setReleaseMavenRepoDir(File releaseMavenRepoDir) {
+    releaseMavenRepoDir.mkdirs()
+    testProperties.setReleaseRepo(releaseMavenRepoDir)
+    this.releaseMavenRepoDir = releaseMavenRepoDir
   }
 
   File newFile(String... paths) {
