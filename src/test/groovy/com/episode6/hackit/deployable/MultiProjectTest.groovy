@@ -97,6 +97,10 @@ ${convertDependentProjectsToDependencies(dependentProjects)}
 
   def "test multi-project deployables"(String groupId, String versionName) {
     given:
+    File tmpM2Fldr = new File("build/m2")
+    testProject.snapshotMavenRepoDir = tmpM2Fldr.newFolder("snapshot")
+    testProject.releaseMavenRepoDir = tmpM2Fldr.newFolder("release")
+
     testProject.rootGradlePropertiesFile << testProject.testProperties.inGradlePropertiesFormat
     File javalib = testProject.newFile("javalib")
     File groovylib = testProject.newFile("groovylib")
@@ -118,15 +122,18 @@ include ':javalib', ':groovylib', ':androidlib'
     MavenOutputVerifier javalibVerifier = new MavenOutputVerifier(
         groupId: groupId,
         artifactId: "javalib",
-        versionName: versionName)
+        versionName: versionName,
+        testProject: testProject)
     MavenOutputVerifier groovylibVerifier = new MavenOutputVerifier(
         groupId: groupId,
         artifactId: "groovylib",
-        versionName: versionName)
+        versionName: versionName,
+        testProject: testProject)
     MavenOutputVerifier androidlibVerifier = new MavenOutputVerifier(
         groupId: groupId,
         artifactId: "androidlib",
-        versionName: versionName)
+        versionName: versionName,
+        testProject: testProject)
 
     when:
     def result = GradleRunner.create()
@@ -139,6 +146,10 @@ include ':javalib', ':groovylib', ':androidlib'
     result.task(":javalib:deploy").outcome == TaskOutcome.SUCCESS
     result.task(":groovylib:deploy").outcome == TaskOutcome.SUCCESS
     result.task(":androidlib:deploy").outcome == TaskOutcome.SUCCESS
+    javalibVerifier.verifyAll()
+    groovylibVerifier.verifyAll()
+    groovylibVerifier.verifyJarFile("groovydoc")
+    androidlibVerifier.verifyAll("aar")
 
     where:
     groupId                              | versionName
