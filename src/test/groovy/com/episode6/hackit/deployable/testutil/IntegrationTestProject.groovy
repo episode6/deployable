@@ -5,17 +5,13 @@ import org.junit.rules.TemporaryFolder
 /**
  * Hold information about the project-under-test
  */
-class IntegrationTestProject {
+class IntegrationTestProject implements TestProjectTrait {
 
   public final TemporaryFolder buildFolder
   File rootGradleBuildFile
   File rootGradlePropertiesFile
   File rootGradleSettingFile
 
-  File snapshotMavenRepoDir
-  File releaseMavenRepoDir
-
-  TestProperties testProperties
 
   IntegrationTestProject(TemporaryFolder buildFolder) {
     this.buildFolder = buildFolder
@@ -27,18 +23,6 @@ class IntegrationTestProject {
 
     setSnapshotMavenRepoDir(buildFolder.newFolder("mavenSnapshot"))
     setReleaseMavenRepoDir(buildFolder.newFolder("mavenRelease"))
-  }
-
-  void setSnapshotMavenRepoDir(File snapshotMavenRepoDir) {
-    snapshotMavenRepoDir.mkdirs()
-    testProperties.setSnapshotRepo(snapshotMavenRepoDir)
-    this.snapshotMavenRepoDir = snapshotMavenRepoDir
-  }
-
-  void setReleaseMavenRepoDir(File releaseMavenRepoDir) {
-    releaseMavenRepoDir.mkdirs()
-    testProperties.setReleaseRepo(releaseMavenRepoDir)
-    this.releaseMavenRepoDir = releaseMavenRepoDir
   }
 
   File newFile(String... paths) {
