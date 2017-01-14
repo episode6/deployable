@@ -1,6 +1,7 @@
 package com.episode6.hackit.deployable.addon
 
 import com.episode6.hackit.deployable.testutil.IntegrationTestProject
+import com.episode6.hackit.deployable.testutil.MavenOutputVerifier
 import org.gradle.testkit.runner.GradleRunner
 import org.gradle.testkit.runner.TaskOutcome
 import org.junit.Rule
@@ -12,23 +13,16 @@ import spock.lang.Specification
  */
 class DeployableGroovyAddonIntegrationTest extends Specification {
 
-  @Rule final TemporaryFolder testProjectDir = new TemporaryFolder()
-
-  IntegrationTestProject testProject
-
-  def setup() {
-    testProject = new IntegrationTestProject(testProjectDir)
-    testProject.createNonEmptyGroovyFile("com.example.groupid.testlib")
-    testProject.rootGradlePropertiesFile << testProject.testProperties.getInGradlePropertiesFormat()
-    testProject.rootGradleBuildFile << """
+  private static String simpleBuildFile(String groupId, String versionName) {
+    return """
 plugins {
  id 'groovy'
  id 'com.episode6.hackit.deployable.jar'
  id 'com.episode6.hackit.deployable.addon.groovydocs'
 }
 
-group = 'com.example.groupid'
-version = '0.0.1-SNAPSHOT'
+group = '${groupId}'
+version = '${versionName}'
 
 dependencies {
   compile localGroovy()
@@ -36,7 +30,26 @@ dependencies {
  """
   }
 
-  def "verify deploy tasks (groovy)"() {
+  @Rule final TemporaryFolder testProjectDir = new TemporaryFolder()
+
+  IntegrationTestProject testProject
+
+  def setup() {
+    testProject = new IntegrationTestProject(testProjectDir)
+  }
+
+  def "verify groovy deploy tasks and output"(String groupId, String artifactId, String versionName) {
+    given:
+    testProject.rootProjectName = artifactId
+    testProject.rootGradlePropertiesFile << testProject.testProperties.inGradlePropertiesFormat
+    testProject.rootGradleBuildFile << simpleBuildFile(groupId, versionName)
+    testProject.createNonEmptyGroovyFile("${groupId}.${artifactId}")
+    MavenOutputVerifier mavenOutputVerifier = new MavenOutputVerifier(
+        groupId: groupId,
+        artifactId: artifactId,
+        versionName: versionName,
+        testProject: testProject)
+
     when:
     def result = GradleRunner.create()
         .withProjectDir(testProjectDir.root)
@@ -45,14 +58,30 @@ dependencies {
         .build()
 
     then:
+    result.task(":jar").outcome == TaskOutcome.SUCCESS
+    result.task(":groovydoc").outcome == TaskOutcome.SUCCESS
+    result.task(":groovydocJar").outcome == TaskOutcome.SUCCESS
+    result.task(":sourcesJar").outcome == TaskOutcome.SUCCESS
     result.task(":validateDeployable").outcome == TaskOutcome.SUCCESS
     result.task(":signArchives").outcome == TaskOutcome.SUCCESS
     result.task(":uploadArchives").outcome == TaskOutcome.SUCCESS
     result.task(":deploy").outcome == TaskOutcome.SUCCESS
     result.task(":install") == null
+    mavenOutputVerifier.verifyAll()
+
+    where:
+    groupId                 | artifactId    | versionName
+    "com.snapshot.example"  | "snapshotlib" | "0.0.1-SNAPSHOT"
+    "com.release.example"   | "releaselib"  | "0.0.1"
   }
 
-  def "verify install tasks (groovy)"() {
+  def "verify groovy install tasks"(String groupId, String artifactId, String versionName) {
+    given:
+    testProject.rootProjectName = artifactId
+    testProject.rootGradlePropertiesFile << testProject.testProperties.inGradlePropertiesFormat
+    testProject.rootGradleBuildFile << simpleBuildFile(groupId, versionName)
+    testProject.createNonEmptyGroovyFile("${groupId}.${artifactId}")
+
     when:
     def result = GradleRunner.create()
         .withProjectDir(testProjectDir.root)
@@ -61,24 +90,17 @@ dependencies {
         .build()
 
     then:
-    result.task(":validateDeployable").outcome == TaskOutcome.SUCCESS
-    result.task(":signArchives").outcome == TaskOutcome.SUCCESS
-    result.task(":install").outcome == TaskOutcome.SUCCESS
-    result.task(":uploadArchives") == null
-  }
-
-  def "verify groovy specific tasks"() {
-    when:
-    def result = GradleRunner.create()
-        .withProjectDir(testProjectDir.root)
-        .withPluginClasspath()
-        .withArguments("signArchives")
-        .build()
-
-    then:
     result.task(":jar").outcome == TaskOutcome.SUCCESS
     result.task(":groovydoc").outcome == TaskOutcome.SUCCESS
     result.task(":groovydocJar").outcome == TaskOutcome.SUCCESS
     result.task(":sourcesJar").outcome == TaskOutcome.SUCCESS
+    result.task(":validateDeployable").outcome == TaskOutcome.SUCCESS
+    result.task(":signArchives").outcome == TaskOutcome.SUCCESS
+    result.task(":install").outcome == TaskOutcome.SUCCESS
+    result.task(":uploadArchives") == null
+
+    where:
+    groupId                 | artifactId    | versionName
+    "com.snapshot.example"  | "snapshotlib" | "0.0.1-SNAPSHOT"
   }
 }
