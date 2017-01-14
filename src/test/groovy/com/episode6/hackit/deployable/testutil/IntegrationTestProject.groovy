@@ -30,7 +30,6 @@ class IntegrationTestProject {
 
     testProperties = new TestProperties()
     testProperties.applyMavenRepos(releaseMavenRepoDir, snapshotMavenRepoDir)
-    TestingCategories.initIfNeeded()
   }
 
   File newFile(String... paths) {

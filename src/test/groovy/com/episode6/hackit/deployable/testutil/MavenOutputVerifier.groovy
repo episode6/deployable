@@ -13,10 +13,6 @@ class MavenOutputVerifier {
   File snapshotRepo
   File releaseRepo
 
-  MavenOutputVerifier() {
-    TestingCategories.initIfNeeded()
-  }
-
   boolean isRelease() {
     return !versionName.contains("SNAPSHOT")
   }
