@@ -1,6 +1,7 @@
 package com.episode6.hackit.deployable
 
 import com.episode6.hackit.deployable.testutil.IntegrationTestProject
+import com.episode6.hackit.deployable.testutil.MavenOutputVerifier
 import org.gradle.testkit.runner.GradleRunner
 import org.gradle.testkit.runner.TaskOutcome
 import org.junit.Rule
@@ -18,14 +19,18 @@ class DeployableAarIntegrationTest extends Specification {
 
   def setup() {
     testProject = new IntegrationTestProject(testProjectDir)
+  }
+
+  def "verify aar deploy tasks and output"(String groupId, String artifactId, String versionName) {
+    given:
     testProject.rootGradlePropertiesFile << testProject.testProperties.getInGradlePropertiesFormat()
-    testProject.createNonEmptyJavaFile("com.example.groupid.testlib")
+    testProject.createNonEmptyJavaFile("${groupId}.${artifactId}")
     testProject.rootGradleSettingFile << """
-rootProject.name = 'testlib'
+rootProject.name = '${artifactId}'
 """
     testProject.newFile("src", "main", "AndroidManifest.xml") << """
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.groupid.testlib">
+    package="${groupId}.${artifactId}">
     <application>
     </application>
 </manifest>
@@ -46,8 +51,8 @@ plugins {
 
 apply plugin: 'com.android.library'
 
-group = 'com.example.groupid'
-version = '0.0.1-SNAPSHOT'
+group = '${groupId}'
+version = '${versionName}'
 
 android {
   compileSdkVersion 19
@@ -55,34 +60,32 @@ android {
 }
 
  """
-  }
+    MavenOutputVerifier mavenOutputVerifier = new MavenOutputVerifier(
+        groupId: groupId,
+        artifactId: artifactId,
+        versionName: versionName,
+        testProject: testProject)
 
-  def "verify deploy tasks (aar)"() {
-    when:
-    def result = GradleRunner.create()
-      .withProjectDir(testProjectDir.root)
-      .withPluginClasspath()
-      .withArguments("deploy")
-      .build()
-
-    then:
-    result.task(":validateDeployable").outcome == TaskOutcome.SUCCESS
-    result.task(":signArchives").outcome == TaskOutcome.SUCCESS
-    result.task(":uploadArchives").outcome == TaskOutcome.SUCCESS
-    result.task(":deploy").outcome == TaskOutcome.SUCCESS
-  }
-
-  def "verify aar-specific tasks"() {
     when:
     def result = GradleRunner.create()
         .withProjectDir(testProjectDir.root)
         .withPluginClasspath()
-        .withArguments("signArchives")
+        .withArguments("deploy")
         .build()
 
     then:
     result.task(":androidJavadocs").outcome == TaskOutcome.SUCCESS
     result.task(":androidJavadocsJar").outcome == TaskOutcome.SUCCESS
     result.task(":androidSourcesJar").outcome == TaskOutcome.SUCCESS
+    result.task(":validateDeployable").outcome == TaskOutcome.SUCCESS
+    result.task(":signArchives").outcome == TaskOutcome.SUCCESS
+    result.task(":uploadArchives").outcome == TaskOutcome.SUCCESS
+    result.task(":deploy").outcome == TaskOutcome.SUCCESS
+    mavenOutputVerifier.verifyAll("aar")
+
+    where:
+    groupId                 | artifactId    | versionName
+    "com.android.snapshot.example"  | "snapshotlib" | "0.0.1-SNAPSHOT"
+    "com.android.release.example"   | "releaselib"  | "0.0.1"
   }
 }

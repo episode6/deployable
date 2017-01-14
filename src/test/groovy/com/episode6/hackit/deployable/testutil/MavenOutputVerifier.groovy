@@ -40,11 +40,11 @@ class MavenOutputVerifier {
     return getMavenVersionDir().newFile(getArtifactFileName(extension, descriptor))
   }
 
-  boolean verifyAll() {
+  boolean verifyAll(String artifactPackaging = "jar") {
     return verifyRootMavenMetaData() &&
         verifyVersionSpecificMavenMetaData() &&
         verifyPomData() &&
-        verifyJarFile() &&
+        verifyJarFile(null, artifactPackaging) &&
         verifyJarFile("sources") &&
         verifyJarFile("javadoc")
   }
@@ -133,8 +133,8 @@ class MavenOutputVerifier {
     return true
   }
 
-  boolean verifyJarFile(String descriptor = null) {
-    File jarFile = getArtifactFile("jar", descriptor)
+  boolean verifyJarFile(String descriptor = null, String extension = "jar") {
+    File jarFile = getArtifactFile(extension, descriptor)
 
     JarFile jar = new JarFile(jarFile, true)
     jar.close()
