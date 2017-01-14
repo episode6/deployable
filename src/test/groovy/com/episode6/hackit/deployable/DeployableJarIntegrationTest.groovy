@@ -13,6 +13,18 @@ import spock.lang.Specification
  */
 class DeployableJarIntegrationTest extends Specification {
 
+  private static String simpleBuildFile(String groupId, String versionName) {
+    return """
+plugins {
+ id 'java'
+ id 'com.episode6.hackit.deployable.jar'
+}
+
+group = '${groupId}'
+version = '${versionName}'
+ """
+  }
+
   @Rule final TemporaryFolder testProjectDir = new TemporaryFolder()
 
   IntegrationTestProject testProject
@@ -23,21 +35,10 @@ class DeployableJarIntegrationTest extends Specification {
 
   def "verify jar deploy tasks and output"(String groupId, String artifactId, String versionName) {
     given:
+    testProject.rootProjectName = artifactId
     testProject.rootGradlePropertiesFile << testProject.testProperties.inGradlePropertiesFormat
+    testProject.rootGradleBuildFile << simpleBuildFile(groupId, versionName)
     testProject.createNonEmptyJavaFile("${groupId}.${artifactId}")
-    testProject.rootGradleSettingFile << """
-rootProject.name = '${artifactId}'
-"""
-    testProject.rootGradleBuildFile << """
-plugins {
- id 'java'
- id 'com.episode6.hackit.deployable.jar'
-}
-
-group = '${groupId}'
-version = '${versionName}'
-
- """
     MavenOutputVerifier mavenOutputVerifier = new MavenOutputVerifier(
         groupId: groupId,
         artifactId: artifactId,
@@ -71,21 +72,10 @@ version = '${versionName}'
 
   def "verify jar install tasks"(String groupId, String artifactId, String versionName) {
     given:
+    testProject.rootProjectName = artifactId
     testProject.rootGradlePropertiesFile << testProject.testProperties.inGradlePropertiesFormat
+    testProject.rootGradleBuildFile << simpleBuildFile(groupId, versionName)
     testProject.createNonEmptyJavaFile("${groupId}.${artifactId}")
-    testProject.rootGradleSettingFile << """
-rootProject.name = '${artifactId}'
-"""
-    testProject.rootGradleBuildFile << """
-plugins {
- id 'java'
- id 'com.episode6.hackit.deployable.jar'
-}
-
-group = '${groupId}'
-version = '${versionName}'
-
- """
 
     when:
     def result = GradleRunner.create()
@@ -95,6 +85,10 @@ version = '${versionName}'
         .build()
 
     then:
+    result.task(":jar").outcome == TaskOutcome.SUCCESS
+    result.task(":javadoc").outcome == TaskOutcome.SUCCESS
+    result.task(":javadocJar").outcome == TaskOutcome.SUCCESS
+    result.task(":sourcesJar").outcome == TaskOutcome.SUCCESS
     result.task(":validateDeployable").outcome == TaskOutcome.SUCCESS
     result.task(":signArchives").outcome == TaskOutcome.SUCCESS
     result.task(":install").outcome == TaskOutcome.SUCCESS
