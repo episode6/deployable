@@ -8,6 +8,8 @@ import org.bouncycastle.openpgp.PGPUtil
 import org.bouncycastle.openpgp.operator.bc.BcKeyFingerprintCalculator
 import org.bouncycastle.openpgp.operator.bc.BcPGPContentVerifierBuilderProvider
 
+import java.util.jar.JarFile
+
 /**
  * Verifies maven output
  */
@@ -42,7 +44,9 @@ class MavenOutputVerifier {
     return verifyRootMavenMetaData() &&
         verifyVersionSpecificMavenMetaData() &&
         verifyPomData() &&
-        verifySignatureOfFile(getArtifactFile("pom"))
+        verifyJarFile() &&
+        verifyJarFile("sources") &&
+        verifyJarFile("javadoc")
   }
 
   boolean verifyRootMavenMetaData() {
@@ -79,7 +83,8 @@ class MavenOutputVerifier {
 
   boolean verifyPomData() {
     DeployablePluginExtension.PomExtension expectedPom = testProject.testProperties.deployable.pom
-    def pom = getArtifactFile("pom").asXml()
+    File pomFile = getArtifactFile("pom")
+    def pom = pomFile.asXml()
 
     assert pom.name() == "project"
     assert pom.modelVersion.text() == "4.0.0"
@@ -99,6 +104,9 @@ class MavenOutputVerifier {
     assert pom.scm.connection.text() == expectedPom.scm.connection
     assert pom.scm.developerConnection.text() == expectedPom.scm.developerConnection
     assert pom.scm.url.text() == expectedPom.scm.url
+
+    assert verifySignatureOfFile(pomFile)
+
     return true
   }
 
@@ -121,9 +129,18 @@ class MavenOutputVerifier {
     literalDataInputStreamStream.close()
     signatureInputStream.close()
 
-    boolean result = signature.verify()
-    assert result
-    return result
+    assert signature.verify()
+    return true
+  }
+
+  boolean verifyJarFile(String descriptor = null) {
+    File jarFile = getArtifactFile("jar", descriptor)
+
+    JarFile jar = new JarFile(jarFile, true)
+    jar.close()
+
+    assert verifySignatureOfFile(jarFile)
+    return true
   }
 
   private String getArtifactFileName(String extension, String descriptor = null) {
