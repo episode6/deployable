@@ -1,6 +1,6 @@
-Deployable
-==========
-Some quick and dirty gradle plugins to ease the pain of deploying jars and aars to sonatype. This currently uses the old `maven` plugin instead of the new `maven-publish` plugin.
+Deployable for Gradle
+=====================
+Gradle plugins to ease the pain of deploying jars and aars to maven repositories. This currently uses the old `maven` plugin instead of the new `maven-publish` plugin.
 
 ## Usage
 Add Deployable to the classpath in your root `build.gradle`
@@ -10,7 +10,7 @@ buildscript {
     jcenter()
   }
   dependencies {
-    classpath 'com.episode6.hackit.deployable:deployable:0.0.0.1-SNAPSHOT'
+    classpath 'com.episode6.hackit.deployable:deployable:0.0.5-SNAPSHOT'
   }
 }
 ```
@@ -21,7 +21,6 @@ allprojects {
   group = "com.example.mygroup"
   version = "1.0-SNAPSHOT"
 }
-
 ```
 
 Add the common pom elements to your root `gradle.properties`
@@ -102,9 +101,11 @@ deployable {
 }
 ```
 
-
 Finally, deploy using
 `./gradlew uploadArchives` or the new deploy alias `./gradlew deploy`
+
+### Why does it exist?
+This is my first gradle plugin and groovy project so it may be rough around the edges. There are probably better tools out there for your open source libraries, but this will be building block for upcoming episode6 open source projects.
 
 ### License
 MIT: https://github.com/episode6/chop/blob/master/LICENSE

@@ -5,7 +5,8 @@ import org.gradle.api.Project
 import org.gradle.api.tasks.bundling.Jar
 
 /**
- * Addon plugin to package and upload groovydocs
+ * Addon plugin to package and upload groovydocs. Use this in conjunction with `com.episode6.hackit.deployable.jar'
+ * Referenced as 'com.episode6.hackit.deployable.addon.groovydocs'
  */
 class GroovyDocAddonPlugin implements Plugin<Project>{
   @Override

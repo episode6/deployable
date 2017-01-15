@@ -8,12 +8,12 @@ import org.gradle.api.plugins.MavenPlugin
 import org.gradle.plugins.signing.SigningPlugin
 
 /**
- * Base deployable plugin
+ * Base deployable plugin. It is not referenced directly in gradle, but applied by either the jar or aar plugin
  */
 class DeployablePlugin implements Plugin<Project> {
   String pomPackaging = null
 
-  def isReleaseBuild(Project project) {
+  static isReleaseBuild(Project project) {
     return project.version.contains("SNAPSHOT") == false
   }
 

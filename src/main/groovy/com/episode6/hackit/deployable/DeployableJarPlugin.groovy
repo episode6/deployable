@@ -6,6 +6,7 @@ import org.gradle.api.tasks.bundling.Jar
 
 /**
  * Plugin to make Jars deployable
+ * Referenced as 'com.episode6.hackit.deployable.jar'
  */
 class DeployableJarPlugin implements Plugin<Project> {
   void apply(Project project) {

@@ -6,7 +6,8 @@ import org.gradle.api.tasks.bundling.Jar
 import org.gradle.api.tasks.javadoc.Javadoc
 
 /**
- * Plugin to make Aars deployable
+ * Plugin to make Aars (android artifacts) deployable.
+ * Referenced as 'com.episode6.hackit.deployable.aar'
  */
 class DeployableAarPlugin implements Plugin<Project> {
   void apply(Project project) {

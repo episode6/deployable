@@ -1,7 +1,7 @@
 package com.episode6.hackit.deployable.extension
 
 /**
- * Helper class to help out with translating directly-accessed get methods into calls to getProperty() so that
+ * Helper class to translate directly-accessed get methods into calls to getProperty() so that
  * the gradle.properties can be checked
  */
 class NestedExtensionHelper {

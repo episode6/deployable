@@ -3,7 +3,8 @@ package com.episode6.hackit.deployable.extension
 import org.gradle.api.Project
 
 /**
- * Root deployable plugin extension
+ * Deployable plugin extension. Stores/retreives info that is used
+ * to build the pom and upload the artifacts.
  */
 class DeployablePluginExtension extends NestedExtension {
   static class PomExtension extends NestedExtension {
