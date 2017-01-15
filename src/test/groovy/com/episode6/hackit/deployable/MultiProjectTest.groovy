@@ -150,6 +150,10 @@ include ':javalib', ':groovylib', ':androidlib'
     groovylibVerifier.verifyAll()
     groovylibVerifier.verifyJarFile("groovydoc")
     androidlibVerifier.verifyAll("aar")
+    groovylibVerifier.verifyPomDependencies(
+        new MavenOutputVerifier.MavenDependency(groupId: groupId, artifactId: "javalib", version: versionName),
+        new MavenOutputVerifier.MavenDependency(groupId: groupId, artifactId: "andfroidlib", version: versionName)
+    )
 
     where:
     groupId                              | versionName

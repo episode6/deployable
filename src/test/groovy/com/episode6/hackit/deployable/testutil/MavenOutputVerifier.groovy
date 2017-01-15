@@ -110,6 +110,24 @@ class MavenOutputVerifier {
     return true
   }
 
+  boolean verifyPomDependencies(MavenDependency... dependencies) {
+    def pom = getArtifactFile("pom").asXml()
+    dependencies.each { md ->
+      def foundDep = pom.dependencies.dependency.find{ pd ->
+        println "looking at ${pd} - ${pd.groupId.text()}"
+        pd.groupId.text() == md.groupId &&
+          pd.artifactId.text() == md.artifactId &&
+          pd.version.text() == md.version &&
+          pd.scope.text() == md.scope
+      }
+      assert foundDep.groupId.text() == md.groupId
+      assert foundDep.artifactId.text() == md.artifactId
+      assert foundDep.version.text() == md.version
+      assert foundDep.scope.text() == md.scope
+      println "found dep: ${foundDep.groupId.text()}:${foundDep.artifactId.text()}:${foundDep.version.text()}"
+    }
+  }
+
   boolean verifySignatureOfFile(File file) {
     File signatureFile = new File(file.absolutePath + ".asc")
 
@@ -153,5 +171,12 @@ class MavenOutputVerifier {
     String snapshotTimestamp = versionSpecificMavenMetaData.versioning.snapshot.timestamp.text()
     String snapshotBuildNumber = versionSpecificMavenMetaData.versioning.snapshot.buildNumber.text()
     return "${artifactId}-${versionName.replace("-SNAPSHOT", "")}-${snapshotTimestamp}-${snapshotBuildNumber}${endOfFileName}"
+  }
+
+  static class MavenDependency {
+    String groupId
+    String artifactId
+    String version
+    String scope = "compile"
   }
 }
