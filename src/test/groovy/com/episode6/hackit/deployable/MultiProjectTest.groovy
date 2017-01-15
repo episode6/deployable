@@ -144,16 +144,17 @@ include ':javalib', ':groovylib', ':androidlib'
 
     then:
     result.task(":javalib:deploy").outcome == TaskOutcome.SUCCESS
-    result.task(":groovylib:deploy").outcome == TaskOutcome.SUCCESS
-    result.task(":androidlib:deploy").outcome == TaskOutcome.SUCCESS
     javalibVerifier.verifyAll()
+
+    result.task(":groovylib:deploy").outcome == TaskOutcome.SUCCESS
     groovylibVerifier.verifyAll()
     groovylibVerifier.verifyJarFile("groovydoc")
+    groovylibVerifier.verifyPomDependency(groupId, "javalib", versionName)
+
+    result.task(":androidlib:deploy").outcome == TaskOutcome.SUCCESS
     androidlibVerifier.verifyAll("aar")
-    groovylibVerifier.verifyPomDependencies(
-        new MavenOutputVerifier.MavenDependency(groupId: groupId, artifactId: "javalib", version: versionName),
-        new MavenOutputVerifier.MavenDependency(groupId: groupId, artifactId: "andfroidlib", version: versionName)
-    )
+    androidlibVerifier.verifyPomDependency(groupId, "javalib", versionName)
+    androidlibVerifier.verifyPomDependency(groupId, "groovylib", versionName)
 
     where:
     groupId                              | versionName
