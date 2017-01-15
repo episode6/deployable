@@ -96,10 +96,6 @@ ${convertDependentProjectsToDependencies(dependentProjects)}
 
   def "test multi-project deployables"(String groupId, String versionName) {
     given:
-    File tmpM2Fldr = new File("build/m2")
-    testProject.snapshotMavenRepoDir = tmpM2Fldr.newFolder("snapshot")
-    testProject.releaseMavenRepoDir = tmpM2Fldr.newFolder("release")
-
     testProject.rootGradlePropertiesFile << testProject.testProperties.inGradlePropertiesFormat
     File javalib = testProject.newFile("javalib")
     File groovylib = testProject.newFile("groovylib")
