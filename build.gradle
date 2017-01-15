@@ -1,0 +1,38 @@
+group = "com.episode6.hackit.deployable"
+version = "0.1"
+
+repositories {
+  jcenter()
+}
+
+apply plugin: 'groovy'
+apply plugin: 'java-gradle-plugin'
+
+// Apply this plugin to itself so we don't need to duplicate the deploy logic.
+GroovyScriptEngine scriptEngine = new GroovyScriptEngine([
+      file('src/main/groovy').absolutePath,
+      file('src/main/resources').absolutePath
+    ].toArray(new String[2]),
+    this.class.classLoader)
+apply plugin: scriptEngine.loadScriptByName('com/episode6/hackit/deployable/DeployableJarPlugin.groovy')
+apply plugin: scriptEngine.loadScriptByName('com/episode6/hackit/deployable/addon/GroovyDocAddonPlugin.groovy')
+
+dependencies {
+  compile localGroovy()
+  compile gradleApi()
+
+  testCompile("org.spockframework:spock-core:1.1-groovy-2.4-rc-2")  {
+    exclude module: 'groovy-all'
+  }
+  testCompile gradleTestKit()
+  testCompile("org.bouncycastle:bcpg-jdk15on:1.56")
+}
+
+test {
+  testLogging {
+    showStandardStreams = true
+  }
+}
+
+
+
