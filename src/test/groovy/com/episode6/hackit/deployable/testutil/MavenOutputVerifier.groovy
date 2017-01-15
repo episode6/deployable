@@ -40,7 +40,7 @@ class MavenOutputVerifier {
     return getMavenVersionDir().newFile(getArtifactFileName(extension, descriptor))
   }
 
-  boolean verifyAll(String artifactPackaging = "jar") {
+  boolean verifyStandardOutput(String artifactPackaging = "jar") {
     return verifyRootMavenMetaData() &&
         verifyVersionSpecificMavenMetaData() &&
         verifyPomData() &&

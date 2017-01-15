@@ -144,15 +144,15 @@ include ':javalib', ':groovylib', ':androidlib'
 
     then:
     result.task(":javalib:deploy").outcome == TaskOutcome.SUCCESS
-    javalibVerifier.verifyAll()
+    javalibVerifier.verifyStandardOutput()
 
     result.task(":groovylib:deploy").outcome == TaskOutcome.SUCCESS
-    groovylibVerifier.verifyAll()
+    groovylibVerifier.verifyStandardOutput()
     groovylibVerifier.verifyJarFile("groovydoc")
     groovylibVerifier.verifyPomDependency(groupId, "javalib", versionName)
 
     result.task(":androidlib:deploy").outcome == TaskOutcome.SUCCESS
-    androidlibVerifier.verifyAll("aar")
+    androidlibVerifier.verifyStandardOutput("aar")
     androidlibVerifier.verifyPomDependency(groupId, "javalib", versionName)
     androidlibVerifier.verifyPomDependency(groupId, "groovylib", versionName)
 

@@ -132,7 +132,7 @@ deployable {
     result.task(":install") == null
     // check one of the properties to make sure it was overridden, let mavenOutputVerifier handle the rest
     mavenOutputVerifier.getArtifactFile("pom").asXml().licenses.license.name.text() == "The MIT OVERRIDE License (MIT)"
-    mavenOutputVerifier.verifyAll()
+    mavenOutputVerifier.verifyStandardOutput()
 
     where:
     groupId                          | artifactId    | versionName
