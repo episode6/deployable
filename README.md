@@ -10,7 +10,7 @@ buildscript {
     jcenter()
   }
   dependencies {
-    classpath 'com.episode6.hackit.deployable:deployable:0.0.5-SNAPSHOT'
+    classpath 'com.episode6.hackit.deployable:deployable:0.1'
   }
 }
 ```
