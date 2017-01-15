@@ -51,8 +51,8 @@ rootProject.name = '${rootProjectName}'
 """
   }
 
-  File createNonEmptyJavaFile(String packageName, String className = "SampleClass") {
-    File dir = buildFolder.getRoot().newFolder("src", "main", "java").newFolderFromPackage(packageName)
+  File createNonEmptyJavaFile(String packageName, String className = "SampleClass", File rootDir = buildFolder.getRoot()) {
+    File dir = rootDir.newFolder("src", "main", "java").newFolderFromPackage(packageName)
     File nonEmptyJavaFile = dir.newFile("${className}.java")
     nonEmptyJavaFile << """
 package ${packageName};
@@ -67,8 +67,8 @@ public class ${className} {
     return nonEmptyJavaFile
   }
 
-  File createNonEmptyGroovyFile(String packageName, String className = "SampleClass") {
-    File dir = buildFolder.getRoot().newFolder("src", "main", "groovy").newFolderFromPackage(packageName)
+  File createNonEmptyGroovyFile(String packageName, String className = "SampleClass", File rootDir = buildFolder.getRoot()) {
+    File dir = rootDir.newFolder("src", "main", "groovy").newFolderFromPackage(packageName)
     File nonEmptyGroovyFile = dir.newFile("${className}.groovy")
     nonEmptyGroovyFile << """
 package ${packageName}

@@ -67,7 +67,7 @@ dependencies {
     result.task(":uploadArchives").outcome == TaskOutcome.SUCCESS
     result.task(":deploy").outcome == TaskOutcome.SUCCESS
     result.task(":install") == null
-    mavenOutputVerifier.verifyAll()
+    mavenOutputVerifier.verifyStandardOutput()
     mavenOutputVerifier.verifyJarFile("groovydoc")
 
     where:

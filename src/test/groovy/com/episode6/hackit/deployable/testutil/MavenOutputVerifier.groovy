@@ -40,7 +40,7 @@ class MavenOutputVerifier {
     return getMavenVersionDir().newFile(getArtifactFileName(extension, descriptor))
   }
 
-  boolean verifyAll(String artifactPackaging = "jar") {
+  boolean verifyStandardOutput(String artifactPackaging = "jar") {
     return verifyRootMavenMetaData() &&
         verifyVersionSpecificMavenMetaData() &&
         verifyPomData() &&
@@ -107,6 +107,21 @@ class MavenOutputVerifier {
 
     assert verifySignatureOfFile(pomFile)
 
+    return true
+  }
+
+  boolean verifyPomDependency(String groupId, String artifactId, String version, String scope = "compile") {
+    def pom = getArtifactFile("pom").asXml()
+    def pomDep = pom.dependencies.dependency.find { pd ->
+      pd.groupId.text() == groupId &&
+          pd.artifactId.text() == artifactId &&
+          pd.version.text() == version &&
+          pd.scope.text() == scope
+    }
+    assert pomDep.groupId.text() == groupId &&
+        pomDep.artifactId.text() == artifactId &&
+        pomDep.version.text() == version &&
+        pomDep.scope.text() == scope
     return true
   }
 

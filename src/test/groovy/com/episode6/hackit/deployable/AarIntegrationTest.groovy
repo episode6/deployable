@@ -86,7 +86,7 @@ android {
     result.task(":signArchives").outcome == TaskOutcome.SUCCESS
     result.task(":uploadArchives").outcome == TaskOutcome.SUCCESS
     result.task(":deploy").outcome == TaskOutcome.SUCCESS
-    mavenOutputVerifier.verifyAll("aar")
+    mavenOutputVerifier.verifyStandardOutput("aar")
 
     where:
     groupId                         | artifactId    | versionName
