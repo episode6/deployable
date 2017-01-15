@@ -2,7 +2,6 @@ package com.episode6.hackit.deployable
 
 import com.episode6.hackit.deployable.testutil.IntegrationTestProject
 import com.episode6.hackit.deployable.testutil.MavenOutputVerifier
-import org.gradle.testkit.runner.GradleRunner
 import org.gradle.testkit.runner.TaskOutcome
 import org.junit.Rule
 import org.junit.rules.TemporaryFolder
@@ -136,11 +135,7 @@ include ':javalib', ':groovylib', ':androidlib'
         testProject: testProject)
 
     when:
-    def result = GradleRunner.create()
-        .withProjectDir(testProjectDir.root)
-        .withPluginClasspath()
-        .withArguments("deploy")
-        .build()
+    def result = testProject.executeGradleTask("deploy")
 
     then:
     result.task(":javalib:deploy").outcome == TaskOutcome.SUCCESS

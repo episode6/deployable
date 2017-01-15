@@ -2,7 +2,6 @@ package com.episode6.hackit.deployable
 
 import com.episode6.hackit.deployable.testutil.IntegrationTestProject
 import com.episode6.hackit.deployable.testutil.MavenOutputVerifier
-import org.gradle.testkit.runner.GradleRunner
 import org.gradle.testkit.runner.TaskOutcome
 import org.junit.Rule
 import org.junit.rules.TemporaryFolder
@@ -46,11 +45,7 @@ version = '${versionName}'
         testProject: testProject)
 
     when:
-    def result = GradleRunner.create()
-        .withProjectDir(testProjectDir.root)
-        .withPluginClasspath()
-        .withArguments("deploy")
-        .build()
+    def result = testProject.executeGradleTask("deploy")
 
     then:
     result.task(":jar").outcome == TaskOutcome.SUCCESS
@@ -78,11 +73,7 @@ version = '${versionName}'
     testProject.createNonEmptyJavaFile("${groupId}.${artifactId}")
 
     when:
-    def result = GradleRunner.create()
-        .withProjectDir(testProjectDir.root)
-        .withPluginClasspath()
-        .withArguments("install")
-        .build()
+    def result = testProject.executeGradleTask("install")
 
     then:
     result.task(":jar").outcome == TaskOutcome.SUCCESS

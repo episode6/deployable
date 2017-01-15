@@ -3,7 +3,6 @@ package com.episode6.hackit.deployable
 import com.episode6.hackit.deployable.extension.DeployablePluginExtension
 import com.episode6.hackit.deployable.testutil.IntegrationTestProject
 import com.episode6.hackit.deployable.testutil.MavenOutputVerifier
-import org.gradle.testkit.runner.GradleRunner
 import org.gradle.testkit.runner.TaskOutcome
 import org.junit.Rule
 import org.junit.rules.TemporaryFolder
@@ -114,11 +113,7 @@ deployable {
     testProject.rootGradleBuildFile << overridePropertiesBuildFile(groupId, versionName, testProject.testProperties.deployable)
 
     when:
-    def result = GradleRunner.create()
-        .withProjectDir(testProjectDir.root)
-        .withPluginClasspath()
-        .withArguments("deploy")
-        .build()
+    def result = testProject.executeGradleTask("deploy")
 
     then:
     result.task(":jar").outcome == TaskOutcome.SUCCESS

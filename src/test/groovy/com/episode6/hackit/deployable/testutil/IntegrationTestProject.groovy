@@ -1,5 +1,7 @@
 package com.episode6.hackit.deployable.testutil
 
+import org.gradle.testkit.runner.BuildResult
+import org.gradle.testkit.runner.GradleRunner
 import org.junit.rules.TemporaryFolder
 
 /**
@@ -81,5 +83,13 @@ class ${className} {
 }
 """
     return nonEmptyGroovyFile
+  }
+
+  BuildResult executeGradleTask(String task) {
+    return GradleRunner.create()
+        .withProjectDir(buildFolder.root)
+        .withPluginClasspath()
+        .withArguments(task)
+        .build()
   }
 }
