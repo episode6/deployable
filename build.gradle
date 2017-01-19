@@ -1,12 +1,9 @@
 buildscript {
   repositories {
     jcenter()
-    maven {
-      url "https://oss.sonatype.org/content/repositories/snapshots/"
-    }
   }
   dependencies {
-    classpath 'com.episode6.hackit.nestable:nestable:+'
+    classpath 'com.episode6.hackit.nestable:nestable:0.0.1'
   }
 }
 
@@ -15,9 +12,6 @@ version = "0.1.1-SNAPSHOT"
 
 repositories {
   jcenter()
-  maven {
-    url "https://oss.sonatype.org/content/repositories/snapshots/"
-  }
 }
 
 apply plugin: 'groovy'
@@ -35,7 +29,7 @@ apply plugin: scriptEngine.loadScriptByName('com/episode6/hackit/deployable/addo
 dependencies {
   compile localGroovy()
   compile gradleApi()
-  compile 'com.episode6.hackit.nestable:nestable:+'
+  compile 'com.episode6.hackit.nestable:nestable:0.0.1'
 
   testCompile("org.spockframework:spock-core:1.1-groovy-2.4-rc-2")  {
     exclude module: 'groovy-all'
