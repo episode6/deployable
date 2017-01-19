@@ -108,4 +108,4 @@ Finally, deploy using
 This is my first gradle plugin and groovy project so it may be rough around the edges. There are probably better tools out there for your open source libraries, but this will be building block for upcoming episode6 open source projects.
 
 ### License
-MIT: https://github.com/episode6/chop/blob/master/LICENSE
+MIT: https://github.com/episode6/deployable/blob/master/LICENSE
