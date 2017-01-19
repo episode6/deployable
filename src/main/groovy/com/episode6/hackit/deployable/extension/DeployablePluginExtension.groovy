@@ -1,39 +1,40 @@
 package com.episode6.hackit.deployable.extension
 
+import com.episode6.hackit.nestable.NestablePluginExtension
 import org.gradle.api.Project
 
 /**
  * Deployable plugin extension. Stores/retreives info that is used
  * to build the pom and upload the artifacts.
  */
-class DeployablePluginExtension extends NestedExtension {
-  static class PomExtension extends NestedExtension {
+class DeployablePluginExtension extends NestablePluginExtension {
+  static class PomExtension extends NestablePluginExtension {
 
-    static class ScmExtension extends NestedExtension {
+    static class ScmExtension extends NestablePluginExtension {
       String url = null
       String connection = null
       String developerConnection = null
 
-      ScmExtension(NestedExtension parent) {
+      ScmExtension(NestablePluginExtension parent) {
         super(parent, "scm")
       }
     }
 
-    static class LicenseExtension extends NestedExtension {
+    static class LicenseExtension extends NestablePluginExtension {
       String name = null
       String url = null
       String distribution = null
 
-      LicenseExtension(NestedExtension parent) {
+      LicenseExtension(NestablePluginExtension parent) {
         super(parent, "license")
       }
     }
 
-    static class DeveloperExtension extends NestedExtension {
+    static class DeveloperExtension extends NestablePluginExtension {
       String id
       String name
 
-      DeveloperExtension(NestedExtension parent) {
+      DeveloperExtension(NestablePluginExtension parent) {
         super(parent, "developer")
       }
     }
@@ -45,7 +46,7 @@ class DeployablePluginExtension extends NestedExtension {
     LicenseExtension license
     DeveloperExtension developer
 
-    PomExtension(NestedExtension parent) {
+    PomExtension(NestablePluginExtension parent) {
       super(parent, "pom")
       scm = new ScmExtension(this)
       license = new LicenseExtension(this)
@@ -53,13 +54,13 @@ class DeployablePluginExtension extends NestedExtension {
     }
   }
 
-  static class NexusExtension extends NestedExtension {
+  static class NexusExtension extends NestablePluginExtension {
     String username = null
     String password = null
     String releaseRepoUrl = null
     String snapshotRepoUrl = null
 
-    NexusExtension(NestedExtension parent) {
+    NexusExtension(NestablePluginExtension parent) {
       super(parent, "nexus")
     }
 
