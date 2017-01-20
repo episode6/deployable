@@ -1,9 +1,9 @@
 package com.episode6.hackit.deployable.testutil
 
 import com.episode6.hackit.deployable.extension.DeployablePluginExtension
-import com.episode6.hackit.deployable.extension.NestedExtension
 import com.episode6.hackit.deployable.testutil.keyring.KeyRingBundle
 import com.episode6.hackit.deployable.testutil.keyring.KeyRings
+import com.episode6.hackit.nestable.NestablePluginExtension
 
 /**
  *
@@ -66,7 +66,7 @@ class TestProperties {
     return builder.toString()
   }
 
-  private StringBuilder buildGradlePropertiesForNestedExtension(NestedExtension nestedExtension, StringBuilder stringBuilder) {
+  private StringBuilder buildGradlePropertiesForNestedExtension(NestablePluginExtension nestedExtension, StringBuilder stringBuilder) {
     nestedExtension.getProperties().each { key, value ->
       if (value instanceof String) {
         stringBuilder.append(nestedExtension.getNamespace())
@@ -75,7 +75,7 @@ class TestProperties {
           .append("=")
           .append(value)
           .append("\n")
-      } else if (value instanceof NestedExtension) {
+      } else if (value instanceof NestablePluginExtension) {
         buildGradlePropertiesForNestedExtension(value, stringBuilder)
       }
     }

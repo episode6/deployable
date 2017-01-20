@@ -28,7 +28,7 @@ class DeployablePlugin implements Plugin<Project> {
 
     project.task("validateDeployable") {
       doLast {
-        List<String> missingProps = deployable.findMissingProps()
+        List<String> missingProps = deployable.findMissingProperties()
         if (!missingProps.isEmpty()) {
           throw new MissingPropertyException("Missing the following required properties: ${missingProps}")
         }
