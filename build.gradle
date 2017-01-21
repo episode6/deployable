@@ -36,6 +36,7 @@ dependencies {
   }
   testCompile gradleTestKit()
   testCompile("org.bouncycastle:bcpg-jdk15on:1.56")
+  testCompile("com.episode6.hackit.groovykit:gk-files:0.0.1")
 }
 
 test {

@@ -1,3 +1,0 @@
-moduleName = testing-extension-module
-moduleVersion = 1.0
-extensionClasses = com.episode6.hackit.deployable.testutil.TestingExtension
