@@ -4,7 +4,6 @@ import com.episode6.hackit.deployable.testutil.IntegrationTestProject
 import com.episode6.hackit.deployable.testutil.MavenOutputVerifier
 import org.gradle.testkit.runner.TaskOutcome
 import org.junit.Rule
-import org.junit.rules.TemporaryFolder
 import spock.lang.Specification
 
 /**
@@ -86,21 +85,14 @@ ${convertDependentProjectsToDependencies(dependentProjects)}
 """
   }
 
-  @Rule final TemporaryFolder testProjectDir = new TemporaryFolder()
-
-  IntegrationTestProject testProject
-
-  def setup() {
-    testProject = new IntegrationTestProject(testProjectDir)
-  }
+  @Rule final IntegrationTestProject testProject = new IntegrationTestProject()
 
   def "test multi-project deployables"(String groupId, String versionName) {
     given:
     testProject.rootGradlePropertiesFile << testProject.testProperties.inGradlePropertiesFormat
-    File javalib = testProject.newFile("javalib")
-    File groovylib = testProject.newFile("groovylib")
-    File androidlib = testProject.newFile("androidlib")
-    mkdirs(javalib, groovylib, androidlib)
+    File javalib = testProject.newFolder("javalib")
+    File groovylib = testProject.newFolder("groovylib")
+    File androidlib = testProject.newFolder("androidlib")
     testProject.rootGradleSettingFile << """
 include ':javalib', ':groovylib', ':androidlib'
 """
@@ -151,12 +143,6 @@ include ':javalib', ':groovylib', ':androidlib'
     groupId                              | versionName
     "com.multiproject.snapshot.example"  | "0.0.1-SNAPSHOT"
     "com.multiproject.release.example"   | "0.0.1"
-  }
-
-  private static void mkdirs(File... dirs) {
-    dirs.each {
-      it.mkdirs()
-    }
   }
 
   private static String convertDependentProjectsToDependencies(String... dependentProjectNames) {

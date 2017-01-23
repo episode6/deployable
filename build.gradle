@@ -1,5 +1,14 @@
+buildscript {
+  repositories {
+    jcenter()
+  }
+  dependencies {
+    classpath 'com.episode6.hackit.nestable:nestable:0.0.1'
+  }
+}
+
 group = "com.episode6.hackit.deployable"
-version = "0.1"
+version = "0.1.1"
 
 repositories {
   jcenter()
@@ -20,12 +29,14 @@ apply plugin: scriptEngine.loadScriptByName('com/episode6/hackit/deployable/addo
 dependencies {
   compile localGroovy()
   compile gradleApi()
+  compile 'com.episode6.hackit.nestable:nestable:0.0.1'
 
   testCompile("org.spockframework:spock-core:1.1-groovy-2.4-rc-2")  {
     exclude module: 'groovy-all'
   }
   testCompile gradleTestKit()
   testCompile("org.bouncycastle:bcpg-jdk15on:1.56")
+  testCompile("com.episode6.hackit.groovykit:gk-files:0.0.1")
 }
 
 test {
@@ -33,6 +44,3 @@ test {
     showStandardStreams = true
   }
 }
-
-
-

@@ -26,14 +26,7 @@ class DeployablePlugin implements Plugin<Project> {
         DeployablePluginExtension,
         project)
 
-    project.task("validateDeployable") {
-      doLast {
-        List<String> missingProps = deployable.findMissingProps()
-        if (!missingProps.isEmpty()) {
-          throw new MissingPropertyException("Missing the following required properties: ${missingProps}")
-        }
-      }
-    }
+    project.task("validateDeployable", type: DeployableValidationTask)
 
     if (project.tasks.findByPath("install") != null) {
       project.install.dependsOn project.validateDeployable
