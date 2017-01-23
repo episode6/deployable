@@ -1,9 +1,17 @@
 buildscript {
+  ext {
+    // In order to deploy this plugin using itself, we must define all our external compile dependencies on
+    // the buildscript classpath as well as the normal dependency block.
+    // Put them here so we don't have to write them twice
+    compileDependencies = [
+        "com.episode6.hackit.nestable:nestable:0.0.1",
+    ]
+  }
   repositories {
     jcenter()
   }
   dependencies {
-    classpath 'com.episode6.hackit.nestable:nestable:0.0.1'
+    classpath compileDependencies
   }
 }
 
@@ -29,7 +37,7 @@ apply plugin: scriptEngine.loadScriptByName('com/episode6/hackit/deployable/addo
 dependencies {
   compile localGroovy()
   compile gradleApi()
-  compile 'com.episode6.hackit.nestable:nestable:0.0.1'
+  compile compileDependencies
 
   testCompile("org.spockframework:spock-core:1.1-groovy-2.4-rc-2")  {
     exclude module: 'groovy-all'
