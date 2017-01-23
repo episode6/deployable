@@ -21,7 +21,6 @@ class DeployableValidationTask extends DefaultTask {
     if (!isPropertyValid(project.version)) {
       missingProps.add("Project Property: version")
     }
-    println "project def: ${project.group}:${project.name}:${project.version}"
     missingProps.addAll(project.deployable.findMissingProperties())
     if (!missingProps.isEmpty()) {
       throw new DeployableValidationException(missingProps)
