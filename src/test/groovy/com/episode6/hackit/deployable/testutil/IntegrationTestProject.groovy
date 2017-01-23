@@ -7,9 +7,8 @@ import org.junit.rules.TemporaryFolder
 /**
  * Hold information about the project-under-test
  */
-class IntegrationTestProject {
+class IntegrationTestProject extends TemporaryFolder {
 
-  public final TemporaryFolder buildFolder
   File rootGradleBuildFile
   File rootGradlePropertiesFile
   File rootGradleSettingFile
@@ -19,16 +18,17 @@ class IntegrationTestProject {
 
   TestProperties testProperties
 
-  IntegrationTestProject(TemporaryFolder buildFolder) {
-    this.buildFolder = buildFolder
+  @Override
+  protected void before() {
+    super.before()
     testProperties = new TestProperties()
 
-    rootGradleBuildFile = buildFolder.newFile("build.gradle")
-    rootGradlePropertiesFile = buildFolder.newFile("gradle.properties")
-    rootGradleSettingFile = buildFolder.newFile("settings.gradle")
+    rootGradleBuildFile = newFile("build.gradle")
+    rootGradlePropertiesFile = newFile("gradle.properties")
+    rootGradleSettingFile = newFile("settings.gradle")
 
-    setSnapshotMavenRepoDir(buildFolder.newFolder("mavenSnapshot"))
-    setReleaseMavenRepoDir(buildFolder.newFolder("mavenRelease"))
+    setSnapshotMavenRepoDir(newFolder("mavenSnapshot"))
+    setReleaseMavenRepoDir(newFolder("mavenRelease"))
   }
 
   void setSnapshotMavenRepoDir(File snapshotMavenRepoDir) {
@@ -43,17 +43,13 @@ class IntegrationTestProject {
     this.releaseMavenRepoDir = releaseMavenRepoDir
   }
 
-  File newFile(String... paths) {
-    return buildFolder.getRoot().newFile(paths)
-  }
-
   void setRootProjectName(String rootProjectName) {
     rootGradleSettingFile << """
 rootProject.name = '${rootProjectName}'
 """
   }
 
-  File createNonEmptyJavaFile(String packageName, String className = "SampleClass", File rootDir = buildFolder.getRoot()) {
+  File createNonEmptyJavaFile(String packageName, String className = "SampleClass", File rootDir = root) {
     File dir = rootDir.newFolder("src", "main", "java").newFolderFromPackage(packageName)
     File nonEmptyJavaFile = dir.newFile("${className}.java")
     nonEmptyJavaFile << """
@@ -69,7 +65,7 @@ public class ${className} {
     return nonEmptyJavaFile
   }
 
-  File createNonEmptyGroovyFile(String packageName, String className = "SampleClass", File rootDir = buildFolder.getRoot()) {
+  File createNonEmptyGroovyFile(String packageName, String className = "SampleClass", File rootDir = root) {
     File dir = rootDir.newFolder("src", "main", "groovy").newFolderFromPackage(packageName)
     File nonEmptyGroovyFile = dir.newFile("${className}.groovy")
     nonEmptyGroovyFile << """
@@ -87,7 +83,7 @@ class ${className} {
 
   BuildResult executeGradleTask(String task) {
     return GradleRunner.create()
-        .withProjectDir(buildFolder.root)
+        .withProjectDir(root)
         .withPluginClasspath()
         .withArguments(task)
         .build()

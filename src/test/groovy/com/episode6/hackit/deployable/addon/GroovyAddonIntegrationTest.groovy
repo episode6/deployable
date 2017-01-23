@@ -4,7 +4,6 @@ import com.episode6.hackit.deployable.testutil.IntegrationTestProject
 import com.episode6.hackit.deployable.testutil.MavenOutputVerifier
 import org.gradle.testkit.runner.TaskOutcome
 import org.junit.Rule
-import org.junit.rules.TemporaryFolder
 import spock.lang.Specification
 
 /**
@@ -29,13 +28,7 @@ dependencies {
  """
   }
 
-  @Rule final TemporaryFolder testProjectDir = new TemporaryFolder()
-
-  IntegrationTestProject testProject
-
-  def setup() {
-    testProject = new IntegrationTestProject(testProjectDir)
-  }
+  @Rule final IntegrationTestProject testProject = new IntegrationTestProject()
 
   def "verify groovy deploy tasks and output"(String groupId, String artifactId, String versionName) {
     given:

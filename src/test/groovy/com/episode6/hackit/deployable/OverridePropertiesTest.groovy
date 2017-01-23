@@ -5,7 +5,6 @@ import com.episode6.hackit.deployable.testutil.IntegrationTestProject
 import com.episode6.hackit.deployable.testutil.MavenOutputVerifier
 import org.gradle.testkit.runner.TaskOutcome
 import org.junit.Rule
-import org.junit.rules.TemporaryFolder
 import spock.lang.Specification
 
 /**
@@ -58,13 +57,7 @@ deployable {
  """
   }
 
-  @Rule final TemporaryFolder testProjectDir = new TemporaryFolder()
-
-  IntegrationTestProject testProject
-
-  def setup() {
-    testProject = new IntegrationTestProject(testProjectDir)
-  }
+  @Rule final IntegrationTestProject testProject = new IntegrationTestProject()
 
   def "test override gradle.settings"(String groupId, String artifactId, String versionName) {
     given:
@@ -80,8 +73,8 @@ deployable {
     testProject.rootGradlePropertiesFile << testProject.testProperties.inGradlePropertiesFormat
 
     //change the properties
-    testProject.snapshotMavenRepoDir = testProject.newFile("overrideMavenSnapshot")
-    testProject.releaseMavenRepoDir = testProject.newFile("overrideMavenRelease")
+    testProject.snapshotMavenRepoDir = testProject.newFolder("overrideMavenSnapshot")
+    testProject.releaseMavenRepoDir = testProject.newFolder("overrideMavenRelease")
     testProject.testProperties.deployable {
       pom {
         description "OVERRIDE Test POM Description"
