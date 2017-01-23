@@ -1,6 +1,7 @@
 package com.episode6.hackit.deployable
 
 import com.episode6.hackit.deployable.extension.DeployablePluginExtension
+import org.gradle.api.Nullable
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.artifacts.maven.MavenDeployment
@@ -28,9 +29,20 @@ class DeployablePlugin implements Plugin<Project> {
 
     project.task("validateDeployable") {
       doLast {
-        List<String> missingProps = deployable.findMissingProperties()
+        List<String> missingProps = new LinkedList<>()
+        if (!isPropertyValid(project.name)) {
+          missingProps.add("Project Property: name")
+        }
+        if (!isPropertyValid(project.group)) {
+          missingProps.add("Project Property: group")
+        }
+        if (!isPropertyValid(project.version)) {
+          missingProps.add("Project Property: version")
+        }
+        println "project def: ${project.group}:${project.name}:${project.version}"
+        missingProps.addAll(deployable.findMissingProperties())
         if (!missingProps.isEmpty()) {
-          throw new MissingPropertyException("Missing the following required properties: ${missingProps}")
+          throw new DeployableValidationException(missingProps)
         }
       }
     }
@@ -97,5 +109,10 @@ class DeployablePlugin implements Plugin<Project> {
         sign project.configurations.archives
       }
     }
+  }
+
+  private static boolean isPropertyValid(@Nullable String prop) {
+    prop = prop?.trim()?.toLowerCase()
+    return prop && prop != "unspecified"
   }
 }

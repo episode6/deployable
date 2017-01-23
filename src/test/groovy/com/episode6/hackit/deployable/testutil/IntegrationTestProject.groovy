@@ -88,4 +88,12 @@ class ${className} {
         .withArguments(task)
         .build()
   }
+
+  BuildResult failGradleTask(String task) {
+    return GradleRunner.create()
+        .withProjectDir(root)
+        .withPluginClasspath()
+        .withArguments(task)
+        .buildAndFail()
+  }
 }
