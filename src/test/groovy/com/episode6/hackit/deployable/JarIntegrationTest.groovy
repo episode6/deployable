@@ -11,16 +11,12 @@ import spock.lang.Specification
  */
 class JarIntegrationTest extends Specification {
 
-  private static final String BUILD_FILE_HEADER = """
+  private static String simpleBuildFile(String groupId, String versionName) {
+    return """
 plugins {
  id 'java'
  id 'com.episode6.hackit.deployable.jar'
 }
-"""
-
-  private static String simpleBuildFile(String groupId, String versionName) {
-    return """
-${BUILD_FILE_HEADER}
 
 group = '${groupId}'
 version = '${versionName}'
@@ -85,61 +81,5 @@ version = '${versionName}'
     where:
     groupId                 | artifactId    | versionName
     "com.snapshot.example"  | "snapshotlib" | "0.0.3-SNAPSHOT"
-  }
-
-  def "fail on missing groupId"() {
-    given:
-    testProject.rootProjectName = "test-artifact"
-    testProject.rootGradlePropertiesFile << testProject.testProperties.inGradlePropertiesFormat
-    testProject.createNonEmptyJavaFile("com.testing.example")
-    testProject.rootGradleBuildFile << """
-${BUILD_FILE_HEADER}
-
-version = '0.0.1-SNAPSHOT'
-"""
-
-    when:
-    def result = testProject.failGradleTask("validateDeployable")
-
-    then:
-    result.task(":validateDeployable").outcome == TaskOutcome.FAILED
-    result.output.contains("deployable validation failure")
-    result.output.contains("Project Property: group")
-  }
-
-  def "fail on missing version"() {
-    given:
-    testProject.rootProjectName = "test-artifact"
-    testProject.rootGradlePropertiesFile << testProject.testProperties.inGradlePropertiesFormat
-    testProject.createNonEmptyJavaFile("com.testing.example")
-    testProject.rootGradleBuildFile << """
-${BUILD_FILE_HEADER}
-
-group = 'com.testing.example'
-"""
-
-    when:
-    def result = testProject.failGradleTask("validateDeployable")
-
-    then:
-    result.task(":validateDeployable").outcome == TaskOutcome.FAILED
-    result.output.contains("deployable validation failure")
-    result.output.contains("Project Property: version")
-  }
-
-  def "fail on missing name"() {
-    given:
-    testProject.rootProjectName = ""
-    testProject.rootGradlePropertiesFile << testProject.testProperties.inGradlePropertiesFormat
-    testProject.createNonEmptyJavaFile("com.testing.example")
-    testProject.rootGradleBuildFile << simpleBuildFile("com.testing.example", "0.0.1-SNAPSHOT")
-
-    when:
-    def result = testProject.failGradleTask("validateDeployable")
-
-    then:
-    result.task(":validateDeployable").outcome == TaskOutcome.FAILED
-    result.output.contains("deployable validation failure")
-    result.output.contains("Project Property: name")
   }
 }
