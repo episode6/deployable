@@ -113,4 +113,24 @@ group = 'com.testing.example'
     result.output.contains("deployable.pom.description")
     result.output.contains("deployable.pom.developer.id")
   }
+
+  def "pass if only missing optional properties"() {
+    given:
+    testProject.rootProjectName = "test-artifact"
+    testProject.createNonEmptyJavaFile("com.testing.example")
+    testProject.rootGradleBuildFile << simpleBuildFile("com.testing.example", "0.0.1-SNAPSHOT")
+    testProject.testProperties.deployable {
+      nexus {
+        username = null
+        password = null
+      }
+    }
+    testProject.rootGradlePropertiesFile << testProject.testProperties.inGradlePropertiesFormat
+
+    when:
+    def result = testProject.executeGradleTask("validateDeployable")
+
+    then:
+    result.task(":validateDeployable").outcome == TaskOutcome.SUCCESS
+  }
 }

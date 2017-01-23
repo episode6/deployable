@@ -8,6 +8,10 @@ import org.gradle.api.Project
  * to build the pom and upload the artifacts.
  */
 class DeployablePluginExtension extends NestablePluginExtension {
+  private static final String[] OPTIONAL_PROPERTIES = [
+      "deployable.nexus.username",
+      "deployable.nexus.password"]
+
   static class PomExtension extends NestablePluginExtension {
 
     static class ScmExtension extends NestablePluginExtension {
@@ -102,5 +106,10 @@ class DeployablePluginExtension extends NestablePluginExtension {
 
   NexusExtension nexus(Closure closure) {
     return nexus.applyClosure(closure)
+  }
+
+  @Override
+  List<String> findMissingProperties() {
+    return findMissingPropertiesExcluding(OPTIONAL_PROPERTIES)
   }
 }
