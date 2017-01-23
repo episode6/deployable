@@ -85,4 +85,32 @@ group = 'com.testing.example'
     result.output.contains("deployable validation failure")
     result.output.contains("Project Property: name")
   }
+
+  def "fail on missing all 3 project properties and a few deployable ones"() {
+    given:
+    testProject.rootProjectName = ""
+    testProject.createNonEmptyJavaFile("com.testing.example")
+    testProject.rootGradleBuildFile << BUILD_FILE_HEADER
+    testProject.testProperties.deployable {
+      pom {
+        description = null
+        developer {
+          id = null
+        }
+      }
+    }
+    testProject.rootGradlePropertiesFile << testProject.testProperties.inGradlePropertiesFormat
+
+    when:
+    def result = testProject.failGradleTask("validateDeployable")
+
+    then:
+    result.task(":validateDeployable").outcome == TaskOutcome.FAILED
+    result.output.contains("deployable validation failure")
+    result.output.contains("Project Property: name")
+    result.output.contains("Project Property: version")
+    result.output.contains("Project Property: group")
+    result.output.contains("deployable.pom.description")
+    result.output.contains("deployable.pom.developer.id")
+  }
 }
