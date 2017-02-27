@@ -27,14 +27,20 @@ class DeployablePlugin implements Plugin<Project> {
         DeployablePluginExtension,
         project)
 
-    project.task("validateDeployable", type: DeployableValidationTask)
+    project.task("validateDeployable", type: DeployableValidationTask) {
+      description = "Validates this project's deployable properties to ensure it can generate a valid pom."
+      group = "verification"
+    }
 
     addDependsOnToTask(project, "install", project.validateDeployable)
     addDependsOnToTask(project, "check", project.validateDeployable)
 
 
     // add deploy alias for uploadArchives task (because it's more fun to type)
-    project.task("deploy", dependsOn: project.uploadArchives) {}
+    project.task("deploy", dependsOn: project.uploadArchives) {
+      description = "A simple alias for uploadArchives, because it's more fun to say."
+      group = "upload"
+    }
 
     project.afterEvaluate {
       project.uploadArchives {
