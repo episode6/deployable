@@ -42,6 +42,12 @@ class DeployablePlugin implements Plugin<Project> {
     }
 
     project.afterEvaluate {
+      // map the compileOnly config (if it exists) to maven's 'provide' scope
+      def compileOnlyConfig = project.configurations.findByName("compileOnly")
+      if (compileOnlyConfig) {
+        project.conf2ScopeMappings.addMapping(0, compileOnlyConfig, "provided")
+      }
+
       project.uploadArchives {
         dependsOn project.validateDeployable
 
