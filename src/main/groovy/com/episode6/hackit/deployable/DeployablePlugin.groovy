@@ -3,7 +3,6 @@ package com.episode6.hackit.deployable
 import com.episode6.hackit.deployable.extension.DeployablePluginExtension
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.api.Task
 import org.gradle.api.artifacts.maven.MavenDeployment
 import org.gradle.api.plugins.MavenPlugin
 import org.gradle.plugins.signing.SigningPlugin
@@ -32,9 +31,9 @@ class DeployablePlugin implements Plugin<Project> {
       group = "verification"
     }
 
-    addDependsOnToTask(project, "install", project.validateDeployable)
-    addDependsOnToTask(project, "check", project.validateDeployable)
-
+    project.tasks.findByPath("install")?.dependsOn project.validateDeployable
+    project.tasks.findByPath("check")?.dependsOn project.validateDeployable
+    project.tasks.findByPath("test")?.dependsOn project.validateDeployable
 
     // add deploy alias for uploadArchives task (because it's more fun to type)
     project.task("deploy", dependsOn: project.uploadArchives) {
@@ -95,13 +94,6 @@ class DeployablePlugin implements Plugin<Project> {
                   project.gradle.taskGraph.hasTask("uploadArchives")) }
         sign project.configurations.archives
       }
-    }
-  }
-
-  private static void addDependsOnToTask(Project project, String taskToConfigure, Task dependentTask) {
-    Task configTask = project.tasks.findByPath(taskToConfigure)
-    if (configTask != null) {
-      configTask.dependsOn dependentTask
     }
   }
 }
