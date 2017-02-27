@@ -2,12 +2,16 @@ package com.episode6.hackit.deployable
 
 import org.gradle.api.DefaultTask
 import org.gradle.api.Nullable
+import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.TaskAction
+import org.gradle.api.tasks.VerificationTask
 
 /**
  * task that validates deployable project properties
  */
-class DeployableValidationTask extends DefaultTask {
+class DeployableValidationTask extends DefaultTask implements VerificationTask {
+
+  @Input boolean ignoreFailures = false
 
   @TaskAction
   def validate() {
@@ -24,6 +28,14 @@ class DeployableValidationTask extends DefaultTask {
     missingProps.addAll(project.deployable.findMissingProperties())
     if (!missingProps.isEmpty()) {
       throw new DeployableValidationException(missingProps)
+    }
+  }
+
+  private fail(Throwable failure) {
+    if (ignoreFailures) {
+      println failure.message
+    } else {
+      throw failure
     }
   }
 
