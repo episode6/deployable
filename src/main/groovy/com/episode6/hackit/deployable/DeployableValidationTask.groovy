@@ -27,7 +27,7 @@ class DeployableValidationTask extends DefaultTask implements VerificationTask {
     }
     missingProps.addAll(project.deployable.findMissingProperties())
     if (!missingProps.isEmpty()) {
-      throw new DeployableValidationException(missingProps)
+      fail(new DeployableValidationException(missingProps))
     }
   }
 
