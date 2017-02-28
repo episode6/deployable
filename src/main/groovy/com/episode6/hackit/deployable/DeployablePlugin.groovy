@@ -3,7 +3,6 @@ package com.episode6.hackit.deployable
 import com.episode6.hackit.deployable.extension.DeployablePluginExtension
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.api.Task
 import org.gradle.api.artifacts.maven.MavenDeployment
 import org.gradle.api.plugins.MavenPlugin
 import org.gradle.plugins.signing.SigningPlugin
@@ -27,16 +26,28 @@ class DeployablePlugin implements Plugin<Project> {
         DeployablePluginExtension,
         project)
 
-    project.task("validateDeployable", type: DeployableValidationTask)
+    project.task("validateDeployable", type: DeployableValidationTask) {
+      description = "Validates this project's deployable properties to ensure it can generate a valid pom."
+      group = "verification"
+    }
 
-    addDependsOnToTask(project, "install", project.validateDeployable)
-    addDependsOnToTask(project, "check", project.validateDeployable)
-
+    project.tasks.findByPath("install")?.dependsOn project.validateDeployable
+    project.tasks.findByPath("check")?.dependsOn project.validateDeployable
+    project.tasks.findByPath("test")?.dependsOn project.validateDeployable
 
     // add deploy alias for uploadArchives task (because it's more fun to type)
-    project.task("deploy", dependsOn: project.uploadArchives) {}
+    project.task("deploy", dependsOn: project.uploadArchives) {
+      description = "A simple alias for uploadArchives, because it's more fun to say."
+      group = "upload"
+    }
 
     project.afterEvaluate {
+      // map the compileOnly config (if it exists) to maven's 'provide' scope
+      def compileOnlyConfig = project.configurations.findByName("compileOnly")
+      if (compileOnlyConfig) {
+        project.conf2ScopeMappings.addMapping(0, compileOnlyConfig, "provided")
+      }
+
       project.uploadArchives {
         dependsOn project.validateDeployable
 
@@ -89,13 +100,6 @@ class DeployablePlugin implements Plugin<Project> {
                   project.gradle.taskGraph.hasTask("uploadArchives")) }
         sign project.configurations.archives
       }
-    }
-  }
-
-  private static void addDependsOnToTask(Project project, String taskToConfigure, Task dependentTask) {
-    Task configTask = project.tasks.findByPath(taskToConfigure)
-    if (configTask != null) {
-      configTask.dependsOn dependentTask
     }
   }
 }

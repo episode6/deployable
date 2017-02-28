@@ -10,7 +10,7 @@ buildscript {
     jcenter()
   }
   dependencies {
-    classpath 'com.episode6.hackit.deployable:deployable:0.1.2'
+    classpath 'com.episode6.hackit.deployable:deployable:0.1.3'
   }
 }
 ```
@@ -103,6 +103,8 @@ deployable {
 
 Finally, deploy using
 `./gradlew uploadArchives` or the new deploy alias `./gradlew deploy`
+
+Also worth noting, deployable will automatically add a mapping for gradle's `compileOnly` dependencies to maven's `provided` scope.
 
 ### Why does it exist?
 This is my first gradle plugin and groovy project so it may be rough around the edges. There are probably better tools out there for your open source libraries, but this will be building block for upcoming episode6 open source projects.
