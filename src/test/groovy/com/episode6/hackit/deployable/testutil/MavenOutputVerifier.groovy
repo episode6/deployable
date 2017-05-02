@@ -110,7 +110,12 @@ class MavenOutputVerifier {
     return true
   }
 
-  boolean verifyPomDependency(String groupId, String artifactId, String version, String scope = "compile") {
+  boolean verifyPomDependency(
+      String groupId,
+      String artifactId,
+      String version,
+      String scope = "compile",
+      boolean optional = false) {
     def pom = getArtifactFile("pom").asXml()
     def pomDep = pom.dependencies.dependency.find { pd ->
       pd.groupId.text() == groupId &&
@@ -122,6 +127,27 @@ class MavenOutputVerifier {
         pomDep.artifactId.text() == artifactId &&
         pomDep.version.text() == version &&
         pomDep.scope.text() == scope
+    assert pomDep.optional.toBoolean() == optional
+    return true
+  }
+
+  boolean verifyPomDependencyExclusion(
+      String groupId,
+      String artifactId,
+      String exclusionGroupId,
+      String exclusionArtifactId) {
+    def pom = getArtifactFile("pom").asXml()
+    def pomDep = pom.dependencies.dependency.find { pd ->
+      pd.groupId.text() == groupId &&
+          pd.artifactId.text() == artifactId
+    }
+    def exclusion = pomDep.exclusions.exclusion.find { ex ->
+      ex.artifactId.text() == exclusionArtifactId &&
+          ex.groupId.text() == exclusionGroupId
+    }
+    assert exclusion != null &&
+        exclusion.artifactId.text() == exclusionArtifactId &&
+        exclusion.groupId.text() == exclusionGroupId
     return true
   }
 
