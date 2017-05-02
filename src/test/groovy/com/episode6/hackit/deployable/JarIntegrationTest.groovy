@@ -136,7 +136,7 @@ repositories {
 }
 
 dependencies {
-  optional compile 'com.episode6.hackit.chop:chop-core:0.1.8'
+  optional(compile('com.episode6.hackit.chop:chop-core:0.1.8'))
 }
 """
     when:
