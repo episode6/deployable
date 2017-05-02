@@ -178,7 +178,7 @@ repositories {
 
 dependencies {
   compile('org.spockframework:spock-core:1.1-groovy-2.4-rc-3') {
-    optional(delegate)
+    optional(it)
     exclude module: 'groovy-all'
   }
 }
