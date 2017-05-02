@@ -119,6 +119,47 @@ dependencies {
     "com.release.example"   | "releaselib"  | "0.0.2"
   }
 
+  def "verify optional dependencies inverted"(String groupId, String artifactId, String versionName) {
+    given:
+    testProject.rootProjectName = artifactId
+    testProject.rootGradlePropertiesFile << testProject.testProperties.inGradlePropertiesFormat
+    testProject.rootGradleBuildFile << simpleBuildFile(groupId, versionName)
+    testProject.createNonEmptyJavaFile("${groupId}.${artifactId}")
+    MavenOutputVerifier mavenOutputVerifier = new MavenOutputVerifier(
+        groupId: groupId,
+        artifactId: artifactId,
+        versionName: versionName,
+        testProject: testProject)
+    testProject.rootGradleBuildFile << """
+repositories {
+  jcenter()
+}
+
+dependencies {
+  optional compile 'com.episode6.hackit.chop:chop-core:0.1.8'
+}
+"""
+    when:
+    def result = testProject.executeGradleTask("deploy")
+
+    then:
+    result.task(":uploadArchives").outcome == TaskOutcome.SUCCESS
+    result.task(":deploy").outcome == TaskOutcome.SUCCESS
+    result.task(":install") == null
+    mavenOutputVerifier.verifyStandardOutput()
+    mavenOutputVerifier.verifyPomDependency(
+        "com.episode6.hackit.chop",
+        "chop-core",
+        "0.1.8",
+        "compile",
+        true)
+
+    where:
+    groupId                 | artifactId    | versionName
+    "com.snapshot.example"  | "snapshotlib" | "0.0.1-SNAPSHOT"
+    "com.release.example"   | "releaselib"  | "0.0.2"
+  }
+
   def "verify optional dependencies"(String groupId, String artifactId, String versionName) {
     given:
     testProject.rootProjectName = artifactId
@@ -159,6 +200,7 @@ dependencies {
     "com.snapshot.example"  | "snapshotlib" | "0.0.1-SNAPSHOT"
     "com.release.example"   | "releaselib"  | "0.0.2"
   }
+
 
   def "verify provided optional dependencies"(String groupId, String artifactId, String versionName) {
     given:
