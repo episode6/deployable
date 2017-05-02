@@ -21,6 +21,8 @@ class DeployablePlugin implements Plugin<Project> {
     project.plugins.apply(MavenPlugin)
     project.plugins.apply(SigningPlugin)
 
+    OptionalDependencies.prepareProjectForOptionals(project)
+
     DeployablePluginExtension deployable = project.extensions.create(
         "deployable",
         DeployablePluginExtension,
@@ -100,6 +102,8 @@ class DeployablePlugin implements Plugin<Project> {
                   project.gradle.taskGraph.hasTask("uploadArchives")) }
         sign project.configurations.archives
       }
+
+      OptionalDependencies.applyOptionals(project)
     }
   }
 }
