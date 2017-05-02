@@ -131,6 +131,26 @@ class MavenOutputVerifier {
     return true
   }
 
+  boolean verifyPomDependencyExclusion(
+      String groupId,
+      String artifactId,
+      String exclusionGroupId,
+      String exclusionArtifactId) {
+    def pom = getArtifactFile("pom").asXml()
+    def pomDep = pom.dependencies.dependency.find { pd ->
+      pd.groupId.text() == groupId &&
+          pd.artifactId.text() == artifactId
+    }
+    def exclusion = pomDep.exclusions.exclusion.find { ex ->
+      ex.artifactId.text() == exclusionArtifactId &&
+          ex.groupId.text() == exclusionGroupId
+    }
+    assert exclusion != null &&
+        exclusion.artifactId.text() == exclusionArtifactId &&
+        exclusion.groupId.text() == exclusionGroupId
+    return true
+  }
+
   boolean verifySignatureOfFile(File file) {
     File signatureFile = new File(file.absolutePath + ".asc")
 
