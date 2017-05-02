@@ -104,7 +104,17 @@ deployable {
 Finally, deploy using
 `./gradlew uploadArchives` or the new deploy alias `./gradlew deploy`
 
-Also worth noting, deployable will automatically add a mapping for gradle's `compileOnly` dependencies to maven's `provided` scope.
+Deployable also adds some basic support for maven's `provided` scope and `optional` flag. (many thanks to [nebula-plugins/gradle-extra-configurations-plugin](https://github.com/nebula-plugins/gradle-extra-configurations-plugin/) for providing the logic for this.
+```groovy
+dependencies {
+
+    // automatically maps to maven's 'provided' scope
+    compileOnly 'com.example:example-dep:1.0'
+
+    // adds the 'optional' flag to this dependency in maven output
+    compile 'com.otherexample:other-dep:1.0', optional
+}
+```
 
 ### Why does it exist?
 This is my first gradle plugin and groovy project so it may be rough around the edges. There are probably better tools out there for your open source libraries, but this will be building block for upcoming episode6 open source projects.
