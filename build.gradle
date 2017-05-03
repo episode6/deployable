@@ -17,7 +17,12 @@ buildscript {
 }
 
 group = "com.episode6.hackit.deployable"
-version = "0.1.4"
+version = "0.1.5"
+
+task wrapper(type: Wrapper) {
+  gradleVersion = "3.3"
+  distributionType = "all"
+}
 
 repositories {
   jcenter()

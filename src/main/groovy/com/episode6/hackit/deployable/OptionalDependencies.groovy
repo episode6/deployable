@@ -22,6 +22,7 @@
 package com.episode6.hackit.deployable
 
 import org.gradle.api.Project
+import org.gradle.api.artifacts.Dependency
 
 /**
  * Prepare a project to accept optional dependencies.
@@ -35,8 +36,10 @@ class OptionalDependencies {
    */
   static void prepareProjectForOptionals(Project project) {
     project.ext.optionalDeps = []
-    project.ext.optional = { dep ->
+    project.ext.optional = { Dependency dep ->
       project.ext.optionalDeps << dep
+      // exclude optional dependency when resolving dependencies between projects
+      project.configurations.default.exclude(group: dep.group, module: dep.name)
       return dep
     }
   }
