@@ -49,11 +49,17 @@ rootProject.name = '${rootProjectName}'
 """
   }
 
-  File createNonEmptyJavaFile(String packageName, String className = "SampleClass", File rootDir = root) {
+  File createNonEmptyJavaFileWithImports(String packageName, String imports) {
+    return createNonEmptyJavaFile(packageName, "SampleClass", root, imports)
+  }
+
+  File createNonEmptyJavaFile(String packageName, String className = "SampleClass", File rootDir = root, String imports = "") {
     File dir = rootDir.newFolder("src", "main", "java").newFolderFromPackage(packageName)
     File nonEmptyJavaFile = dir.newFile("${className}.java")
     nonEmptyJavaFile << """
 package ${packageName};
+
+${imports}
 
 /**
  * A sample class for testing
@@ -65,11 +71,13 @@ public class ${className} {
     return nonEmptyJavaFile
   }
 
-  File createNonEmptyGroovyFile(String packageName, String className = "SampleClass", File rootDir = root) {
+  File createNonEmptyGroovyFile(String packageName, String className = "SampleClass", File rootDir = root, String imports = "") {
     File dir = rootDir.newFolder("src", "main", "groovy").newFolderFromPackage(packageName)
     File nonEmptyGroovyFile = dir.newFile("${className}.groovy")
     nonEmptyGroovyFile << """
 package ${packageName}
+
+${imports}
 
 /**
  * A sample class for testing

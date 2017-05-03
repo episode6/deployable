@@ -11,6 +11,11 @@ import spock.lang.Specification
  */
 class JarIntegrationTest extends Specification {
 
+  static final String CHOP_IMPORT = """
+import com.episode6.hackit.chop.Chop;
+
+"""
+
   private static String simpleBuildFile(String groupId, String versionName) {
     return """
 plugins {
@@ -88,7 +93,7 @@ version = '${versionName}'
     testProject.rootProjectName = artifactId
     testProject.rootGradlePropertiesFile << testProject.testProperties.inGradlePropertiesFormat
     testProject.rootGradleBuildFile << simpleBuildFile(groupId, versionName)
-    testProject.createNonEmptyJavaFile("${groupId}.${artifactId}")
+    testProject.createNonEmptyJavaFileWithImports("${groupId}.${artifactId}", CHOP_IMPORT)
     MavenOutputVerifier mavenOutputVerifier = new MavenOutputVerifier(
         groupId: groupId,
         artifactId: artifactId,
@@ -100,7 +105,7 @@ repositories {
 }
 
 dependencies {
-  compileOnly 'com.episode6.hackit.chop:chop-core:0.1.8'
+  provided 'com.episode6.hackit.chop:chop-core:0.1.8'
 }
 """
     when:
@@ -124,7 +129,7 @@ dependencies {
     testProject.rootProjectName = artifactId
     testProject.rootGradlePropertiesFile << testProject.testProperties.inGradlePropertiesFormat
     testProject.rootGradleBuildFile << simpleBuildFile(groupId, versionName)
-    testProject.createNonEmptyJavaFile("${groupId}.${artifactId}")
+    testProject.createNonEmptyJavaFileWithImports("${groupId}.${artifactId}", CHOP_IMPORT)
     MavenOutputVerifier mavenOutputVerifier = new MavenOutputVerifier(
         groupId: groupId,
         artifactId: artifactId,
@@ -215,7 +220,7 @@ dependencies {
     testProject.rootProjectName = artifactId
     testProject.rootGradlePropertiesFile << testProject.testProperties.inGradlePropertiesFormat
     testProject.rootGradleBuildFile << simpleBuildFile(groupId, versionName)
-    testProject.createNonEmptyJavaFile("${groupId}.${artifactId}")
+    testProject.createNonEmptyJavaFileWithImports("${groupId}.${artifactId}", CHOP_IMPORT)
     MavenOutputVerifier mavenOutputVerifier = new MavenOutputVerifier(
         groupId: groupId,
         artifactId: artifactId,
@@ -227,7 +232,7 @@ repositories {
 }
 
 dependencies {
-  compileOnly 'com.episode6.hackit.chop:chop-core:0.1.8', optional
+  provided 'com.episode6.hackit.chop:chop-core:0.1.8', optional
 }
 """
     when:

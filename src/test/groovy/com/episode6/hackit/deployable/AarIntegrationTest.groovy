@@ -11,6 +11,11 @@ import spock.lang.Specification
  */
 class AarIntegrationTest extends Specification {
 
+  static final String CHOP_IMPORT = """
+import com.episode6.hackit.chop.Chop;
+
+"""
+
   private static String simpleManifest(String groupId, String artifactId) {
     return """
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
@@ -75,6 +80,128 @@ android {
     result.task(":uploadArchives").outcome == TaskOutcome.SUCCESS
     result.task(":deploy").outcome == TaskOutcome.SUCCESS
     mavenOutputVerifier.verifyStandardOutput("aar")
+
+    where:
+    groupId                         | artifactId    | versionName
+    "com.android.snapshot.example"  | "snapshotlib" | "0.0.1-SNAPSHOT"
+    "com.android.release.example"   | "releaselib"  | "0.0.1"
+  }
+
+  def "verify optional dependencies"(String groupId, String artifactId, String versionName) {
+    given:
+    testProject.rootProjectName = artifactId
+    testProject.rootGradlePropertiesFile << testProject.testProperties.getInGradlePropertiesFormat()
+    testProject.rootGradleBuildFile << simpleBuildFile(groupId, versionName)
+    testProject.createNonEmptyJavaFileWithImports("${groupId}.${artifactId}", CHOP_IMPORT)
+    testProject.root.newFile("src", "main", "AndroidManifest.xml") << simpleManifest(groupId, artifactId)
+    MavenOutputVerifier mavenOutputVerifier = new MavenOutputVerifier(
+        groupId: groupId,
+        artifactId: artifactId,
+        versionName: versionName,
+        testProject: testProject)
+    testProject.rootGradleBuildFile << """
+repositories {
+  jcenter()
+}
+
+dependencies {
+  compile 'com.episode6.hackit.chop:chop-core:0.1.8', optional
+}
+"""
+    when:
+    def result = testProject.executeGradleTask("deploy")
+
+    then:
+    result.task(":uploadArchives").outcome == TaskOutcome.SUCCESS
+    result.task(":deploy").outcome == TaskOutcome.SUCCESS
+    mavenOutputVerifier.verifyStandardOutput("aar")
+    mavenOutputVerifier.verifyPomDependency(
+        "com.episode6.hackit.chop",
+        "chop-core",
+        "0.1.8",
+        "compile",
+        true)
+
+    where:
+    groupId                         | artifactId    | versionName
+    "com.android.snapshot.example"  | "snapshotlib" | "0.0.1-SNAPSHOT"
+    "com.android.release.example"   | "releaselib"  | "0.0.1"
+  }
+
+  def "verify provided dependencies"(String groupId, String artifactId, String versionName) {
+    given:
+    testProject.rootProjectName = artifactId
+    testProject.rootGradlePropertiesFile << testProject.testProperties.getInGradlePropertiesFormat()
+    testProject.rootGradleBuildFile << simpleBuildFile(groupId, versionName)
+    testProject.createNonEmptyJavaFileWithImports("${groupId}.${artifactId}", CHOP_IMPORT)
+    testProject.root.newFile("src", "main", "AndroidManifest.xml") << simpleManifest(groupId, artifactId)
+    MavenOutputVerifier mavenOutputVerifier = new MavenOutputVerifier(
+        groupId: groupId,
+        artifactId: artifactId,
+        versionName: versionName,
+        testProject: testProject)
+    testProject.rootGradleBuildFile << """
+repositories {
+  jcenter()
+}
+
+dependencies {
+  provided 'com.episode6.hackit.chop:chop-core:0.1.8'
+}
+"""
+    when:
+    def result = testProject.executeGradleTask("deploy")
+
+    then:
+    result.task(":uploadArchives").outcome == TaskOutcome.SUCCESS
+    result.task(":deploy").outcome == TaskOutcome.SUCCESS
+    mavenOutputVerifier.verifyStandardOutput("aar")
+    mavenOutputVerifier.verifyPomDependency(
+        "com.episode6.hackit.chop",
+        "chop-core",
+        "0.1.8",
+        "provided")
+
+    where:
+    groupId                         | artifactId    | versionName
+    "com.android.snapshot.example"  | "snapshotlib" | "0.0.1-SNAPSHOT"
+    "com.android.release.example"   | "releaselib"  | "0.0.1"
+  }
+
+  def "verify provided optional dependencies"(String groupId, String artifactId, String versionName) {
+    given:
+    testProject.rootProjectName = artifactId
+    testProject.rootGradlePropertiesFile << testProject.testProperties.getInGradlePropertiesFormat()
+    testProject.rootGradleBuildFile << simpleBuildFile(groupId, versionName)
+    testProject.createNonEmptyJavaFileWithImports("${groupId}.${artifactId}", CHOP_IMPORT)
+    testProject.root.newFile("src", "main", "AndroidManifest.xml") << simpleManifest(groupId, artifactId)
+    MavenOutputVerifier mavenOutputVerifier = new MavenOutputVerifier(
+        groupId: groupId,
+        artifactId: artifactId,
+        versionName: versionName,
+        testProject: testProject)
+    testProject.rootGradleBuildFile << """
+repositories {
+  jcenter()
+}
+
+dependencies {
+  provided 'com.episode6.hackit.chop:chop-core:0.1.8', optional
+}
+"""
+    when:
+    def result = testProject.executeGradleTask("deploy")
+
+    then:
+    result.task(":uploadArchives").outcome == TaskOutcome.SUCCESS
+    result.task(":deploy").outcome == TaskOutcome.SUCCESS
+    mavenOutputVerifier.verifyStandardOutput("aar")
+    mavenOutputVerifier.verifyPomDependency(
+        "com.episode6.hackit.chop",
+        "chop-core",
+        "0.1.8",
+        "provided",
+        true)
 
     where:
     groupId                         | artifactId    | versionName
