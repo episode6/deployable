@@ -10,6 +10,10 @@ import org.gradle.api.tasks.bundling.Jar
  */
 class DeployableJarPlugin implements Plugin<Project> {
   void apply(Project project) {
+
+    def providedConf = project.configurations.create("provided")
+    project.configurations.compileOnly.extendsFrom providedConf
+
     project.plugins.apply(DeployablePlugin).pomPackaging = "jar"
 
     project.task("javadocJar", type: Jar, dependsOn: project.javadoc) {
