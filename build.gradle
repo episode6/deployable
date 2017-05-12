@@ -53,6 +53,7 @@ dependencies {
   testCompile gradleTestKit()
   testCompile("org.bouncycastle:bcpg-jdk15on")
   testCompile("com.episode6.hackit.groovykit:gk-files")
+  testCompile('com.episode6.hackit.gdmc:gdmc')
 }
 
 test {

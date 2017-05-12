@@ -2,7 +2,7 @@ package com.episode6.hackit.deployable
 
 import com.episode6.hackit.deployable.testutil.IntegrationTestProject
 import com.episode6.hackit.deployable.testutil.MavenOutputVerifier
-import com.episode6.hackit.deployable.testutil.TestDefinitions
+import com.episode6.hackit.deployable.testutil.MyDependencyMap
 import org.gradle.testkit.runner.TaskOutcome
 import org.junit.Rule
 import spock.lang.Specification
@@ -34,7 +34,7 @@ buildscript {
     jcenter()
   }
   dependencies {
-    classpath '${TestDefinitions.ANDROID_GRADLE_TOOLS_DEP}'
+    classpath '${MyDependencyMap.lookupDep("com.android.tools.build:gradle")}'
   }
 }
 
