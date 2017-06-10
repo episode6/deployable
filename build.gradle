@@ -12,7 +12,7 @@ buildscript {
   }
   dependencies {
     classpath compileDependencies
-    classpath 'com.episode6.hackit.gdmc:gdmc:0.1.4'
+    classpath 'com.episode6.hackit.gdmc:gdmc:0.1.5'
   }
 }
 
