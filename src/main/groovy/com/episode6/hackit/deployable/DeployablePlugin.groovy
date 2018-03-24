@@ -50,6 +50,7 @@ class DeployablePlugin implements Plugin<Project> {
 
     project.afterEvaluate {
       project.configurations.compileOnly.extendsFrom providedConf
+      OptionalDependencies.assertNoApiOptionals(project)
 
       project.conf2ScopeMappings.addMapping(0, providedConf, "provided")
       project.conf2ScopeMappings.addMapping(0, project.configurations.implementation, "compile")

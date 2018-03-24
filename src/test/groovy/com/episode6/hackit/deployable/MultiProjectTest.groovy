@@ -56,7 +56,7 @@ allprojects {
   private static String javaBuildFile(String deps = "") {
     return """
 plugins {
- id 'java'
+ id 'java-library'
  id 'com.episode6.hackit.deployable.jar'
 }
 

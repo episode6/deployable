@@ -21,6 +21,7 @@
  */
 package com.episode6.hackit.deployable
 
+import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Dependency
 
@@ -57,5 +58,21 @@ class OptionalDependencies {
         }.optional = true
       }
     }
+  }
+
+
+  static void assertNoApiOptionals(Project project) {
+    def apiConf = project.configurations.findByName("api")
+    if (apiConf != null) {
+      def optionalApiDeps = apiConf.dependencies.findAll {project.ext.optionalDeps.contains(it)}
+      if (!optionalApiDeps.isEmpty()) {
+        throw apiOptionalException(optionalApiDeps)
+      }
+    }
+  }
+
+  private static GradleException apiOptionalException(Set<Dependency> deps) {
+    String depList = deps.collect {"$it.group:$it.name:$it.version"}.join(", ")
+    return new GradleException("api dependencies are not allowed to be optional ($depList)")
   }
 }
