@@ -45,6 +45,11 @@ class DeployablePlugin implements Plugin<Project> {
 
     project.afterEvaluate {
       project.conf2ScopeMappings.addMapping(0, project.configurations.provided, "provided")
+      project.conf2ScopeMappings.addMapping(0, project.configurations.implementation, "compile")
+      def apiConfig = project.configurations.findByName("api")
+      if (apiConfig != null) {
+        project.conf2ScopeMappings.addMapping(0, apiConfig, "compile")
+      }
 
       project.uploadArchives {
         dependsOn project.validateDeployable

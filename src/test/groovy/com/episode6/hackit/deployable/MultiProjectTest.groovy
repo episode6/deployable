@@ -7,6 +7,8 @@ import org.gradle.testkit.runner.TaskOutcome
 import org.junit.Rule
 import spock.lang.Specification
 
+import static com.episode6.hackit.deployable.testutil.TestUtil.mavenScopeForGradleConfig
+
 /**
  * Tests deployable in a multi-project scenario
  */
@@ -23,7 +25,7 @@ import com.episode6.hackit.chop.Chop;
 
 """
 
-  private static String chopDep(String config = "compile", boolean optional = false) {
+  private static String chopDep(String config = "implementation", boolean optional = false) {
     return """
   ${config} 'com.episode6.hackit.chop:chop-core:0.1.8'${optional ? ", optional" : ""}
 """
@@ -34,6 +36,7 @@ import com.episode6.hackit.chop.Chop;
 buildscript {
   repositories {
     jcenter()
+    google()
   }
   dependencies {
     classpath '${MyDependencyMap.lookupDep("com.android.tools.build:gradle")}'
@@ -42,6 +45,7 @@ buildscript {
 allprojects {
   repositories {
     jcenter()
+    google()
   }
   group = '${groupId}'
   version = '${versionName}'
@@ -72,7 +76,7 @@ plugins {
 }
 
 dependencies {
-  compile localGroovy()
+  implementation localGroovy()
 ${deps}
 }
  """
@@ -88,7 +92,7 @@ apply plugin: 'com.android.library'
 
 android {
   compileSdkVersion 19
-  buildToolsVersion "25.0.2"
+  buildToolsVersion "26.0.2"
 }
 
 dependencies {
@@ -223,13 +227,26 @@ include ':parentlib', ':childlib'
         testProject: testProject)
 
     when:
-    def parentResult = testProject.executeGradleTask(":parentlib:deploy");
-    def childResult = pass ? testProject.executeGradleTask(":childlib:deploy") : testProject.failGradleTask(":childlib:deploy")
+    def parentResult
+    def childResult
+    try {
+      parentResult = testProject.executeGradleTask(":parentlib:deploy");
+      childResult = pass ? testProject.executeGradleTask(":childlib:deploy") : testProject.failGradleTask(":childlib:deploy")
+    } catch (Throwable t) {
+      println("BUILD FAIL libType: $libType, pass: $pass, config: $config, optional: $optional")
+      throw t
+    }
 
     then:
     parentResult.task(":parentlib:deploy").outcome == TaskOutcome.SUCCESS
     String packaging = libType == LibType.ANDROID ? "aar" : "jar"
     parentlibVerifier.verifyStandardOutput(packaging)
+    parentlibVerifier.verifyPomDependency(
+        "com.episode6.hackit.chop",
+        "chop-core",
+        "0.1.8",
+        mavenScopeForGradleConfig(config),
+        optional)
 
     if (pass) {
       childResult.task(":childlib:deploy").outcome == TaskOutcome.SUCCESS
@@ -241,30 +258,37 @@ include ':parentlib', ':childlib'
 
     where:
     libType         | pass  | config     | optional
-    LibType.JAVA    | true  | "provided" | false
-    LibType.JAVA    | false | "provided" | false
-    LibType.JAVA    | true  | "compile"  | true
-    LibType.JAVA    | false | "compile"  | true
     LibType.JAVA    | true  | "provided" | true
     LibType.JAVA    | false | "provided" | true
-    LibType.GROOVY  | true  | "provided" | false
-    LibType.GROOVY  | false | "provided" | false
-    LibType.GROOVY  | true  | "compile"  | true
-    LibType.GROOVY  | false | "compile"  | true
+    LibType.JAVA    | true  | "provided" | false
+    LibType.JAVA    | false | "provided" | false
+    LibType.JAVA    | true  | "implementation"  | true
+    LibType.JAVA    | false | "implementation"  | true
+    LibType.JAVA    | true  | "implementation"  | false
+    LibType.JAVA    | false | "implementation"  | false
     LibType.GROOVY  | true  | "provided" | true
     LibType.GROOVY  | false | "provided" | true
-    LibType.ANDROID | true  | "provided" | false
-    LibType.ANDROID | false | "provided" | false
-    LibType.ANDROID | true  | "compile"  | true
-    LibType.ANDROID | false | "compile"  | true
+    LibType.GROOVY  | true  | "provided" | false
+    LibType.GROOVY  | false | "provided" | false
+    LibType.GROOVY  | true  | "implementation"  | true
+    LibType.GROOVY  | false | "implementation"  | true
+    LibType.GROOVY  | true  | "implementation"  | false
+    LibType.GROOVY  | false | "implementation"  | false
     LibType.ANDROID | true  | "provided" | true
     LibType.ANDROID | false | "provided" | true
+    LibType.ANDROID | true  | "provided" | false
+    LibType.ANDROID | false | "provided" | false
+    LibType.ANDROID | true  | "implementation"  | true
+    LibType.ANDROID | false | "implementation"  | true
+    LibType.ANDROID | true  | "implementation"  | false
+    LibType.ANDROID | false | "implementation"  | false
+
   }
 
   private static String projectDeps(String... dependentProjectNames) {
     StringBuilder builder = new StringBuilder()
     dependentProjectNames.each {
-      builder.append("  compile project(\":").append(it).append("\")\n")
+      builder.append("  implementation project(\":").append(it).append("\")\n")
     }
     return builder.toString()
   }

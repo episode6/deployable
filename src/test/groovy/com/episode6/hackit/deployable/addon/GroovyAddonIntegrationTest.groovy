@@ -23,7 +23,7 @@ group = '${groupId}'
 version = '${versionName}'
 
 dependencies {
-  compile localGroovy()
+  implementation localGroovy()
 }
  """
   }
