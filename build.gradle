@@ -12,15 +12,15 @@ buildscript {
   }
   dependencies {
     classpath compileDependencies
-    classpath 'com.episode6.hackit.gdmc:gdmc:0.1.1'
+    classpath 'com.episode6.hackit.gdmc:gdmc:0.1.6'
   }
 }
 
 group = "com.episode6.hackit.deployable"
-version = "0.1.5"
+version = "0.1.6"
 
 task wrapper(type: Wrapper) {
-  gradleVersion = "3.3"
+  gradleVersion = "4.1"
   distributionType = "all"
 }
 
@@ -43,16 +43,17 @@ apply plugin: scriptEngine.loadScriptByName('com/episode6/hackit/deployable/addo
 apply plugin: 'com.episode6.hackit.gdmc'
 
 dependencies {
-  compile localGroovy()
-  compile gradleApi()
-  compile compileDependencies
+  implementation localGroovy()
+  implementation gradleApi()
+  implementation compileDependencies
 
-  testCompile("org.spockframework:spock-core")  {
+  testImplementation("org.spockframework:spock-core")  {
     exclude module: 'groovy-all'
   }
-  testCompile gradleTestKit()
-  testCompile("org.bouncycastle:bcpg-jdk15on")
-  testCompile("com.episode6.hackit.groovykit:gk-files")
+  testImplementation gradleTestKit()
+  testImplementation("org.bouncycastle:bcpg-jdk15on")
+  testImplementation("com.episode6.hackit.groovykit:gk-files")
+  testImplementation('com.episode6.hackit.gdmc:gdmc')
 }
 
 test {
