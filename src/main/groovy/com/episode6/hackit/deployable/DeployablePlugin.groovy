@@ -11,6 +11,9 @@ import org.gradle.plugins.signing.SigningPlugin
  * Base deployable plugin. It is not referenced directly in gradle, but applied by either the jar or aar plugin
  */
 class DeployablePlugin implements Plugin<Project> {
+
+  private static final String PROVIDED_CONFIG_NAME = "mavenProvided"
+
   String pomPackaging = null
 
   static isReleaseBuild(Project project) {
@@ -18,6 +21,8 @@ class DeployablePlugin implements Plugin<Project> {
   }
 
   void apply(Project project) {
+    def providedConf = project.configurations.create(PROVIDED_CONFIG_NAME)
+
     project.plugins.apply(MavenPlugin)
     project.plugins.apply(SigningPlugin)
 
@@ -44,7 +49,9 @@ class DeployablePlugin implements Plugin<Project> {
     }
 
     project.afterEvaluate {
-      project.conf2ScopeMappings.addMapping(0, project.configurations.provided, "provided")
+      project.configurations.compileOnly.extendsFrom providedConf
+
+      project.conf2ScopeMappings.addMapping(0, providedConf, "provided")
       project.conf2ScopeMappings.addMapping(0, project.configurations.implementation, "compile")
       def apiConfig = project.configurations.findByName("api")
       if (apiConfig != null) {

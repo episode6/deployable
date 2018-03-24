@@ -107,19 +107,27 @@ Finally, deploy using
 Deployable also adds some basic support for maven's `provided` scope and `optional` flag. (many thanks to [nebula-plugins/gradle-extra-configurations-plugin](https://github.com/nebula-plugins/gradle-extra-configurations-plugin/) for providing the logic for this.
 ```groovy
 dependencies {
-    // maps to maven's 'provided' scope
-    provided 'com.example:example-dep:1.0'
+    // api -> maven: 'compile'
+    api 'com.example:example-core:1.0'
 
-    // adds the 'optional' flag to this dependency in maven output
-    compile 'com.otherexample:other-dep:1.0', optional
+    // implementation -> maven: 'compile'
+    implementation 'com.example:example-addition:1.0'
+
+    // mavenProvided -> maven: 'provided'
+    mavenProvided 'com.example:example-dep:1.0'
+
+    // optional -> maven: 'optional=true'
+    implementation 'com.otherexample:other-dep:1.0', optional
 
     // compile an optional dependency with excludes
-    compile('org.spockframework:spock-core:1.1-groovy-2.4-rc-3') {
+    implementation('org.spockframework:spock-core:1.1-groovy-2.4-rc-3') {
         optional(it)
         exclude module: 'groovy-all'
     }
 }
 ```
+
+
 
 ### Why does it exist?
 This is my first gradle plugin and groovy project so it may be rough around the edges. There are probably better tools out there for your open source libraries, but this will be building block for upcoming episode6 open source projects.

@@ -10,7 +10,7 @@ class TestUtil {
       case "api":
       case "implementation":
         return "compile"
-      case "provided":
+      case "mavenProvided":
       case "compileOnly":
         return "provided"
       default:

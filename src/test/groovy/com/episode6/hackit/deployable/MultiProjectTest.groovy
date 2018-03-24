@@ -258,26 +258,26 @@ include ':parentlib', ':childlib'
 
     where:
     libType         | pass  | config     | optional
-    LibType.JAVA    | true  | "provided" | true
-    LibType.JAVA    | false | "provided" | true
-    LibType.JAVA    | true  | "provided" | false
-    LibType.JAVA    | false | "provided" | false
+    LibType.JAVA    | true  | "mavenProvided" | true
+    LibType.JAVA    | false | "mavenProvided" | true
+    LibType.JAVA    | true  | "mavenProvided" | false
+    LibType.JAVA    | false | "mavenProvided" | false
     LibType.JAVA    | true  | "implementation"  | true
     LibType.JAVA    | false | "implementation"  | true
     LibType.JAVA    | true  | "implementation"  | false
     LibType.JAVA    | false | "implementation"  | false
-    LibType.GROOVY  | true  | "provided" | true
-    LibType.GROOVY  | false | "provided" | true
-    LibType.GROOVY  | true  | "provided" | false
-    LibType.GROOVY  | false | "provided" | false
+    LibType.GROOVY  | true  | "mavenProvided" | true
+    LibType.GROOVY  | false | "mavenProvided" | true
+    LibType.GROOVY  | true  | "mavenProvided" | false
+    LibType.GROOVY  | false | "mavenProvided" | false
     LibType.GROOVY  | true  | "implementation"  | true
     LibType.GROOVY  | false | "implementation"  | true
     LibType.GROOVY  | true  | "implementation"  | false
     LibType.GROOVY  | false | "implementation"  | false
-    LibType.ANDROID | true  | "provided" | true
-    LibType.ANDROID | false | "provided" | true
-    LibType.ANDROID | true  | "provided" | false
-    LibType.ANDROID | false | "provided" | false
+    LibType.ANDROID | true  | "mavenProvided" | true
+    LibType.ANDROID | false | "mavenProvided" | true
+    LibType.ANDROID | true  | "mavenProvided" | false
+    LibType.ANDROID | false | "mavenProvided" | false
     LibType.ANDROID | true  | "implementation"  | true
     LibType.ANDROID | false | "implementation"  | true
     LibType.ANDROID | true  | "implementation"  | false

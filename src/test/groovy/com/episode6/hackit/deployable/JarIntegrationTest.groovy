@@ -177,7 +177,7 @@ repositories {
 }
 
 dependencies {
-  provided 'com.episode6.hackit.chop:chop-core:0.1.8'
+  mavenProvided 'com.episode6.hackit.chop:chop-core:0.1.8'
 }
 """
     when:
@@ -304,7 +304,7 @@ repositories {
 }
 
 dependencies {
-  provided 'com.episode6.hackit.chop:chop-core:0.1.8', optional
+  mavenProvided 'com.episode6.hackit.chop:chop-core:0.1.8', optional
 }
 """
     when:
