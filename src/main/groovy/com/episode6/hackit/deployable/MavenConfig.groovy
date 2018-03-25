@@ -2,6 +2,7 @@ package com.episode6.hackit.deployable
 
 import com.episode6.hackit.deployable.extension.DeployablePluginExtension
 import org.gradle.api.Project
+import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.maven.MavenDeployment
 
 /**
@@ -13,14 +14,19 @@ class MavenConfig {
     return new ConfigToScopeMapper(project: project)
   }
 
-  static class ConfigToScopeMapper {
+  static class ConfigToScopeMapper implements GroovyInterceptable {
     Project project
 
     ConfigToScopeMapper map(String gradleConfigName, String mavenScope) {
       def config = project.configurations.findByName(gradleConfigName)
       if (config != null) {
-        project.conf2ScopeMappings.addMapping(0, config, mavenScope)
+        map(config, mavenScope)
       }
+      return this
+    }
+
+    ConfigToScopeMapper map(Configuration gradleConfig, String mavenScope) {
+      project.conf2ScopeMappings.addMapping(0, gradleConfig, mavenScope)
       return this
     }
   }

@@ -25,6 +25,12 @@ class DeployablePlugin implements Plugin<Project> {
 
     OptionalDependencies.prepareProjectForOptionals(project)
 
+    project.ext.mavenDependencies = { Closure closure ->
+      closure.setDelegate(MavenConfig.configMapper(project))
+      closure.setResolveStrategy(Closure.DELEGATE_FIRST)
+      closure.call()
+    }
+
     DeployablePluginExtension deployable = project.extensions.create(
         "deployable",
         DeployablePluginExtension,
@@ -54,6 +60,7 @@ class DeployablePlugin implements Plugin<Project> {
           .map("implementation", "compile")
           .map("api", "compile")
           .map("mavenProvided", "provided")
+          .map("testImplementation", "test")
 
       MavenConfig.configurePom(project, deployable, pomPackaging)
       MavenConfig.configureSigning(project)

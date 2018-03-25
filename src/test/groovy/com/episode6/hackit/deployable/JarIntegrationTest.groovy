@@ -343,7 +343,6 @@ dependencies {
     "com.release.example"   | "releaselib"  | "0.0.2"
   }
 
-
   def "verify provided optional dependencies"(String groupId, String artifactId, String versionName) {
     given:
     testProject.rootProjectName = artifactId
@@ -377,6 +376,120 @@ dependencies {
         "chop-core",
         "0.1.8",
         "provided",
+        true)
+
+    where:
+    groupId                 | artifactId    | versionName
+    "com.snapshot.example"  | "snapshotlib" | "0.0.1-SNAPSHOT"
+    "com.release.example"   | "releaselib"  | "0.0.2"
+  }
+
+  def "verify mapped dependencies"(String groupId, String artifactId, String versionName) {
+    given:
+    testProject.rootProjectName = artifactId
+    testProject.rootGradlePropertiesFile << testProject.testProperties.inGradlePropertiesFormat
+    testProject.rootGradleBuildFile << simpleBuildFile(groupId, versionName)
+    testProject.createNonEmptyJavaFile("${groupId}.${artifactId}")
+    MavenOutputVerifier mavenOutputVerifier = new MavenOutputVerifier(
+        groupId: groupId,
+        artifactId: artifactId,
+        versionName: versionName,
+        testProject: testProject)
+    testProject.rootGradleBuildFile << """
+repositories {
+  jcenter()
+}
+
+configurations {
+  someConfig
+  someOtherConfig
+}
+
+dependencies {
+  someConfig 'org.spockframework:spock-core:1.1-groovy-2.4'
+  someOtherConfig 'com.episode6.hackit.chop:chop-core:0.1.8'
+}
+
+mavenDependencies {
+  map configurations.someConfig, "provided"
+  map "someOtherConfig", "compile"
+}
+"""
+    when:
+    def result = testProject.executeGradleTask("deploy")
+
+    then:
+    result.task(":uploadArchives").outcome == TaskOutcome.SUCCESS
+    result.task(":deploy").outcome == TaskOutcome.SUCCESS
+    result.task(":install") == null
+    mavenOutputVerifier.verifyStandardOutput()
+    mavenOutputVerifier.verifyPomDependency(
+        "com.episode6.hackit.chop",
+        "chop-core",
+        "0.1.8",
+        "compile")
+    mavenOutputVerifier.verifyPomDependency(
+        "org.spockframework",
+        "spock-core",
+        "1.1-groovy-2.4",
+        "provided")
+
+    where:
+    groupId                 | artifactId    | versionName
+    "com.snapshot.example"  | "snapshotlib" | "0.0.1-SNAPSHOT"
+    "com.release.example"   | "releaselib"  | "0.0.2"
+  }
+
+  def "verify mapped optional dependencies"(String groupId, String artifactId, String versionName) {
+    given:
+    testProject.rootProjectName = artifactId
+    testProject.rootGradlePropertiesFile << testProject.testProperties.inGradlePropertiesFormat
+    testProject.rootGradleBuildFile << simpleBuildFile(groupId, versionName)
+    testProject.createNonEmptyJavaFile("${groupId}.${artifactId}")
+    MavenOutputVerifier mavenOutputVerifier = new MavenOutputVerifier(
+        groupId: groupId,
+        artifactId: artifactId,
+        versionName: versionName,
+        testProject: testProject)
+    testProject.rootGradleBuildFile << """
+repositories {
+  jcenter()
+}
+
+configurations {
+  someConfig
+  someOtherConfig
+}
+
+dependencies {
+  someConfig 'org.spockframework:spock-core:1.1-groovy-2.4', optional
+  someOtherConfig 'com.episode6.hackit.chop:chop-core:0.1.8', optional
+}
+
+mavenDependencies {
+  map configurations.someConfig, "compile"
+  map "someOtherConfig", "provided"
+}
+"""
+    when:
+    def result = testProject.executeGradleTask("deploy")
+
+    then:
+    result.task(":uploadArchives").outcome == TaskOutcome.SUCCESS
+    result.task(":deploy").outcome == TaskOutcome.SUCCESS
+    result.task(":install") == null
+    mavenOutputVerifier.verifyStandardOutput()
+    mavenOutputVerifier.verifyPomDependency(
+        "com.episode6.hackit.chop",
+        "chop-core",
+        "0.1.8",
+        "provided",
+        true)
+    mavenOutputVerifier.verifyPomDependency(
+        "org.spockframework",
+        "spock-core",
+        "1.1-groovy-2.4",
+        "compile",
         true)
 
     where:

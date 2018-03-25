@@ -10,7 +10,7 @@ buildscript {
     jcenter()
   }
   dependencies {
-    classpath 'com.episode6.hackit.deployable:deployable:0.1.6'
+    classpath 'com.episode6.hackit.deployable:deployable:0.1.7'
   }
 }
 ```
@@ -127,7 +127,26 @@ dependencies {
 }
 ```
 
+To map dependencies of extra configurations use the `mavenDependencies` method...
+```groovy
+configurations {
+    someConfig
+    someOtherConfig
+}
 
+mavenDependencies {
+    // map with configuration reference
+    map configurations.someConfig, "compile"
+
+    // map with configuration name (and ignore if it doesnt exist)
+    map "someOtherConfig", "provided"
+}
+
+dependencies {
+    someConfig 'com.example:compile-dep:1.0'
+    someOtherConfig 'com.example:provided-optional-dep-dep:1.0', optional
+}
+```
 
 ### Why does it exist?
 This is my first gradle plugin and groovy project so it may be rough around the edges. There are probably better tools out there for your open source libraries, but this will be building block for upcoming episode6 open source projects.
