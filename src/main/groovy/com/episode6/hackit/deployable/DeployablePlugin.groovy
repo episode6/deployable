@@ -25,6 +25,12 @@ class DeployablePlugin implements Plugin<Project> {
 
     OptionalDependencies.prepareProjectForOptionals(project)
 
+    project.ext.mavenDependencies = { Closure closure ->
+      closure.setDelegate(MavenConfig.configMapper(project))
+      closure.setResolveStrategy(Closure.DELEGATE_FIRST)
+      closure.call()
+    }
+
     DeployablePluginExtension deployable = project.extensions.create(
         "deployable",
         DeployablePluginExtension,
