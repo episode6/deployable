@@ -54,6 +54,7 @@ class DeployablePlugin implements Plugin<Project> {
           .map("implementation", "compile")
           .map("api", "compile")
           .map("mavenProvided", "provided")
+          .map("testImplementation", "test")
 
       MavenConfig.configurePom(project, deployable, pomPackaging)
       MavenConfig.configureSigning(project)
