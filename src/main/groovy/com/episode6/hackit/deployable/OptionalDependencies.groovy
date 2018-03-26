@@ -39,8 +39,6 @@ class OptionalDependencies {
     project.ext.optionalDeps = []
     project.ext.optional = { Dependency dep ->
       project.ext.optionalDeps << dep
-      // exclude optional dependency when resolving dependencies between projects
-      project.configurations.default.exclude(group: dep.group, module: dep.name)
       return dep
     }
   }
@@ -51,6 +49,9 @@ class OptionalDependencies {
    * @param project
    */
   static void applyOptionals(Project project) {
+    project.ext.optionalDeps.forEach { Dependency dep ->
+      project.configurations.default.exclude(group: dep.group, module: dep.name)
+    }
     project.tasks.uploadArchives.repositories*.activePomFilters.flatten()*.pomTemplate*.whenConfigured { pom ->
       project.ext.optionalDeps.each { optionalDep ->
         pom.dependencies.find {
