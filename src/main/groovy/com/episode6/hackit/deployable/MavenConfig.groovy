@@ -3,6 +3,7 @@ package com.episode6.hackit.deployable
 import com.episode6.hackit.deployable.extension.DeployablePluginExtension
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
+import org.gradle.api.artifacts.Dependency
 import org.gradle.api.artifacts.maven.MavenDeployment
 
 /**
@@ -25,8 +26,30 @@ class MavenConfig {
       return this
     }
 
+    ConfigToScopeMapper mapOptional(String gradleConfigName, String mavenScope) {
+      def config = project.configurations.findByName(gradleConfigName)
+      if (config != null) {
+        mapOptional(config, mavenScope)
+      }
+      return this
+    }
+
     ConfigToScopeMapper map(Configuration gradleConfig, String mavenScope) {
       project.conf2ScopeMappings.addMapping(0, gradleConfig, mavenScope)
+      return this
+    }
+
+    ConfigToScopeMapper mapOptional(Configuration gradleConfig, String mavenScope) {
+      map(gradleConfig, mavenScope)
+      project.afterEvaluate {
+        project.tasks.uploadArchives.repositories*.activePomFilters.flatten()*.pomTemplate*.whenConfigured { pom ->
+          gradleConfig.getAllDependencies().each { Dependency dep ->
+            pom.dependencies.find { pomDep ->
+              pomDep.groupId == dep.group && pomDep.artifactId == dep.name
+            }.optional = true
+          }
+        }
+      }
       return this
     }
   }

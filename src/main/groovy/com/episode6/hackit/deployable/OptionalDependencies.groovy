@@ -49,11 +49,8 @@ class OptionalDependencies {
    * @param project
    */
   static void applyOptionals(Project project) {
-    project.ext.optionalDeps.forEach { Dependency dep ->
-      project.configurations.default.exclude(group: dep.group, module: dep.name)
-    }
     project.tasks.uploadArchives.repositories*.activePomFilters.flatten()*.pomTemplate*.whenConfigured { pom ->
-      project.ext.optionalDeps.each { optionalDep ->
+      project.ext.optionalConfigs.collectMany { it.dependencies }.each { optionalDep ->
         pom.dependencies.find {
           dep -> dep.groupId == optionalDep.group && dep.artifactId == optionalDep.name
         }.optional = true

@@ -18,12 +18,16 @@ class DeployablePlugin implements Plugin<Project> {
   }
 
   void apply(Project project) {
-    def providedConf = project.configurations.create("mavenProvided")
+    project.configurations {
+      mavenOptional
+      mavenProvided
+      mavenProvidedOptional
+    }
+
+    project.ext.optionalConfigs = []
 
     project.plugins.apply(MavenPlugin)
     project.plugins.apply(SigningPlugin)
-
-    OptionalDependencies.prepareProjectForOptionals(project)
 
     project.ext.mavenDependencies = { Closure closure ->
       closure.setDelegate(MavenConfig.configMapper(project))
@@ -52,20 +56,24 @@ class DeployablePlugin implements Plugin<Project> {
     }
 
     project.afterEvaluate {
-      project.configurations.compileOnly.extendsFrom providedConf
-
-      OptionalDependencies.assertNoApiOptionals(project)
+      project.configurations {
+        compileOnly {
+          extendsFrom mavenOptional
+          extendsFrom mavenProvided
+          extendsFrom mavenProvidedOptional
+        }
+      }
 
       MavenConfig.configMapper(project)
           .map("implementation", "compile")
           .map("api", "compile")
           .map("mavenProvided", "provided")
           .map("testImplementation", "test")
+          .mapOptional("mavenOptional", "compile")
+          .mapOptional("mavenProvidedOptional", "provided")
 
       MavenConfig.configurePom(project, deployable, pomPackaging)
       MavenConfig.configureSigning(project)
-
-      OptionalDependencies.applyOptionals(project)
     }
   }
 }

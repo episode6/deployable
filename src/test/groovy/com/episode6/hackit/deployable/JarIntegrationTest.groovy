@@ -160,63 +160,6 @@ dependencies {
     "com.release.example"   | "releaselib"  | "0.0.2"
   }
 
-  def "verify optional api dependencies not allowed"(String groupId, String artifactId, String versionName) {
-    given:
-    testProject.rootProjectName = artifactId
-    testProject.rootGradlePropertiesFile << testProject.testProperties.inGradlePropertiesFormat
-    testProject.rootGradleBuildFile << simpleBuildFile(groupId, versionName)
-    testProject.createNonEmptyJavaFileWithImports("${groupId}.${artifactId}", CHOP_IMPORT)
-    testProject.rootGradleBuildFile << """
-repositories {
-  jcenter()
-}
-
-dependencies {
-  api 'com.episode6.hackit.chop:chop-core:0.1.8', optional
-}
-"""
-    when:
-    def result = testProject.failGradleTask("deploy")
-
-    then:
-    result.output.contains("api dependencies are not allowed to be optional (com.episode6.hackit.chop:chop-core:0.1.8)")
-
-    where:
-    groupId                 | artifactId    | versionName
-    "com.snapshot.example"  | "snapshotlib" | "0.0.1-SNAPSHOT"
-    "com.release.example"   | "releaselib"  | "0.0.2"
-  }
-
-  def "verify optional api dependencies not allowed (via closure)"(String groupId, String artifactId, String versionName) {
-    given:
-    testProject.rootProjectName = artifactId
-    testProject.rootGradlePropertiesFile << testProject.testProperties.inGradlePropertiesFormat
-    testProject.rootGradleBuildFile << simpleBuildFile(groupId, versionName)
-    testProject.createNonEmptyJavaFileWithImports("${groupId}.${artifactId}", CHOP_IMPORT)
-    testProject.rootGradleBuildFile << """
-repositories {
-  jcenter()
-}
-
-dependencies {
-  api('org.spockframework:spock-core:1.1-groovy-2.4-rc-3') {
-    optional(it)
-    exclude module: 'groovy-all'
-  }
-}
-"""
-    when:
-    def result = testProject.failGradleTask("deploy")
-
-    then:
-    result.output.contains("api dependencies are not allowed to be optional (org.spockframework:spock-core:1.1-groovy-2.4-rc-3)")
-
-    where:
-    groupId                 | artifactId    | versionName
-    "com.snapshot.example"  | "snapshotlib" | "0.0.1-SNAPSHOT"
-    "com.release.example"   | "releaselib"  | "0.0.2"
-  }
-
   def "verify provided dependencies"(String groupId, String artifactId, String versionName) {
     given:
     testProject.rootProjectName = artifactId
@@ -270,7 +213,7 @@ repositories {
 }
 
 dependencies {
-  implementation 'com.episode6.hackit.chop:chop-core:0.1.8', optional
+  mavenOptional 'com.episode6.hackit.chop:chop-core:0.1.8'
 }
 """
     when:
@@ -311,8 +254,7 @@ repositories {
 }
 
 dependencies {
-  implementation('org.spockframework:spock-core:1.1-groovy-2.4-rc-3') {
-    optional(it)
+  mavenOptional('org.spockframework:spock-core:1.1-groovy-2.4-rc-3') {
     exclude module: 'groovy-all'
   }
 }
@@ -360,7 +302,7 @@ repositories {
 }
 
 dependencies {
-  mavenProvided 'com.episode6.hackit.chop:chop-core:0.1.8', optional
+  mavenProvidedOptional 'com.episode6.hackit.chop:chop-core:0.1.8'
 }
 """
     when:
@@ -462,13 +404,13 @@ configurations {
 }
 
 dependencies {
-  someConfig 'org.spockframework:spock-core:1.1-groovy-2.4', optional
-  someOtherConfig 'com.episode6.hackit.chop:chop-core:0.1.8', optional
+  someConfig 'org.spockframework:spock-core:1.1-groovy-2.4'
+  someOtherConfig 'com.episode6.hackit.chop:chop-core:0.1.8'
 }
 
 mavenDependencies {
-  map configurations.someConfig, "compile"
-  map "someOtherConfig", "provided"
+  mapOptional configurations.someConfig, "compile"
+  mapOptional "someOtherConfig", "provided"
 }
 """
     when:
