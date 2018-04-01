@@ -35,12 +35,12 @@ class MavenConfigurator {
     }
 
     mapConfigs {
-      map("testImplementation", "test")
-      map("implementation", "compile")
+      map("implementation", "runtime")
       map("api", "compile")
+      map("testImplementation", "test")
       map("mavenProvided", "provided")
       mapOptional("mavenProvidedOptional", "provided")
-      mapOptional("mavenOptional", "compile")
+      mapOptional("mavenOptional", "runtime")
     }
 
 

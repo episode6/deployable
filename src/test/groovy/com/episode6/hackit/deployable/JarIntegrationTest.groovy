@@ -116,7 +116,7 @@ dependencies {
     result.task(":deploy").outcome == TaskOutcome.SUCCESS
     result.task(":install") == null
     mavenOutputVerifier.verifyStandardOutput()
-    mavenOutputVerifier.verifyPomDependency("com.episode6.hackit.chop", "chop-core", "0.1.8", "compile")
+    mavenOutputVerifier.verifyPomDependency("com.episode6.hackit.chop", "chop-core", "0.1.8", "runtime")
 
     where:
     groupId                 | artifactId    | versionName
@@ -228,7 +228,7 @@ dependencies {
         "com.episode6.hackit.chop",
         "chop-core",
         "0.1.8",
-        "compile",
+        "runtime",
         true)
 
     where:
@@ -271,7 +271,7 @@ dependencies {
         "org.spockframework",
         "spock-core",
         "1.1-groovy-2.4-rc-3",
-        "compile",
+        "runtime",
         true)
     mavenOutputVerifier.verifyPomDependencyExclusion(
         "org.spockframework",
@@ -474,8 +474,8 @@ dependencies {
     result.task(":install") == null
     mavenOutputVerifier.verifyStandardOutput()
     mavenOutputVerifier.verifyPomDependency("com.episode6.hackit.chop", "chop-core", "0.1.8", "compile")
-    mavenOutputVerifier.verifyPomDependency("io.reactivex.rxjava2", "rxjava", "2.1.12", "compile")
-    mavenOutputVerifier.verifyPomDependency("org.assertj", "assertj-core", "3.9.1", "compile", true)
+    mavenOutputVerifier.verifyPomDependency("io.reactivex.rxjava2", "rxjava", "2.1.12", "runtime")
+    mavenOutputVerifier.verifyPomDependency("org.assertj", "assertj-core", "3.9.1", "runtime", true)
     mavenOutputVerifier.verifyPomDependency("org.mockito", "mockito-core", "2.9.0", "provided")
     mavenOutputVerifier.verifyPomDependency("com.squareup.dagger", "dagger", "1.2.5", "provided", true)
     mavenOutputVerifier.verifyPomDependency("org.spockframework", "spock-core", "1.1-groovy-2.4", "test")

@@ -6,10 +6,11 @@ package com.episode6.hackit.deployable.testutil
 class TestUtil {
   static String mavenScopeForGradleConfig(String gradleConfig) {
     switch (gradleConfig) {
-      case "compile":
-      case "api":
       case "implementation":
       case "mavenOptional":
+        return "runtime"
+      case "compile":
+      case "api":
         return "compile"
       case "mavenProvided":
       case "mavenProvidedOptional":

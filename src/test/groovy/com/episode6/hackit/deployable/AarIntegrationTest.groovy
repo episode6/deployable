@@ -114,7 +114,7 @@ dependencies {
 }
 """
     when:
-    def result = testProject.executeGradleTask("deploy")
+    def result = testProject.executeGradleTask("deploy", "--stacktrace")
 
     then:
     result.task(":uploadArchives").outcome == TaskOutcome.SUCCESS
@@ -124,7 +124,7 @@ dependencies {
         "com.episode6.hackit.chop",
         "chop-core",
         "0.1.8",
-        "compile")
+        "runtime")
 
     where:
     groupId                         | artifactId    | versionName
@@ -196,7 +196,7 @@ dependencies {
         "com.episode6.hackit.chop",
         "chop-core",
         "0.1.8",
-        "compile",
+        "runtime",
         true)
 
     where:
