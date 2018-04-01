@@ -10,7 +10,7 @@ buildscript {
     jcenter()
   }
   dependencies {
-    classpath 'com.episode6.hackit.deployable:deployable:0.1.7'
+    classpath 'com.episode6.hackit.deployable:deployable:0.1.8'
   }
 }
 ```
@@ -104,47 +104,52 @@ deployable {
 Finally, deploy using
 `./gradlew uploadArchives` or the new deploy alias `./gradlew deploy`
 
-Deployable also adds some basic support for maven's `provided` scope and `optional` flag. (many thanks to [nebula-plugins/gradle-extra-configurations-plugin](https://github.com/nebula-plugins/gradle-extra-configurations-plugin/) for providing the logic for this.
+Deployable also adds some basic support for maven's `provided` scope and `optional` flag via custom scopes...
 ```groovy
 dependencies {
-    // api -> maven: 'compile' (cannot be optional)
+    // api -> maven: 'compile'
     api 'com.example:example-core:1.0'
 
     // implementation -> maven: 'compile'
     implementation 'com.example:example-addition:1.0'
 
+    // implementation -> maven: 'compile' + 'optional=true'
+    mavenOption 'com.example:example-addition:1.0'
+
     // mavenProvided -> maven: 'provided'
     mavenProvided 'com.example:example-dep:1.0'
 
-    // optional -> maven: 'optional=true'
-    implementation 'com.otherexample:other-dep:1.0', optional
-
-    // optional dependency via closure
-    implementation('org.spockframework:spock-core:1.1-groovy-2.4-rc-3') {
-        optional(it)
-        exclude module: 'groovy-all'
-    }
+    // mavenProvidedOptional -> maven: 'provided' + 'optional=true'
+    mavenProvidedOptional 'com.otherexample:other-dep:1.0', optional
 }
 ```
 
 To map dependencies of extra configurations use the `mavenDependencies` method...
 ```groovy
 configurations {
-    someConfig
-    someOtherConfig
+    someCompileConfig
+    someProvidedConfig
+    someCompileOptionalConfig
+    someProvidedOptionalConfig
 }
 
 mavenDependencies {
     // map with configuration reference
-    map configurations.someConfig, "compile"
+    map configurations.someCompileConfig, "compile"
 
     // map with configuration name (and ignore if it doesnt exist)
-    map "someOtherConfig", "provided"
+    map "someProvidedConfig", "provided"
+
+    // map optional configs using mapOptional
+    mapOptional "someCompileOptionalConfig", "compile"
+    mapOptional "someProvidedOptionalConfig", "provided"
 }
 
 dependencies {
-    someConfig 'com.example:compile-dep:1.0'
-    someOtherConfig 'com.example:provided-optional-dep-dep:1.0', optional
+    someCompileConfig 'com.example:compile-dep:1.0'
+    someProvidedConfig 'com.example:provided-dep:1.0'
+    someCompileOptionalConfig 'com.example:compile-optional-dep:1.0'
+    someProvidedOptionalConfig 'com.example:provided-optional-dep:1.0'
 }
 ```
 

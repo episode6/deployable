@@ -7,6 +7,7 @@ import org.gradle.testkit.runner.TaskOutcome
 import org.junit.Rule
 import spock.lang.Specification
 
+import static com.episode6.hackit.deployable.testutil.TestUtil.isGradleScopeOptional
 import static com.episode6.hackit.deployable.testutil.TestUtil.mavenScopeForGradleConfig
 
 /**
@@ -25,9 +26,9 @@ import com.episode6.hackit.chop.Chop;
 
 """
 
-  private static String chopDep(String config = "implementation", boolean optional = false) {
+  private static String chopDep(String config = "implementation") {
     return """
-  ${config} 'com.episode6.hackit.chop:chop-core:0.1.8'${optional ? ", optional" : ""}
+  ${config} 'com.episode6.hackit.chop:chop-core:0.1.8'
 """
   }
 
@@ -111,7 +112,8 @@ ${deps}
 """
   }
 
-  @Rule final IntegrationTestProject testProject = new IntegrationTestProject()
+  @Rule
+  final IntegrationTestProject testProject = new IntegrationTestProject()
 
   def "test multi-project deployables"(String groupId, String versionName) {
     given:
@@ -166,15 +168,15 @@ include ':javalib', ':groovylib', ':androidlib'
     androidlibVerifier.verifyPomDependency(groupId, "groovylib", versionName)
 
     where:
-    groupId                              | versionName
-    "com.multiproject.snapshot.example"  | "0.0.1-SNAPSHOT"
-    "com.multiproject.release.example"   | "0.0.1"
+    groupId                             | versionName
+    "com.multiproject.snapshot.example" | "0.0.1-SNAPSHOT"
+    "com.multiproject.release.example"  | "0.0.1"
   }
 
   // this test our extra configurations (provided, compileOptional, providedOptional) and
   // ensures that multi-projects will exclude their optional/provided dependencies from their
   // sibling dependent projects
-  def "test multi-project extra configurations"(LibType libType, boolean pass, String config, boolean optional) {
+  def "test multi-project extra configurations"(LibType libType, boolean pass, String config) {
     given:
     String groupId = "com.multiproject.release.example"
     String versionName = "0.2.7"
@@ -186,7 +188,7 @@ include ':javalib', ':groovylib', ':androidlib'
 include ':parentlib', ':childlib'
 """
     testProject.rootGradleBuildFile << rootBuildFile(groupId, versionName)
-    String parentDeps = chopDep(config, optional)
+    String parentDeps = chopDep(config)
     String childDeps = projectDeps("parentlib")
     if (pass) {
       childDeps = chopDep() + childDeps
@@ -233,7 +235,7 @@ include ':parentlib', ':childlib'
       parentResult = testProject.executeGradleTask(":parentlib:deploy");
       childResult = pass ? testProject.executeGradleTask(":childlib:deploy") : testProject.failGradleTask(":childlib:deploy")
     } catch (Throwable t) {
-      println("BUILD FAIL libType: $libType, pass: $pass, config: $config, optional: $optional")
+      println("BUILD FAIL libType: $libType, pass: $pass, config: $config")
       throw t
     }
 
@@ -246,7 +248,7 @@ include ':parentlib', ':childlib'
         "chop-core",
         "0.1.8",
         mavenScopeForGradleConfig(config),
-        optional)
+        isGradleScopeOptional(config))
 
     if (pass) {
       childResult.task(":childlib:deploy").outcome == TaskOutcome.SUCCESS
@@ -257,31 +259,31 @@ include ':parentlib', ':childlib'
     }
 
     where:
-    libType         | pass  | config     | optional
-    LibType.JAVA    | true  | "mavenProvided" | true
-    LibType.JAVA    | false | "mavenProvided" | true
-    LibType.JAVA    | true  | "mavenProvided" | false
-    LibType.JAVA    | false | "mavenProvided" | false
-    LibType.JAVA    | true  | "implementation"  | true
-    LibType.JAVA    | false | "implementation"  | true
-    LibType.JAVA    | true  | "implementation"  | false
-    LibType.JAVA    | false | "implementation"  | false
-    LibType.GROOVY  | true  | "mavenProvided" | true
-    LibType.GROOVY  | false | "mavenProvided" | true
-    LibType.GROOVY  | true  | "mavenProvided" | false
-    LibType.GROOVY  | false | "mavenProvided" | false
-    LibType.GROOVY  | true  | "implementation"  | true
-    LibType.GROOVY  | false | "implementation"  | true
-    LibType.GROOVY  | true  | "implementation"  | false
-    LibType.GROOVY  | false | "implementation"  | false
-    LibType.ANDROID | true  | "mavenProvided" | true
-    LibType.ANDROID | false | "mavenProvided" | true
-    LibType.ANDROID | true  | "mavenProvided" | false
-    LibType.ANDROID | false | "mavenProvided" | false
-    LibType.ANDROID | true  | "implementation"  | true
-    LibType.ANDROID | false | "implementation"  | true
-    LibType.ANDROID | true  | "implementation"  | false
-    LibType.ANDROID | false | "implementation"  | false
+    libType         | pass  | config
+    LibType.JAVA    | true  | "mavenProvidedOptional"
+    LibType.JAVA    | false | "mavenProvidedOptional"
+    LibType.JAVA    | true  | "mavenProvided"
+    LibType.JAVA    | false | "mavenProvided"
+    LibType.JAVA    | true  | "mavenOptional"
+    LibType.JAVA    | false | "mavenOptional"
+    LibType.JAVA    | true  | "implementation"
+    LibType.JAVA    | false | "implementation"
+    LibType.GROOVY  | true  | "mavenProvidedOptional"
+    LibType.GROOVY  | false | "mavenProvidedOptional"
+    LibType.GROOVY  | true  | "mavenProvided"
+    LibType.GROOVY  | false | "mavenProvided"
+    LibType.GROOVY  | true  | "mavenOptional"
+    LibType.GROOVY  | false | "mavenOptional"
+    LibType.GROOVY  | true  | "implementation"
+    LibType.GROOVY  | false | "implementation"
+    LibType.ANDROID | true  | "mavenProvidedOptional"
+    LibType.ANDROID | false | "mavenProvidedOptional"
+    LibType.ANDROID | true  | "mavenProvided"
+    LibType.ANDROID | false | "mavenProvided"
+    LibType.ANDROID | true  | "mavenOptional"
+    LibType.ANDROID | false | "mavenOptional"
+    LibType.ANDROID | true  | "implementation"
+    LibType.ANDROID | false | "implementation"
 
   }
 

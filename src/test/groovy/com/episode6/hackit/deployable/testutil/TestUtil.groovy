@@ -4,15 +4,31 @@ package com.episode6.hackit.deployable.testutil
  *
  */
 class TestUtil {
-  public static String mavenScopeForGradleConfig(String gradleConfig) {
+  static String mavenScopeForGradleConfig(String gradleConfig) {
     switch (gradleConfig) {
       case "compile":
       case "api":
       case "implementation":
+      case "mavenOptional":
         return "compile"
       case "mavenProvided":
-      case "compileOnly":
+      case "mavenProvidedOptional":
         return "provided"
+      default:
+        throw new RuntimeException("Invalid gradleConfig: $gradleConfig")
+    }
+  }
+
+  static boolean isGradleScopeOptional(String gradleConfig) {
+    switch (gradleConfig) {
+      case "compile":
+      case "api":
+      case "implementation":
+      case "mavenProvided":
+        return false
+      case "mavenOptional":
+      case "mavenProvidedOptional":
+        return true
       default:
         throw new RuntimeException("Invalid gradleConfig: $gradleConfig")
     }
