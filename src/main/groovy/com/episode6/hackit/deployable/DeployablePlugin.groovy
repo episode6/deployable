@@ -13,26 +13,21 @@ class DeployablePlugin implements Plugin<Project> {
 
   String pomPackaging = null
 
+  private MavenConfigurator mavenConfig;
+
   static isReleaseBuild(Project project) {
     return project.version.contains("SNAPSHOT") == false
   }
 
   void apply(Project project) {
-    project.configurations {
-      mavenOptional
-      mavenProvided
-      mavenProvidedOptional
-    }
-
-    project.ext.optionalConfigs = []
-
     project.plugins.apply(MavenPlugin)
     project.plugins.apply(SigningPlugin)
 
+    mavenConfig = new MavenConfigurator(project: project)
+    mavenConfig.prepare()
+
     project.ext.mavenDependencies = { Closure closure ->
-      closure.setDelegate(MavenConfig.configMapper(project))
-      closure.setResolveStrategy(Closure.DELEGATE_FIRST)
-      closure.call()
+      mavenConfig.mapConfigs(closure)
     }
 
     DeployablePluginExtension deployable = project.extensions.create(
@@ -56,24 +51,7 @@ class DeployablePlugin implements Plugin<Project> {
     }
 
     project.afterEvaluate {
-      project.configurations {
-        compileOnly {
-          extendsFrom mavenOptional
-          extendsFrom mavenProvided
-          extendsFrom mavenProvidedOptional
-        }
-      }
-
-      MavenConfig.configMapper(project)
-          .map("implementation", "compile")
-          .map("api", "compile")
-          .map("mavenProvided", "provided")
-          .map("testImplementation", "test")
-          .mapOptional("mavenOptional", "compile")
-          .mapOptional("mavenProvidedOptional", "provided")
-
-      MavenConfig.configurePom(project, deployable, pomPackaging)
-      MavenConfig.configureSigning(project)
+      mavenConfig.configure(deployable, pomPackaging)
     }
   }
 }

@@ -9,14 +9,50 @@ import org.gradle.api.artifacts.maven.MavenDeployment
 /**
  *
  */
-class MavenConfig {
+class MavenConfigurator {
+  Project project
 
-  static ConfigToScopeMapper configMapper(Project project) {
-    return new ConfigToScopeMapper(project: project)
+  void prepare() {
+    project.ext.optionalConfigs = []
+
+    project.configurations {
+      mavenOptional
+      mavenProvided
+      mavenProvidedOptional
+    }
   }
 
-  static class ConfigToScopeMapper implements GroovyInterceptable {
-    Project project
+  void configure(DeployablePluginExtension deployable, String pomPackaging) {
+    project.configurations {
+      compileOnly {
+        extendsFrom(
+            mavenOptional,
+            mavenProvided,
+            mavenProvidedOptional)
+      }
+    }
+
+    mapConfigs {
+      map("implementation", "compile")
+      map("api", "compile")
+      map("mavenProvided", "provided")
+      map("testImplementation", "test")
+      mapOptional("mavenOptional", "compile")
+      mapOptional("mavenProvidedOptional", "provided")
+    }
+
+
+    configurePom(deployable, pomPackaging)
+    configureSigning()
+  }
+
+  void mapConfigs(Closure closure) {
+    closure.setDelegate(new ConfigToScopeMapper())
+    closure.setResolveStrategy(Closure.DELEGATE_FIRST)
+    closure.call()
+  }
+
+  class ConfigToScopeMapper implements GroovyInterceptable {
 
     ConfigToScopeMapper map(String gradleConfigName, String mavenScope) {
       def config = project.configurations.findByName(gradleConfigName)
@@ -41,20 +77,12 @@ class MavenConfig {
 
     ConfigToScopeMapper mapOptional(Configuration gradleConfig, String mavenScope) {
       map(gradleConfig, mavenScope)
-      project.afterEvaluate {
-        project.tasks.uploadArchives.repositories*.activePomFilters.flatten()*.pomTemplate*.whenConfigured { pom ->
-          gradleConfig.getAllDependencies().each { Dependency dep ->
-            pom.dependencies.find { pomDep ->
-              pomDep.groupId == dep.group && pomDep.artifactId == dep.name
-            }.optional = true
-          }
-        }
-      }
+      project.ext.optionalConfigs << gradleConfig
       return this
     }
   }
 
-  static void configurePom(Project project, DeployablePluginExtension deployable, String pomPackaging) {
+  private void configurePom(DeployablePluginExtension deployable, String pomPackaging) {
     project.uploadArchives {
       it.dependsOn project.validateDeployable
 
@@ -67,6 +95,17 @@ class MavenConfig {
           }
           snapshotRepository(url: deployable.nexus.snapshotRepoUrl) {
             authentication(userName: deployable.nexus.username, password: deployable.nexus.password)
+          }
+
+          // apply optional dependencies
+          pom.whenConfigured { pom ->
+            project.optionalConfigs.each { Configuration gradleConfig ->
+              gradleConfig.getAllDependencies().each { Dependency dep ->
+                pom.dependencies.find { pomDep ->
+                  pomDep.groupId == dep.group && pomDep.artifactId == dep.name
+                }.optional = true
+              }
+            }
           }
 
           pom.project {
@@ -101,7 +140,7 @@ class MavenConfig {
     }
   }
 
-  static void configureSigning(Project project) {
+  private void configureSigning() {
     project.signing {
       required {
         DeployablePlugin.isReleaseBuild(project) &&
