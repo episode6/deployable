@@ -12,7 +12,7 @@ import org.gradle.api.artifacts.maven.MavenDeployment
 class MavenConfigurator {
   Project project
 
-  private int scopePriority = 51
+  private int scopePriority = 451
 
   void prepare() {
     project.ext.optionalConfigs = []
@@ -35,12 +35,12 @@ class MavenConfigurator {
     }
 
     mapConfigs {
-      mapOptional("mavenOptional", "compile")
-      mapOptional("mavenProvidedOptional", "provided")
-      map("mavenProvided", "provided")
+      map("testImplementation", "test")
       map("implementation", "compile")
       map("api", "compile")
-      map("testImplementation", "test")
+      map("mavenProvided", "provided")
+      mapOptional("mavenProvidedOptional", "provided")
+      mapOptional("mavenOptional", "compile")
     }
 
 
