@@ -48,9 +48,14 @@ apply plugin: 'com.android.library'
 group = '${groupId}'
 version = '${versionName}'
 
+repositories {
+  jcenter()
+  google()
+}
+
 android {
   compileSdkVersion 19
-  buildToolsVersion "26.0.2"
+  buildToolsVersion "${MyDependencyMap.lookupVersion("android.buildtools")}"
 }
  """
   }
@@ -102,9 +107,7 @@ android {
         versionName: versionName,
         testProject: testProject)
     testProject.rootGradleBuildFile << """
-repositories {
-  jcenter()
-}
+
 
 dependencies {
   implementation 'com.episode6.hackit.chop:chop-core:0.1.8'
@@ -142,10 +145,6 @@ dependencies {
         versionName: versionName,
         testProject: testProject)
     testProject.rootGradleBuildFile << """
-repositories {
-  jcenter()
-}
-
 dependencies {
   api 'com.episode6.hackit.chop:chop-core:0.1.8'
 }
@@ -182,10 +181,6 @@ dependencies {
         versionName: versionName,
         testProject: testProject)
     testProject.rootGradleBuildFile << """
-repositories {
-  jcenter()
-}
-
 dependencies {
   mavenOptional 'com.episode6.hackit.chop:chop-core:0.1.8'
 }
@@ -223,10 +218,6 @@ dependencies {
         versionName: versionName,
         testProject: testProject)
     testProject.rootGradleBuildFile << """
-repositories {
-  jcenter()
-}
-
 dependencies {
   mavenProvided 'com.episode6.hackit.chop:chop-core:0.1.8'
 }
@@ -263,9 +254,6 @@ dependencies {
         versionName: versionName,
         testProject: testProject)
     testProject.rootGradleBuildFile << """
-repositories {
-  jcenter()
-}
 
 dependencies {
   mavenProvidedOptional 'com.episode6.hackit.chop:chop-core:0.1.8'

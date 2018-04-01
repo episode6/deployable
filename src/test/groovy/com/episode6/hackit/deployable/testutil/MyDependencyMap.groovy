@@ -15,7 +15,7 @@ class MyDependencyMap {
     return new DependencyMapImpl(gdmcFile)
   }
 
-  static String lookupDep(String key) {
+  private static GdmcDependency lookup(String key) {
     List<GdmcDependency> mapped = get().lookupWithOverrides(key)
     if (!mapped) {
       throw new NullPointerException("Could not find version for key: ${key}")
@@ -24,6 +24,14 @@ class MyDependencyMap {
       throw new NullPointerException("Found multiple entries for key: ${key}, values: ${mapped}")
     }
 
-    return mapped[0].fullMavenKey
+    return mapped[0]
+  }
+
+  static String lookupDep(String key) {
+    return lookup(key).fullMavenKey
+  }
+
+  static String lookupVersion(String key) {
+    return lookup(key).version
   }
 }
