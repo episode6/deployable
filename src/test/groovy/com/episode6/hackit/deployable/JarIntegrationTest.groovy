@@ -439,4 +439,50 @@ mavenDependencies {
     "com.snapshot.example"  | "snapshotlib" | "0.0.1-SNAPSHOT"
     "com.release.example"   | "releaselib"  | "0.0.2"
   }
+
+  def "verify all built-in config type"(String groupId, String artifactId, String versionName) {
+    given:
+    testProject.rootProjectName = artifactId
+    testProject.rootGradlePropertiesFile << testProject.testProperties.inGradlePropertiesFormat
+    testProject.rootGradleBuildFile << simpleBuildFile(groupId, versionName)
+    testProject.createNonEmptyJavaFileWithImports("${groupId}.${artifactId}", CHOP_IMPORT)
+    MavenOutputVerifier mavenOutputVerifier = new MavenOutputVerifier(
+        groupId: groupId,
+        artifactId: artifactId,
+        versionName: versionName,
+        testProject: testProject)
+    testProject.rootGradleBuildFile << """
+repositories {
+  jcenter()
+}
+
+dependencies {
+  api 'com.episode6.hackit.chop:chop-core:0.1.8'
+  implementation 'io.reactivex.rxjava2:rxjava:2.1.12'
+  mavenOptional 'org.assertj:assertj-core:3.9.1'
+  mavenProvided 'org.mockito:mockito-core:2.9.0'
+  mavenProvidedOptional 'com.squareup.dagger:dagger:1.2.5'
+  testImplementation 'org.spockframework:spock-core:1.1-groovy-2.4'
+}
+"""
+    when:
+    def result = testProject.executeGradleTask("deploy")
+
+    then:
+    result.task(":uploadArchives").outcome == TaskOutcome.SUCCESS
+    result.task(":deploy").outcome == TaskOutcome.SUCCESS
+    result.task(":install") == null
+    mavenOutputVerifier.verifyStandardOutput()
+    mavenOutputVerifier.verifyPomDependency("com.episode6.hackit.chop", "chop-core", "0.1.8", "compile")
+    mavenOutputVerifier.verifyPomDependency("io.reactivex.rxjava2", "rxjava", "2.1.12", "compile")
+    mavenOutputVerifier.verifyPomDependency("org.assertj", "assertj-core", "3.9.1", "compile", true)
+    mavenOutputVerifier.verifyPomDependency("org.mockito", "mockito-core", "2.9.0", "provided")
+    mavenOutputVerifier.verifyPomDependency("com.squareup.dagger", "dagger", "1.2.5", "provided", true)
+    mavenOutputVerifier.verifyPomDependency("org.spockframework", "spock-core", "1.1-groovy-2.4", "test")
+
+    where:
+    groupId                 | artifactId    | versionName
+    "com.snapshot.example"  | "snapshotlib" | "0.0.1-SNAPSHOT"
+    "com.release.example"   | "releaselib"  | "0.0.2"
+  }
 }
