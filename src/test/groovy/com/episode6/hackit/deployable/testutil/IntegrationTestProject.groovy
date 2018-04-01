@@ -89,7 +89,7 @@ class ${className} {
     return nonEmptyGroovyFile
   }
 
-  BuildResult executeGradleTask(String task) {
+  BuildResult executeGradleTask(String... task) {
     return GradleRunner.create()
         .withProjectDir(root)
         .withPluginClasspath()
@@ -97,7 +97,7 @@ class ${className} {
         .build()
   }
 
-  BuildResult failGradleTask(String task) {
+  BuildResult failGradleTask(String... task) {
     return GradleRunner.create()
         .withProjectDir(root)
         .withPluginClasspath()
