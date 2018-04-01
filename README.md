@@ -7,10 +7,12 @@ Add Deployable to the classpath in your root `build.gradle`
 ```groovy
 buildscript {
   repositories {
-    jcenter()
+    maven {
+        url "https://oss.sonatype.org/content/repositories/snapshots/"
+    }
   }
   dependencies {
-    classpath 'com.episode6.hackit.deployable:deployable:0.1.9'
+    classpath 'com.episode6.hackit.deployable:deployable:0.1.10-SNAPSHOT'
   }
 }
 ```
