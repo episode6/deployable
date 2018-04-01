@@ -12,6 +12,8 @@ import org.gradle.api.artifacts.maven.MavenDeployment
 class MavenConfigurator {
   Project project
 
+  private int scopePriority = 51
+
   void prepare() {
     project.ext.optionalConfigs = []
 
@@ -33,12 +35,12 @@ class MavenConfigurator {
     }
 
     mapConfigs {
-      map("implementation", "compile")
-      map("api", "compile")
-      map("mavenProvided", "provided")
-      map("testImplementation", "test")
       mapOptional("mavenOptional", "compile")
       mapOptional("mavenProvidedOptional", "provided")
+      map("mavenProvided", "provided")
+      map("implementation", "compile")
+      map("api", "compile")
+      map("testImplementation", "test")
     }
 
 
@@ -71,7 +73,8 @@ class MavenConfigurator {
     }
 
     ConfigToScopeMapper map(Configuration gradleConfig, String mavenScope) {
-      project.conf2ScopeMappings.addMapping(0, gradleConfig, mavenScope)
+      project.conf2ScopeMappings.addMapping(scopePriority, gradleConfig, mavenScope)
+      scopePriority++
       return this
     }
 
