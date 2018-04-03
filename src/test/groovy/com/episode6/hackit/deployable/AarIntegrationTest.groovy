@@ -17,6 +17,8 @@ import com.episode6.hackit.chop.Chop;
 
 """
 
+  static final String CHOP_JAVADOC = "Here is a link to {@link Chop} for ya."
+
   private static String simpleManifest(String groupId, String artifactId) {
     return """
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
@@ -99,7 +101,7 @@ android {
     testProject.rootProjectName = artifactId
     testProject.rootGradlePropertiesFile << testProject.testProperties.getInGradlePropertiesFormat()
     testProject.rootGradleBuildFile << simpleBuildFile(groupId, versionName)
-    testProject.createNonEmptyJavaFileWithImports("${groupId}.${artifactId}", CHOP_IMPORT)
+    testProject.createNonEmptyJavaFileWithImports("${groupId}.${artifactId}", CHOP_IMPORT, CHOP_JAVADOC)
     testProject.root.newFile("src", "main", "AndroidManifest.xml") << simpleManifest(groupId, artifactId)
     MavenOutputVerifier mavenOutputVerifier = new MavenOutputVerifier(
         groupId: groupId,
@@ -137,7 +139,7 @@ dependencies {
     testProject.rootProjectName = artifactId
     testProject.rootGradlePropertiesFile << testProject.testProperties.getInGradlePropertiesFormat()
     testProject.rootGradleBuildFile << simpleBuildFile(groupId, versionName)
-    testProject.createNonEmptyJavaFileWithImports("${groupId}.${artifactId}", CHOP_IMPORT)
+    testProject.createNonEmptyJavaFileWithImports("${groupId}.${artifactId}", CHOP_IMPORT, CHOP_JAVADOC)
     testProject.root.newFile("src", "main", "AndroidManifest.xml") << simpleManifest(groupId, artifactId)
     MavenOutputVerifier mavenOutputVerifier = new MavenOutputVerifier(
         groupId: groupId,
@@ -173,7 +175,7 @@ dependencies {
     testProject.rootProjectName = artifactId
     testProject.rootGradlePropertiesFile << testProject.testProperties.getInGradlePropertiesFormat()
     testProject.rootGradleBuildFile << simpleBuildFile(groupId, versionName)
-    testProject.createNonEmptyJavaFileWithImports("${groupId}.${artifactId}", CHOP_IMPORT)
+    testProject.createNonEmptyJavaFileWithImports("${groupId}.${artifactId}", CHOP_IMPORT, CHOP_JAVADOC)
     testProject.root.newFile("src", "main", "AndroidManifest.xml") << simpleManifest(groupId, artifactId)
     MavenOutputVerifier mavenOutputVerifier = new MavenOutputVerifier(
         groupId: groupId,
@@ -210,7 +212,7 @@ dependencies {
     testProject.rootProjectName = artifactId
     testProject.rootGradlePropertiesFile << testProject.testProperties.getInGradlePropertiesFormat()
     testProject.rootGradleBuildFile << simpleBuildFile(groupId, versionName)
-    testProject.createNonEmptyJavaFileWithImports("${groupId}.${artifactId}", CHOP_IMPORT)
+    testProject.createNonEmptyJavaFileWithImports("${groupId}.${artifactId}", CHOP_IMPORT, CHOP_JAVADOC)
     testProject.root.newFile("src", "main", "AndroidManifest.xml") << simpleManifest(groupId, artifactId)
     MavenOutputVerifier mavenOutputVerifier = new MavenOutputVerifier(
         groupId: groupId,
@@ -246,7 +248,7 @@ dependencies {
     testProject.rootProjectName = artifactId
     testProject.rootGradlePropertiesFile << testProject.testProperties.getInGradlePropertiesFormat()
     testProject.rootGradleBuildFile << simpleBuildFile(groupId, versionName)
-    testProject.createNonEmptyJavaFileWithImports("${groupId}.${artifactId}", CHOP_IMPORT)
+    testProject.createNonEmptyJavaFileWithImports("${groupId}.${artifactId}", CHOP_IMPORT, CHOP_JAVADOC)
     testProject.root.newFile("src", "main", "AndroidManifest.xml") << simpleManifest(groupId, artifactId)
     MavenOutputVerifier mavenOutputVerifier = new MavenOutputVerifier(
         groupId: groupId,

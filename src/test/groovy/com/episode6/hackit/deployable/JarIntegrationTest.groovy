@@ -16,6 +16,8 @@ import com.episode6.hackit.chop.Chop;
 
 """
 
+  static final String CHOP_JAVADOC = "Here is a link to {@link Chop} for ya."
+
   private static String simpleBuildFile(String groupId, String versionName) {
     return """
 plugins {
@@ -93,7 +95,7 @@ version = '${versionName}'
     testProject.rootProjectName = artifactId
     testProject.rootGradlePropertiesFile << testProject.testProperties.inGradlePropertiesFormat
     testProject.rootGradleBuildFile << simpleBuildFile(groupId, versionName)
-    testProject.createNonEmptyJavaFileWithImports("${groupId}.${artifactId}", CHOP_IMPORT)
+    testProject.createNonEmptyJavaFileWithImports("${groupId}.${artifactId}", CHOP_IMPORT, CHOP_JAVADOC)
     MavenOutputVerifier mavenOutputVerifier = new MavenOutputVerifier(
         groupId: groupId,
         artifactId: artifactId,
@@ -129,7 +131,7 @@ dependencies {
     testProject.rootProjectName = artifactId
     testProject.rootGradlePropertiesFile << testProject.testProperties.inGradlePropertiesFormat
     testProject.rootGradleBuildFile << simpleBuildFile(groupId, versionName)
-    testProject.createNonEmptyJavaFileWithImports("${groupId}.${artifactId}", CHOP_IMPORT)
+    testProject.createNonEmptyJavaFileWithImports("${groupId}.${artifactId}", CHOP_IMPORT, CHOP_JAVADOC)
     MavenOutputVerifier mavenOutputVerifier = new MavenOutputVerifier(
         groupId: groupId,
         artifactId: artifactId,
@@ -165,7 +167,7 @@ dependencies {
     testProject.rootProjectName = artifactId
     testProject.rootGradlePropertiesFile << testProject.testProperties.inGradlePropertiesFormat
     testProject.rootGradleBuildFile << simpleBuildFile(groupId, versionName)
-    testProject.createNonEmptyJavaFileWithImports("${groupId}.${artifactId}", CHOP_IMPORT)
+    testProject.createNonEmptyJavaFileWithImports("${groupId}.${artifactId}", CHOP_IMPORT, CHOP_JAVADOC)
     MavenOutputVerifier mavenOutputVerifier = new MavenOutputVerifier(
         groupId: groupId,
         artifactId: artifactId,
@@ -201,7 +203,7 @@ dependencies {
     testProject.rootProjectName = artifactId
     testProject.rootGradlePropertiesFile << testProject.testProperties.inGradlePropertiesFormat
     testProject.rootGradleBuildFile << simpleBuildFile(groupId, versionName)
-    testProject.createNonEmptyJavaFileWithImports("${groupId}.${artifactId}", CHOP_IMPORT)
+    testProject.createNonEmptyJavaFileWithImports("${groupId}.${artifactId}", CHOP_IMPORT, CHOP_JAVADOC)
     MavenOutputVerifier mavenOutputVerifier = new MavenOutputVerifier(
         groupId: groupId,
         artifactId: artifactId,
@@ -290,7 +292,7 @@ dependencies {
     testProject.rootProjectName = artifactId
     testProject.rootGradlePropertiesFile << testProject.testProperties.inGradlePropertiesFormat
     testProject.rootGradleBuildFile << simpleBuildFile(groupId, versionName)
-    testProject.createNonEmptyJavaFileWithImports("${groupId}.${artifactId}", CHOP_IMPORT)
+    testProject.createNonEmptyJavaFileWithImports("${groupId}.${artifactId}", CHOP_IMPORT, CHOP_JAVADOC)
     MavenOutputVerifier mavenOutputVerifier = new MavenOutputVerifier(
         groupId: groupId,
         artifactId: artifactId,
@@ -445,7 +447,7 @@ mavenDependencies {
     testProject.rootProjectName = artifactId
     testProject.rootGradlePropertiesFile << testProject.testProperties.inGradlePropertiesFormat
     testProject.rootGradleBuildFile << simpleBuildFile(groupId, versionName)
-    testProject.createNonEmptyJavaFileWithImports("${groupId}.${artifactId}", CHOP_IMPORT)
+    testProject.createNonEmptyJavaFileWithImports("${groupId}.${artifactId}", CHOP_IMPORT, CHOP_JAVADOC)
     MavenOutputVerifier mavenOutputVerifier = new MavenOutputVerifier(
         groupId: groupId,
         artifactId: artifactId,
