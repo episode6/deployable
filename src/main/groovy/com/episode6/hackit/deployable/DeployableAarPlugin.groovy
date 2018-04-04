@@ -20,6 +20,8 @@ class DeployableAarPlugin implements Plugin<Project> {
         println variant.name
         def javadocsTask = project.task("android${variant.name.capitalize()}Javadocs", type: Javadoc) {
           description "Generates Javadoc for $variant.name."
+          dependsOn variant.javaCompile
+          mustRunAfter variant.javaCompile
           source = variant.javaCompile.source
           doFirst {
             classpath += project.files(project.android.getBootClasspath().join(File.pathSeparator))
