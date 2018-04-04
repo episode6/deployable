@@ -81,9 +81,9 @@ android {
     def result = testProject.executeGradleTask("deploy")
 
     then:
-    result.task(":androidJavadocs").outcome == TaskOutcome.SUCCESS
-    result.task(":androidJavadocsJar").outcome == TaskOutcome.SUCCESS
-    result.task(":androidSourcesJar").outcome == TaskOutcome.SUCCESS
+    result.task(":androidReleaseJavadocs").outcome == TaskOutcome.SUCCESS
+    result.task(":androidReleaseJavadocsJar").outcome == TaskOutcome.SUCCESS
+    result.task(":androidReleaseSourcesJar").outcome == TaskOutcome.SUCCESS
     result.task(":validateDeployable").outcome == TaskOutcome.SUCCESS
     result.task(":signArchives").outcome == TaskOutcome.SUCCESS
     result.task(":uploadArchives").outcome == TaskOutcome.SUCCESS

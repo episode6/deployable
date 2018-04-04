@@ -14,23 +14,35 @@ class DeployableAarPlugin implements Plugin<Project> {
     project.plugins.apply(DeployablePlugin).pomPackaging = "aar"
 
     project.afterEvaluate {
-      project.task("androidJavadocs", type: Javadoc) {
-        source = project.android.sourceSets.main.java.srcDirs
-        classpath += project.files(project.android.getBootClasspath().join(File.pathSeparator))
-        classpath += project.configurations.compile
-      }
-      project.task("androidJavadocsJar", type: Jar, dependsOn: project.androidJavadocs) {
-        classifier = 'javadoc'
-        from project.androidJavadocs
-      }
-      project.task("androidSourcesJar", type: Jar) {
-        classifier = 'sources'
-        from project.android.sourceSets.main.java.srcDirs
-      }
 
-      project.artifacts {
-        archives project.androidSourcesJar
-        archives project.androidJavadocsJar
+      println "lib variants"
+      project.android.libraryVariants.all { variant ->
+        println variant.name
+        def javadocsTask = project.task("android${variant.name.capitalize()}Javadocs", type: Javadoc) {
+          description "Generates Javadoc for $variant.name."
+          source = variant.javaCompile.source
+          doFirst {
+            classpath += project.files(project.android.getBootClasspath().join(File.pathSeparator))
+            classpath += project.files(variant.javaCompile.classpath.files)
+          }
+        }
+
+        def javadocJarTask = project.task("android${variant.name.capitalize()}JavadocsJar", type: Jar, dependsOn: javadocsTask) {
+          classifier = 'javadoc'
+          from javadocsTask
+        }
+
+        def sourcesJarTask = project.task("android${variant.name.capitalize()}SourcesJar", type: Jar) {
+          classifier = 'sources'
+          from variant.javaCompile.source
+        }
+
+        if (variant.name == "release") {
+          project.artifacts {
+            archives javadocJarTask
+            archives sourcesJarTask
+          }
+        }
       }
 
       // android libs appear to have a problem mapping implementation -> runtime
