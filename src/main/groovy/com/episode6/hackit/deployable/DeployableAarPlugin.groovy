@@ -4,6 +4,7 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.tasks.bundling.Jar
 import org.gradle.api.tasks.javadoc.Javadoc
+import org.gradle.external.javadoc.JavadocMemberLevel
 
 /**
  * Plugin to make Aars (android artifacts) deployable.
@@ -15,16 +16,21 @@ class DeployableAarPlugin implements Plugin<Project> {
 
     project.afterEvaluate {
 
-      println "lib variants"
       project.android.libraryVariants.all { variant ->
-        println variant.name
         def javadocsTask = project.task("android${variant.name.capitalize()}Javadocs", type: Javadoc) {
           description "Generates Javadoc for $variant.name."
+          options.memberLevel = JavadocMemberLevel.PRIVATE
+          options.links("http://docs.oracle.com/javase/7/docs/api/");
+          options.links("http://developer.android.com/reference/");
+          exclude '**/BuildConfig.java'
+          exclude '**/R.java'
+
           dependsOn variant.javaCompile
           mustRunAfter variant.javaCompile
+
           source = variant.javaCompile.source
           doFirst {
-            classpath += project.files(project.android.getBootClasspath().join(File.pathSeparator))
+            classpath += project.files(project.android.bootClasspath)
             classpath += project.files(variant.javaCompile.classpath)
           }
         }
