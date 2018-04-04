@@ -23,7 +23,7 @@ class DeployableAarPlugin implements Plugin<Project> {
           source = variant.javaCompile.source
           doFirst {
             classpath += project.files(project.android.getBootClasspath().join(File.pathSeparator))
-            classpath += project.files(variant.javaCompile.classpath.files)
+            classpath += project.files(variant.javaCompile.classpath)
           }
         }
 
