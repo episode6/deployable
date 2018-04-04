@@ -112,11 +112,11 @@ dependencies {
     // api -> maven: 'compile'
     api 'com.example:example-core:1.0'
 
-    // implementation -> maven: 'compile'
+    // implementation -> maven: 'runtime'
     implementation 'com.example:example-addition:1.0'
 
-    // implementation -> maven: 'compile' + 'optional=true'
-    mavenOption 'com.example:example-addition:1.0'
+    // implementation -> maven: 'runtime' + 'optional=true'
+    mavenOptional 'com.example:example-addition:1.0'
 
     // mavenProvided -> maven: 'provided'
     mavenProvided 'com.example:example-dep:1.0'
