@@ -49,11 +49,16 @@ rootProject.name = '${rootProjectName}'
 """
   }
 
-  File createNonEmptyJavaFileWithImports(String packageName, String imports) {
-    return createNonEmptyJavaFile(packageName, "SampleClass", root, imports)
+  File createNonEmptyJavaFileWithImports(String packageName, String imports, String javadocComent = "test comment") {
+    return createNonEmptyJavaFile(packageName, "SampleClass", root, imports, javadocComent)
   }
 
-  File createNonEmptyJavaFile(String packageName, String className = "SampleClass", File rootDir = root, String imports = "") {
+  File createNonEmptyJavaFile(
+      String packageName,
+      String className = "SampleClass",
+      File rootDir = root,
+      String imports = "",
+      String javadocComent = "test comment") {
     File dir = rootDir.newFolder("src", "main", "java").newFolderFromPackage(packageName)
     File nonEmptyJavaFile = dir.newFile("${className}.java")
     nonEmptyJavaFile << """
@@ -62,7 +67,7 @@ package ${packageName};
 ${imports}
 
 /**
- * A sample class for testing
+ * ${javadocComent}
  */
 public class ${className} {
 
@@ -89,7 +94,7 @@ class ${className} {
     return nonEmptyGroovyFile
   }
 
-  BuildResult executeGradleTask(String task) {
+  BuildResult executeGradleTask(String... task) {
     return GradleRunner.create()
         .withProjectDir(root)
         .withPluginClasspath()
@@ -97,7 +102,7 @@ class ${className} {
         .build()
   }
 
-  BuildResult failGradleTask(String task) {
+  BuildResult failGradleTask(String... task) {
     return GradleRunner.create()
         .withProjectDir(root)
         .withPluginClasspath()

@@ -93,7 +93,6 @@ apply plugin: 'com.android.library'
 
 android {
   compileSdkVersion 19
-  buildToolsVersion "26.0.2"
 }
 
 dependencies {
@@ -160,12 +159,12 @@ include ':javalib', ':groovylib', ':androidlib'
     result.task(":groovylib:deploy").outcome == TaskOutcome.SUCCESS
     groovylibVerifier.verifyStandardOutput()
     groovylibVerifier.verifyJarFile("groovydoc")
-    groovylibVerifier.verifyPomDependency(groupId, "javalib", versionName)
+    groovylibVerifier.verifyPomDependency(groupId, "javalib", versionName, "runtime")
 
     result.task(":androidlib:deploy").outcome == TaskOutcome.SUCCESS
     androidlibVerifier.verifyStandardOutput("aar")
-    androidlibVerifier.verifyPomDependency(groupId, "javalib", versionName)
-    androidlibVerifier.verifyPomDependency(groupId, "groovylib", versionName)
+    androidlibVerifier.verifyPomDependency(groupId, "javalib", versionName, "runtime")
+    androidlibVerifier.verifyPomDependency(groupId, "groovylib", versionName, "runtime")
 
     where:
     groupId                             | versionName
@@ -253,7 +252,7 @@ include ':parentlib', ':childlib'
     if (pass) {
       childResult.task(":childlib:deploy").outcome == TaskOutcome.SUCCESS
       childlibVerifier.verifyStandardOutput(packaging)
-      childlibVerifier.verifyPomDependency(groupId, "parentlib", versionName)
+      childlibVerifier.verifyPomDependency(groupId, "parentlib", versionName, "runtime")
     } else {
       childResult.output.contains("import com.episode6.hackit.chop.Chop")
     }
