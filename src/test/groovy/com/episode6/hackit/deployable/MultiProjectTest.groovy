@@ -93,7 +93,6 @@ apply plugin: 'com.android.library'
 
 android {
   compileSdkVersion 19
-  buildToolsVersion "${MyDependencyMap.lookupVersion("android.buildtools")}"
 }
 
 dependencies {
