@@ -12,7 +12,7 @@ buildscript {
     }
   }
   dependencies {
-    classpath 'com.episode6.hackit.deployable:deployable:0.1.10-SNAPSHOT'
+    classpath 'com.episode6.hackit.deployable:deployable:0.1.11-SNAPSHOT'
   }
 }
 ```
