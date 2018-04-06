@@ -12,7 +12,8 @@ import org.gradle.external.javadoc.JavadocMemberLevel
  */
 class DeployableAarPlugin implements Plugin<Project> {
   void apply(Project project) {
-    project.plugins.apply(DeployablePlugin).pomPackaging = "aar"
+    DeployablePlugin deployablePlugin = project.plugins.apply(DeployablePlugin)
+    deployablePlugin.pomPackaging = "aar"
 
     project.afterEvaluate {
 
@@ -56,10 +57,12 @@ class DeployableAarPlugin implements Plugin<Project> {
       // android libs appear to have a problem mapping implementation -> runtime
       // this re-writes the pom as needed
       project.uploadArchives.repositories.mavenDeployer.pom.whenConfigured { pom ->
-        project.configurations.implementation.dependencies.each { dep ->
-          pom.dependencies.find { pomDep ->
-            pomDep.groupId == dep.group && pomDep.artifactId == dep.name
-          }.scope = "runtime"
+        if (deployablePlugin.mavenConfig.isGradleConfigurationMapped("implementation")) {
+          project.configurations.implementation.dependencies.each { dep ->
+            pom.dependencies.find { pomDep ->
+              pomDep.groupId == dep.group && pomDep.artifactId == dep.name
+            }.scope = "runtime"
+          }
         }
       }
     }
