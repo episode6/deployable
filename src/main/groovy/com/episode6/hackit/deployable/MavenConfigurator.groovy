@@ -69,6 +69,16 @@ class MavenConfigurator {
 
   class ConfigToScopeMapper implements GroovyInterceptable {
 
+    void unmap(String gradleConfigName) {
+      builtInConfigs.remove(gradleConfigName)
+
+      def config = project.configurations.findByName(gradleConfigName)
+      if (config != null) {
+        project.conf2ScopeMappings.remove(config)
+        project.ext.optionalConfigs.remove(config)
+      }
+    }
+
     void map(String gradleConfigName, String mavenScope) {
       def config = project.configurations.findByName(gradleConfigName)
       if (config != null) {
