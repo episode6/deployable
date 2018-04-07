@@ -145,6 +145,9 @@ mavenDependencies {
     // map optional configs using mapOptional
     mapOptional "someCompileOptionalConfig", "compile"
     mapOptional "someProvidedOptionalConfig", "provided"
+
+    // remove the mapping of a gradle dependency
+    unmap "implementation"
 }
 
 dependencies {

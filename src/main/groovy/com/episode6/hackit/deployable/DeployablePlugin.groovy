@@ -13,7 +13,7 @@ class DeployablePlugin implements Plugin<Project> {
 
   String pomPackaging = null
 
-  private MavenConfigurator mavenConfig;
+  MavenConfigurator mavenConfig;
 
   static isReleaseBuild(Project project) {
     return project.version.contains("SNAPSHOT") == false
