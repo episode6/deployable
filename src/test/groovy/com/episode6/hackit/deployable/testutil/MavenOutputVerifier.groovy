@@ -116,6 +116,11 @@ class MavenOutputVerifier {
     return true
   }
 
+  boolean verifyNoDependencies() {
+    def pom = getArtifactFile("pom").asXml()
+    return pom.dependencies.dependency.isEmpty()
+  }
+
   boolean verifyPomDependency(
       String groupId,
       String artifactId,
