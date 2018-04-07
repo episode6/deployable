@@ -73,7 +73,7 @@ class MavenConfigurator {
 
       def config = project.configurations.findByName(gradleConfigName)
       if (config != null) {
-        project.conf2ScopeMappings.remove(config)
+        project.conf2ScopeMappings.mappings.remove(config)
         optionalConfigs.remove(config)
       }
     }
