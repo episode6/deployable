@@ -14,6 +14,7 @@ class MavenConfigurator {
 
   private int scopePriority = 451
 
+  private ConfigToScopeMapper mapper = new ConfigToScopeMapper()
   private Map<String, BuiltInConfig2ScopeMapping> builtInConfigs = new HashMap<>()
   private Set<Configuration> optionalConfigs = new HashSet<>()
 
@@ -43,7 +44,6 @@ class MavenConfigurator {
       }
     }
 
-    ConfigToScopeMapper mapper = new ConfigToScopeMapper()
     builtInConfigs.each { name, config ->
       if (config.optional) {
         mapper.mapOptional(config.gradleConfig, config.mavenScope, config.priority)
@@ -57,7 +57,7 @@ class MavenConfigurator {
   }
 
   void mapConfigs(Closure closure) {
-    closure.setDelegate(new ConfigToScopeMapper())
+    closure.setDelegate(mapper)
     closure.setResolveStrategy(Closure.DELEGATE_FIRST)
     closure.call()
   }
