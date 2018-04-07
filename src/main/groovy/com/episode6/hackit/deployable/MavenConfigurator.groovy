@@ -15,10 +15,9 @@ class MavenConfigurator {
   private int scopePriority = 451
 
   private Map<String, BuiltInConfig2ScopeMapping> builtInConfigs = new HashMap<>()
+  private Set<Configuration> optionalConfigs = new HashSet<>()
 
   void prepare() {
-    project.ext.optionalConfigs = []
-
     project.configurations {
       mavenOptional
       mavenProvided
@@ -75,7 +74,7 @@ class MavenConfigurator {
       def config = project.configurations.findByName(gradleConfigName)
       if (config != null) {
         project.conf2ScopeMappings.remove(config)
-        project.ext.optionalConfigs.remove(config)
+        optionalConfigs.remove(config)
       }
     }
 
@@ -118,12 +117,12 @@ class MavenConfigurator {
 
     void mapOptional(Configuration gradleConfig, String mavenScope) {
       map(gradleConfig, mavenScope)
-      project.ext.optionalConfigs << gradleConfig
+      optionalConfigs.add(gradleConfig)
     }
 
     void mapOptional(Configuration gradleConfig, String mavenScope, int priority) {
       map(gradleConfig, mavenScope, priority)
-      project.ext.optionalConfigs << gradleConfig
+      optionalConfigs.add(gradleConfig)
     }
   }
 
@@ -144,7 +143,7 @@ class MavenConfigurator {
 
           // apply optional dependencies
           pom.whenConfigured { pom ->
-            project.optionalConfigs.each { Configuration gradleConfig ->
+            optionalConfigs.each { Configuration gradleConfig ->
               gradleConfig.getAllDependencies().each { Dependency dep ->
                 pom.dependencies.find { pomDep ->
                   pomDep.groupId == dep.group && pomDep.artifactId == dep.name
