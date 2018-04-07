@@ -62,8 +62,18 @@ class MavenConfigurator {
     closure.call()
   }
 
-  boolean isGradleConfigurationMapped(String gradleConfigName) {
-    return builtInConfigs.containsKey(gradleConfigName)
+  String getMavenScopeForGradleConfig(String gradleConfigName) {
+    if (builtInConfigs.containsKey(gradleConfigName)) {
+      return builtInConfigs.get(gradleConfigName).mavenScope
+    }
+    def config = project.configurations.findByName(gradleConfigName)
+    if (config == null) {
+      return null
+    }
+    if (!project.conf2ScopeMappings.mappings.containsKey(config)) {
+      return null
+    }
+    return project.conf2ScopeMappings.mappings.get(config).scope
   }
 
   class ConfigToScopeMapper implements GroovyInterceptable {
