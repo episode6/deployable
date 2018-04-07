@@ -112,6 +112,7 @@ class MavenConfigurator {
     }
 
     void map(Configuration gradleConfig, String mavenScope, int priority) {
+      project.conf2ScopeMappings.mappings.remove(gradleConfig)
       project.conf2ScopeMappings.addMapping(priority, gradleConfig, mavenScope)
     }
 

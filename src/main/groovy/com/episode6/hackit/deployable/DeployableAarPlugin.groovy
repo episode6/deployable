@@ -57,13 +57,20 @@ class DeployableAarPlugin implements Plugin<Project> {
       // android libs appear to have a problem mapping implementation -> runtime
       // this re-writes the pom as needed
       project.uploadArchives.repositories.mavenDeployer.pom.whenConfigured { pom ->
-        if (deployablePlugin.mavenConfig.isGradleConfigurationMapped("implementation")) {
-          project.configurations.implementation.dependencies.each { dep ->
-            pom.dependencies.find { pomDep ->
-              pomDep.groupId == dep.group && pomDep.artifactId == dep.name
-            }.scope = "runtime"
+        boolean isImplementationConfigMapped = deployablePlugin.mavenConfig
+            .isGradleConfigurationMapped("implementation")
+
+        project.configurations.implementation.dependencies.each { dep ->
+          def pomDep = pom.dependencies.find { pomDep ->
+            pomDep.groupId == dep.group && pomDep.artifactId == dep.name
+          }
+          if (isImplementationConfigMapped) {
+            pomDep.scope = "runtime"
+          } else {
+            pom.dependencies.remove(pomDep)
           }
         }
+
       }
     }
   }
