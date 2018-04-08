@@ -70,6 +70,10 @@ class MavenConfigurator {
     if (config == null) {
       return null
     }
+    return getMavenScopeForGradleConfig(config)
+  }
+
+  String getMavenScopeForGradleConfig(Configuration config) {
     if (!project.conf2ScopeMappings.mappings.containsKey(config)) {
       return null
     }
@@ -155,10 +159,13 @@ class MavenConfigurator {
           // apply optional dependencies
           pom.whenConfigured { pom ->
             optionalConfigs.each { Configuration gradleConfig ->
-              gradleConfig.getAllDependencies().each { Dependency dep ->
-                pom.dependencies.find { pomDep ->
-                  pomDep.groupId == dep.group && pomDep.artifactId == dep.name
-                }.optional = true
+              String mavenScope = getMavenScopeForGradleConfig(gradleConfig)
+              if (mavenScope) {
+                gradleConfig.getAllDependencies().each { Dependency dep ->
+                  pom.dependencies.find { pomDep ->
+                    pomDep.groupId == dep.group && pomDep.artifactId == dep.name && pomDep.scope == mavenScope
+                  }.optional = true
+                }
               }
             }
           }
