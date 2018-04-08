@@ -72,7 +72,7 @@ deployable.nexus.snapshotRepoUrl=https://oss.sonatype.org/content/repositories/s
 
 Most of deployable's properties can alternatively be set or overridden directly in your `build.gradle`
 ```groovy
-apply plugin: 'java'
+apply plugin: 'java-library'
 apply plugin: 'com.episode6.hackit.deployable.jar'
 
 deployable {
@@ -143,10 +143,11 @@ mavenDependencies {
     map "someProvidedConfig", "provided"
 
     // map optional configs using mapOptional
-    mapOptional "someCompileOptionalConfig", "compile"
+    mapOptional configurations.someCompileOptionalConfig, "compile"
     mapOptional "someProvidedOptionalConfig", "provided"
 
-    // remove the mapping of a gradle dependency
+    // remove the mapping of a gradle configuration
+    unamp configurations.api
     unmap "implementation"
 }
 

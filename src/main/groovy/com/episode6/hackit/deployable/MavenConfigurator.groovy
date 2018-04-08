@@ -44,7 +44,7 @@ class MavenConfigurator {
       }
     }
 
-    builtInConfigs.each { name, config ->
+    new HashMap<String, BuiltInConfig2ScopeMapping>(builtInConfigs).each { name, config ->
       if (config.optional) {
         mapper.mapOptional(config.gradleConfig, config.mavenScope, config.priority)
       } else {
@@ -83,13 +83,16 @@ class MavenConfigurator {
   class ConfigToScopeMapper implements GroovyInterceptable {
 
     void unmap(String gradleConfigName) {
-      builtInConfigs.remove(gradleConfigName)
-
       def config = project.configurations.findByName(gradleConfigName)
       if (config != null) {
-        project.conf2ScopeMappings.mappings.remove(config)
-        optionalConfigs.remove(config)
+        unmap(config)
       }
+    }
+
+    void unmap(Configuration gradleConfig) {
+      builtInConfigs.remove(gradleConfig.name)
+      project.conf2ScopeMappings.mappings.remove(gradleConfig)
+      optionalConfigs.remove(gradleConfig)
     }
 
     void map(String gradleConfigName, String mavenScope) {
@@ -126,7 +129,7 @@ class MavenConfigurator {
     }
 
     void map(Configuration gradleConfig, String mavenScope, int priority) {
-      project.conf2ScopeMappings.mappings.remove(gradleConfig)
+      unmap(gradleConfig)
       project.conf2ScopeMappings.addMapping(priority, gradleConfig, mavenScope)
     }
 
