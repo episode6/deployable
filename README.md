@@ -25,6 +25,21 @@ allprojects {
 }
 ```
 
+In each deployable sub-module apply the plugin to `build.gradle`
+```groovy
+// to deploy a JAR
+apply plugin: 'com.episode6.hackit.deployable.jar'
+
+// to deploy an AAR
+apply plugin: 'com.episode6.hackit.deployable.aar'
+```
+
+If this is a groovy project you'll want to pair the deployable.jar plugin with the groovydocs addon
+```groovy
+apply plugin: 'com.episode6.hackit.deployable.jar'
+apply plugin: 'com.episode6.hackit.deployable.addon.groovydocs'
+```
+
 Add the common pom elements to your root `gradle.properties`
 ```
 deployable.pom.description=Gradle plugins to ease the pain of creating deployable jars and aars
@@ -53,21 +68,6 @@ You can optionally override the repository urls by adding the following to your 
 ```
 deployable.nexus.releaseRepoUrl=https://oss.sonatype.org/service/local/staging/deploy/maven2/
 deployable.nexus.snapshotRepoUrl=https://oss.sonatype.org/content/repositories/snapshots/
-```
-
-In each deployable sub-module apply the plugin to `build.gradle`
-```groovy
-// to deploy a JAR
-apply plugin: 'com.episode6.hackit.deployable.jar'
-
-// to deploy an AAR
-apply plugin: 'com.episode6.hackit.deployable.aar'
-```
-
-If this is a groovy project you'll want to pair the deployable.jar plugin with the groovydocs addon
-```groovy
-apply plugin: 'com.episode6.hackit.deployable.jar'
-apply plugin: 'com.episode6.hackit.deployable.addon.groovydocs'
 ```
 
 Most of deployable's properties can alternatively be set or overridden directly in your `build.gradle`
