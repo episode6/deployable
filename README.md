@@ -10,7 +10,7 @@ buildscript {
     jcenter()
   }
   dependencies {
-    classpath 'com.episode6.hackit.deployable:deployable:0.1.10'
+    classpath 'com.episode6.hackit.deployable:deployable:0.1.11'
   }
 }
 ```
@@ -21,6 +21,21 @@ allprojects {
   group = "com.example.mygroup"
   version = "1.0-SNAPSHOT"
 }
+```
+
+In each deployable sub-module apply the plugin to `build.gradle`
+```groovy
+// to deploy a JAR
+apply plugin: 'com.episode6.hackit.deployable.jar'
+
+// to deploy an AAR
+apply plugin: 'com.episode6.hackit.deployable.aar'
+```
+
+If this is a groovy project you'll want to pair the deployable.jar plugin with the groovydocs addon
+```groovy
+apply plugin: 'com.episode6.hackit.deployable.jar'
+apply plugin: 'com.episode6.hackit.deployable.addon.groovydocs'
 ```
 
 Add the common pom elements to your root `gradle.properties`
@@ -53,24 +68,9 @@ deployable.nexus.releaseRepoUrl=https://oss.sonatype.org/service/local/staging/d
 deployable.nexus.snapshotRepoUrl=https://oss.sonatype.org/content/repositories/snapshots/
 ```
 
-In each deployable sub-module apply the plugin to `build.gradle`
-```groovy
-// to deploy a JAR
-apply plugin: 'com.episode6.hackit.deployable.jar'
-
-// to deploy an AAR
-apply plugin: 'com.episode6.hackit.deployable.aar'
-```
-
-If this is a groovy project you'll want to pair the deployable.jar plugin with the groovydocs addon
-```groovy
-apply plugin: 'com.episode6.hackit.deployable.jar'
-apply plugin: 'com.episode6.hackit.deployable.addon.groovydocs'
-```
-
 Most of deployable's properties can alternatively be set or overridden directly in your `build.gradle`
 ```groovy
-apply plugin: 'java'
+apply plugin: 'java-library'
 apply plugin: 'com.episode6.hackit.deployable.jar'
 
 deployable {
@@ -141,8 +141,12 @@ mavenDependencies {
     map "someProvidedConfig", "provided"
 
     // map optional configs using mapOptional
-    mapOptional "someCompileOptionalConfig", "compile"
+    mapOptional configurations.someCompileOptionalConfig, "compile"
     mapOptional "someProvidedOptionalConfig", "provided"
+
+    // remove the mapping of a gradle configuration
+    unamp configurations.api
+    unmap "implementation"
 }
 
 dependencies {

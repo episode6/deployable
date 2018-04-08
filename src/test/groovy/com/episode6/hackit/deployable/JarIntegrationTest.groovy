@@ -487,4 +487,174 @@ dependencies {
     "com.snapshot.example"  | "snapshotlib" | "0.0.1-SNAPSHOT"
     "com.release.example"   | "releaselib"  | "0.0.2"
   }
+
+  def "verify unmap dependencies"(String groupId, String artifactId, String versionName) {
+    given:
+    testProject.rootProjectName = artifactId
+    testProject.rootGradlePropertiesFile << testProject.testProperties.inGradlePropertiesFormat
+    testProject.rootGradleBuildFile << simpleBuildFile(groupId, versionName)
+    testProject.createNonEmptyJavaFileWithImports("${groupId}.${artifactId}", CHOP_IMPORT, CHOP_JAVADOC)
+    MavenOutputVerifier mavenOutputVerifier = new MavenOutputVerifier(
+        groupId: groupId,
+        artifactId: artifactId,
+        versionName: versionName,
+        testProject: testProject)
+    testProject.rootGradleBuildFile << """
+repositories {
+  jcenter()
+}
+
+dependencies {
+  implementation 'com.episode6.hackit.chop:chop-core:0.1.8'
+}
+
+mavenDependencies {
+  unmap "implementation"
+}
+"""
+    when:
+    def result = testProject.executeGradleTask("deploy")
+
+    then:
+    result.task(":uploadArchives").outcome == TaskOutcome.SUCCESS
+    result.task(":deploy").outcome == TaskOutcome.SUCCESS
+    result.task(":install") == null
+    mavenOutputVerifier.verifyStandardOutput()
+    mavenOutputVerifier.verifyNoDependencies()
+
+    where:
+    groupId                 | artifactId    | versionName
+    "com.snapshot.example"  | "snapshotlib" | "0.0.1-SNAPSHOT"
+    "com.release.example"   | "releaselib"  | "0.0.2"
+  }
+
+  def "verify unmap custom dependencies"(String groupId, String artifactId, String versionName) {
+    given:
+    testProject.rootProjectName = artifactId
+    testProject.rootGradlePropertiesFile << testProject.testProperties.inGradlePropertiesFormat
+    testProject.rootGradleBuildFile << simpleBuildFile(groupId, versionName)
+    testProject.createNonEmptyJavaFileWithImports("${groupId}.${artifactId}", CHOP_IMPORT, CHOP_JAVADOC)
+    MavenOutputVerifier mavenOutputVerifier = new MavenOutputVerifier(
+        groupId: groupId,
+        artifactId: artifactId,
+        versionName: versionName,
+        testProject: testProject)
+    testProject.rootGradleBuildFile << """
+repositories {
+  jcenter()
+}
+
+dependencies {
+  mavenOptional 'com.episode6.hackit.chop:chop-core:0.1.8'
+}
+
+mavenDependencies {
+  unmap "mavenOptional"
+}
+"""
+    when:
+    def result = testProject.executeGradleTask("deploy")
+
+    then:
+    result.task(":uploadArchives").outcome == TaskOutcome.SUCCESS
+    result.task(":deploy").outcome == TaskOutcome.SUCCESS
+    result.task(":install") == null
+    mavenOutputVerifier.verifyStandardOutput()
+    mavenOutputVerifier.verifyNoDependencies()
+
+    where:
+    groupId                 | artifactId    | versionName
+    "com.snapshot.example"  | "snapshotlib" | "0.0.1-SNAPSHOT"
+    "com.release.example"   | "releaselib"  | "0.0.2"
+  }
+
+  def "verify re-mapped dependencies from built in config"(String groupId, String artifactId, String versionName) {
+    given:
+    testProject.rootProjectName = artifactId
+    testProject.rootGradlePropertiesFile << testProject.testProperties.inGradlePropertiesFormat
+    testProject.rootGradleBuildFile << simpleBuildFile(groupId, versionName)
+    testProject.createNonEmptyJavaFile("${groupId}.${artifactId}")
+    MavenOutputVerifier mavenOutputVerifier = new MavenOutputVerifier(
+        groupId: groupId,
+        artifactId: artifactId,
+        versionName: versionName,
+        testProject: testProject)
+    testProject.rootGradleBuildFile << """
+repositories {
+  jcenter()
+}
+
+dependencies {
+  implementation 'org.spockframework:spock-core:1.1-groovy-2.4'
+}
+
+mavenDependencies {
+  map configurations.implementation, "provided"
+}
+"""
+    when:
+    def result = testProject.executeGradleTask("deploy")
+
+    then:
+    result.task(":uploadArchives").outcome == TaskOutcome.SUCCESS
+    result.task(":deploy").outcome == TaskOutcome.SUCCESS
+    result.task(":install") == null
+    mavenOutputVerifier.verifyStandardOutput()
+    mavenOutputVerifier.verifyPomDependency(
+        "org.spockframework",
+        "spock-core",
+        "1.1-groovy-2.4",
+        "provided")
+    mavenOutputVerifier.verifyNumberOfDependencies(1)
+
+    where:
+    groupId                 | artifactId    | versionName
+    "com.snapshot.example"  | "snapshotlib" | "0.0.1-SNAPSHOT"
+    "com.release.example"   | "releaselib"  | "0.0.2"
+  }
+
+  def "verify re-mapped dependencies from built in custom config"(String groupId, String artifactId, String versionName) {
+    given:
+    testProject.rootProjectName = artifactId
+    testProject.rootGradlePropertiesFile << testProject.testProperties.inGradlePropertiesFormat
+    testProject.rootGradleBuildFile << simpleBuildFile(groupId, versionName)
+    testProject.createNonEmptyJavaFile("${groupId}.${artifactId}")
+    MavenOutputVerifier mavenOutputVerifier = new MavenOutputVerifier(
+        groupId: groupId,
+        artifactId: artifactId,
+        versionName: versionName,
+        testProject: testProject)
+    testProject.rootGradleBuildFile << """
+repositories {
+  jcenter()
+}
+
+dependencies {
+  mavenProvidedOptional 'org.spockframework:spock-core:1.1-groovy-2.4'
+}
+
+mavenDependencies {
+  map "mavenProvidedOptional", "compile"
+}
+"""
+    when:
+    def result = testProject.executeGradleTask("deploy")
+
+    then:
+    result.task(":uploadArchives").outcome == TaskOutcome.SUCCESS
+    result.task(":deploy").outcome == TaskOutcome.SUCCESS
+    result.task(":install") == null
+    mavenOutputVerifier.verifyStandardOutput()
+    mavenOutputVerifier.verifyPomDependency(
+        "org.spockframework",
+        "spock-core",
+        "1.1-groovy-2.4",
+        "compile")
+    mavenOutputVerifier.verifyNumberOfDependencies(1)
+
+    where:
+    groupId                 | artifactId    | versionName
+    "com.snapshot.example"  | "snapshotlib" | "0.0.1-SNAPSHOT"
+    "com.release.example"   | "releaselib"  | "0.0.2"
+  }
 }

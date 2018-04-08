@@ -12,12 +12,12 @@ buildscript {
   }
   dependencies {
     classpath compileDependencies
-    classpath 'com.episode6.hackit.gdmc:gdmc:0.1.7'
+    classpath 'com.episode6.hackit.gdmc:gdmc:0.1.8'
   }
 }
 
 group = "com.episode6.hackit.deployable"
-version = "0.1.10"
+version = "0.1.11"
 
 task wrapper(type: Wrapper) {
   gradleVersion = "4.4"

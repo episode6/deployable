@@ -14,15 +14,25 @@ class MavenConfigurator {
 
   private int scopePriority = 451
 
-  void prepare() {
-    project.ext.optionalConfigs = []
+  private ConfigToScopeMapper mapper = new ConfigToScopeMapper()
+  private Map<String, BuiltInConfig2ScopeMapping> builtInConfigs = new HashMap<>()
+  private Set<Configuration> optionalConfigs = new HashSet<>()
 
+  void prepare() {
     project.configurations {
       mavenOptional
       mavenProvided
       mavenProvidedOptional
     }
+
+    putBuiltInConfig("implementation", "runtime")
+    putBuiltInConfig("api", "compile")
+    putBuiltInConfig("testImplementation", "test")
+    putBuiltInConfig("mavenProvided", "provided")
+    putBuiltInConfig("mavenProvidedOptional", "provided", true)
+    putBuiltInConfig("mavenOptional", "runtime", true)
   }
+
 
   void configure(DeployablePluginExtension deployable, String pomPackaging) {
     project.configurations {
@@ -34,54 +44,103 @@ class MavenConfigurator {
       }
     }
 
-    mapConfigs {
-      map("implementation", "runtime")
-      map("api", "compile")
-      map("testImplementation", "test")
-      map("mavenProvided", "provided")
-      mapOptional("mavenProvidedOptional", "provided")
-      mapOptional("mavenOptional", "runtime")
+    new HashMap<String, BuiltInConfig2ScopeMapping>(builtInConfigs).each { name, config ->
+      if (config.optional) {
+        mapper.mapOptional(config.gradleConfig, config.mavenScope, config.priority)
+      } else {
+        mapper.map(config.gradleConfig, config.mavenScope, config.priority)
+      }
     }
-
 
     configurePom(deployable, pomPackaging)
     configureSigning()
   }
 
   void mapConfigs(Closure closure) {
-    closure.setDelegate(new ConfigToScopeMapper())
+    closure.setDelegate(mapper)
     closure.setResolveStrategy(Closure.DELEGATE_FIRST)
     closure.call()
   }
 
+  String getMavenScopeForGradleConfig(String gradleConfigName) {
+    if (builtInConfigs.containsKey(gradleConfigName)) {
+      return builtInConfigs.get(gradleConfigName).mavenScope
+    }
+    def config = project.configurations.findByName(gradleConfigName)
+    if (config == null) {
+      return null
+    }
+    return getMavenScopeForGradleConfig(config)
+  }
+
+  String getMavenScopeForGradleConfig(Configuration config) {
+    if (!project.conf2ScopeMappings.mappings.containsKey(config)) {
+      return null
+    }
+    return project.conf2ScopeMappings.mappings.get(config).scope
+  }
+
   class ConfigToScopeMapper implements GroovyInterceptable {
 
-    ConfigToScopeMapper map(String gradleConfigName, String mavenScope) {
+    void unmap(String gradleConfigName) {
+      def config = project.configurations.findByName(gradleConfigName)
+      if (config != null) {
+        unmap(config)
+      }
+    }
+
+    void unmap(Configuration gradleConfig) {
+      builtInConfigs.remove(gradleConfig.name)
+      project.conf2ScopeMappings.mappings.remove(gradleConfig)
+      optionalConfigs.remove(gradleConfig)
+    }
+
+    void map(String gradleConfigName, String mavenScope) {
       def config = project.configurations.findByName(gradleConfigName)
       if (config != null) {
         map(config, mavenScope)
       }
-      return this
     }
 
-    ConfigToScopeMapper mapOptional(String gradleConfigName, String mavenScope) {
+    void mapOptional(String gradleConfigName, String mavenScope) {
       def config = project.configurations.findByName(gradleConfigName)
       if (config != null) {
         mapOptional(config, mavenScope)
       }
-      return this
     }
 
-    ConfigToScopeMapper map(Configuration gradleConfig, String mavenScope) {
-      project.conf2ScopeMappings.addMapping(scopePriority, gradleConfig, mavenScope)
+    void map(String gradleConfigName, String mavenScope, int priority) {
+      def config = project.configurations.findByName(gradleConfigName)
+      if (config != null) {
+        map(config, mavenScope, priority)
+      }
+    }
+
+    void mapOptional(String gradleConfigName, String mavenScope, int priority) {
+      def config = project.configurations.findByName(gradleConfigName)
+      if (config != null) {
+        mapOptional(config, mavenScope, priority)
+      }
+    }
+
+    void map(Configuration gradleConfig, String mavenScope) {
+      map(gradleConfig, mavenScope, scopePriority)
       scopePriority++
-      return this
     }
 
-    ConfigToScopeMapper mapOptional(Configuration gradleConfig, String mavenScope) {
+    void map(Configuration gradleConfig, String mavenScope, int priority) {
+      unmap(gradleConfig)
+      project.conf2ScopeMappings.addMapping(priority, gradleConfig, mavenScope)
+    }
+
+    void mapOptional(Configuration gradleConfig, String mavenScope) {
       map(gradleConfig, mavenScope)
-      project.ext.optionalConfigs << gradleConfig
-      return this
+      optionalConfigs.add(gradleConfig)
+    }
+
+    void mapOptional(Configuration gradleConfig, String mavenScope, int priority) {
+      map(gradleConfig, mavenScope, priority)
+      optionalConfigs.add(gradleConfig)
     }
   }
 
@@ -102,11 +161,14 @@ class MavenConfigurator {
 
           // apply optional dependencies
           pom.whenConfigured { pom ->
-            project.optionalConfigs.each { Configuration gradleConfig ->
-              gradleConfig.getAllDependencies().each { Dependency dep ->
-                pom.dependencies.find { pomDep ->
-                  pomDep.groupId == dep.group && pomDep.artifactId == dep.name
-                }.optional = true
+            optionalConfigs.each { Configuration gradleConfig ->
+              String mavenScope = getMavenScopeForGradleConfig(gradleConfig)
+              if (mavenScope) {
+                gradleConfig.getAllDependencies().each { Dependency dep ->
+                  pom.dependencies.find { pomDep ->
+                    pomDep.groupId == dep.group && pomDep.artifactId == dep.name && pomDep.scope == mavenScope
+                  }.optional = true
+                }
               }
             }
           }
@@ -153,4 +215,22 @@ class MavenConfigurator {
       sign project.configurations.archives
     }
   }
+
+  private void putBuiltInConfig(String gradleConfig, String mavenScope, boolean optional = false) {
+    BuiltInConfig2ScopeMapping mapping = new BuiltInConfig2ScopeMapping(
+        gradleConfig: gradleConfig,
+        mavenScope: mavenScope,
+        priority: scopePriority,
+        optional: optional)
+    scopePriority++
+    builtInConfigs.put(mapping.gradleConfig, mapping)
+  }
+
+  private static class BuiltInConfig2ScopeMapping {
+    String gradleConfig
+    String mavenScope
+    int priority
+    boolean optional
+  }
+
 }

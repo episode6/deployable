@@ -321,4 +321,166 @@ dependencies {
     "com.android.snapshot.example"  | "snapshotlib" | "0.0.1-SNAPSHOT"
     "com.android.release.example"   | "releaselib"  | "0.0.1"
   }
+
+  def "verify unmap dependencies"(String groupId, String artifactId, String versionName) {
+    given:
+    testProject.rootProjectName = artifactId
+    testProject.rootGradlePropertiesFile << testProject.testProperties.getInGradlePropertiesFormat()
+    testProject.rootGradleBuildFile << simpleBuildFile(groupId, versionName)
+    testProject.createNonEmptyJavaFileWithImports("${groupId}.${artifactId}", CHOP_IMPORT, CHOP_JAVADOC)
+    testProject.root.newFile("src", "main", "AndroidManifest.xml") << simpleManifest(groupId, artifactId)
+    MavenOutputVerifier mavenOutputVerifier = new MavenOutputVerifier(
+        groupId: groupId,
+        artifactId: artifactId,
+        versionName: versionName,
+        testProject: testProject)
+    testProject.rootGradleBuildFile << """
+
+
+dependencies {
+  implementation 'com.episode6.hackit.chop:chop-core:0.1.8'
+}
+
+mavenDependencies {
+  unmap "implementation"
+}
+"""
+    when:
+    def result = testProject.executeGradleTask("deploy", "--stacktrace")
+
+    then:
+    result.task(":uploadArchives").outcome == TaskOutcome.SUCCESS
+    result.task(":deploy").outcome == TaskOutcome.SUCCESS
+    mavenOutputVerifier.verifyStandardOutput("aar")
+    mavenOutputVerifier.verifyNoDependencies()
+
+    where:
+    groupId                         | artifactId    | versionName
+    "com.android.snapshot.example"  | "snapshotlib" | "0.0.1-SNAPSHOT"
+    "com.android.release.example"   | "releaselib"  | "0.0.1"
+  }
+
+  def "verify unmap custom dependencies"(String groupId, String artifactId, String versionName) {
+    given:
+    testProject.rootProjectName = artifactId
+    testProject.rootGradlePropertiesFile << testProject.testProperties.getInGradlePropertiesFormat()
+    testProject.rootGradleBuildFile << simpleBuildFile(groupId, versionName)
+    testProject.createNonEmptyJavaFileWithImports("${groupId}.${artifactId}", CHOP_IMPORT, CHOP_JAVADOC)
+    testProject.root.newFile("src", "main", "AndroidManifest.xml") << simpleManifest(groupId, artifactId)
+    MavenOutputVerifier mavenOutputVerifier = new MavenOutputVerifier(
+        groupId: groupId,
+        artifactId: artifactId,
+        versionName: versionName,
+        testProject: testProject)
+    testProject.rootGradleBuildFile << """
+
+
+dependencies {
+  mavenOptional 'com.episode6.hackit.chop:chop-core:0.1.8'
+}
+
+mavenDependencies {
+  unmap "mavenOptional"
+}
+"""
+    when:
+    def result = testProject.executeGradleTask("deploy", "--stacktrace")
+
+    then:
+    result.task(":uploadArchives").outcome == TaskOutcome.SUCCESS
+    result.task(":deploy").outcome == TaskOutcome.SUCCESS
+    mavenOutputVerifier.verifyStandardOutput("aar")
+    mavenOutputVerifier.verifyNoDependencies()
+
+    where:
+    groupId                         | artifactId    | versionName
+    "com.android.snapshot.example"  | "snapshotlib" | "0.0.1-SNAPSHOT"
+    "com.android.release.example"   | "releaselib"  | "0.0.1"
+  }
+
+  def "verify re-mapped dependencies from built in config"(String groupId, String artifactId, String versionName) {
+    given:
+    testProject.rootProjectName = artifactId
+    testProject.rootGradlePropertiesFile << testProject.testProperties.getInGradlePropertiesFormat()
+    testProject.rootGradleBuildFile << simpleBuildFile(groupId, versionName)
+    testProject.createNonEmptyJavaFileWithImports("${groupId}.${artifactId}", CHOP_IMPORT, CHOP_JAVADOC)
+    testProject.root.newFile("src", "main", "AndroidManifest.xml") << simpleManifest(groupId, artifactId)
+    MavenOutputVerifier mavenOutputVerifier = new MavenOutputVerifier(
+        groupId: groupId,
+        artifactId: artifactId,
+        versionName: versionName,
+        testProject: testProject)
+    testProject.rootGradleBuildFile << """
+
+
+dependencies {
+  implementation 'com.episode6.hackit.chop:chop-core:0.1.8'
+}
+
+mavenDependencies {
+  map configurations.implementation, "provided"
+}
+"""
+    when:
+    def result = testProject.executeGradleTask("deploy", "--stacktrace")
+
+    then:
+    result.task(":uploadArchives").outcome == TaskOutcome.SUCCESS
+    result.task(":deploy").outcome == TaskOutcome.SUCCESS
+    mavenOutputVerifier.verifyStandardOutput("aar")
+    mavenOutputVerifier.verifyPomDependency(
+        "com.episode6.hackit.chop",
+        "chop-core",
+        "0.1.8",
+        "provided")
+    mavenOutputVerifier.verifyNumberOfDependencies(1)
+
+    where:
+    groupId                         | artifactId    | versionName
+    "com.android.snapshot.example"  | "snapshotlib" | "0.0.1-SNAPSHOT"
+    "com.android.release.example"   | "releaselib"  | "0.0.1"
+  }
+
+  def "verify re-mapped dependencies from built in custom config"(String groupId, String artifactId, String versionName) {
+    given:
+    testProject.rootProjectName = artifactId
+    testProject.rootGradlePropertiesFile << testProject.testProperties.getInGradlePropertiesFormat()
+    testProject.rootGradleBuildFile << simpleBuildFile(groupId, versionName)
+    testProject.createNonEmptyJavaFileWithImports("${groupId}.${artifactId}", CHOP_IMPORT, CHOP_JAVADOC)
+    testProject.root.newFile("src", "main", "AndroidManifest.xml") << simpleManifest(groupId, artifactId)
+    MavenOutputVerifier mavenOutputVerifier = new MavenOutputVerifier(
+        groupId: groupId,
+        artifactId: artifactId,
+        versionName: versionName,
+        testProject: testProject)
+    testProject.rootGradleBuildFile << """
+
+
+dependencies {
+  mavenProvided 'com.episode6.hackit.chop:chop-core:0.1.8'
+}
+
+mavenDependencies {
+  map "mavenProvided", "compile"
+}
+"""
+    when:
+    def result = testProject.executeGradleTask("deploy", "--stacktrace")
+
+    then:
+    result.task(":uploadArchives").outcome == TaskOutcome.SUCCESS
+    result.task(":deploy").outcome == TaskOutcome.SUCCESS
+    mavenOutputVerifier.verifyStandardOutput("aar")
+    mavenOutputVerifier.verifyPomDependency(
+        "com.episode6.hackit.chop",
+        "chop-core",
+        "0.1.8",
+        "compile")
+    mavenOutputVerifier.verifyNumberOfDependencies(1)
+
+    where:
+    groupId                         | artifactId    | versionName
+    "com.android.snapshot.example"  | "snapshotlib" | "0.0.1-SNAPSHOT"
+    "com.android.release.example"   | "releaselib"  | "0.0.1"
+  }
 }
