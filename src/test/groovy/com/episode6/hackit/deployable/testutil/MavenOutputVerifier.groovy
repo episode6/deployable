@@ -116,6 +116,11 @@ class MavenOutputVerifier {
     return true
   }
 
+  boolean verifyNumberOfDependencies(int size) {
+    def pom = getArtifactFile("pom").asXml()
+    return pom.dependencies.dependency.size() == size
+  }
+
   boolean verifyNoDependencies() {
     def pom = getArtifactFile("pom").asXml()
     return pom.dependencies.dependency.isEmpty()
