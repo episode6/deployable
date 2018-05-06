@@ -86,5 +86,30 @@ dependencies {
     "com.snapshot.example"  | "snapshotlib" | "0.0.1-SNAPSHOT"
     "com.release.example"   | "releaselib"  | "0.0.2"
   }
+
+  def "verify jar install tasks"(String groupId, String artifactId, String versionName) {
+    given:
+    testProject.rootProjectName = artifactId
+    testProject.rootGradlePropertiesFile << testProject.testProperties.inGradlePropertiesFormat
+    testProject.rootGradleBuildFile << simpleBuildFile(groupId, versionName)
+    testProject.createNonEmptyKotlinFile("${groupId}.${artifactId}")
+
+    when:
+    def result = testProject.executeGradleTask("install")
+
+    then:
+    result.task(":jar").outcome == TaskOutcome.SUCCESS
+    result.task(":dokka").outcome == TaskOutcome.SUCCESS
+    result.task(":javadocJar").outcome == TaskOutcome.SUCCESS
+    result.task(":sourcesJar").outcome == TaskOutcome.SUCCESS
+    result.task(":validateDeployable").outcome == TaskOutcome.SUCCESS
+    result.task(":signArchives").outcome == TaskOutcome.SUCCESS
+    result.task(":install").outcome == TaskOutcome.SUCCESS
+    result.task(":uploadArchives") == null
+
+    where:
+    groupId                 | artifactId    | versionName
+    "com.snapshot.example"  | "snapshotlib" | "0.0.3-SNAPSHOT"
+  }
 }
 
