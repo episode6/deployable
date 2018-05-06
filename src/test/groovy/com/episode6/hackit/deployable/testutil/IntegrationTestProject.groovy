@@ -53,6 +53,10 @@ rootProject.name = '${rootProjectName}'
     return createNonEmptyJavaFile(packageName, "SampleClass", root, imports, javadocComent)
   }
 
+  File createNonEmptyKotlinFileWithImports(String packageName, String imports, String javadocComent = "test comment") {
+    return createNonEmptyKotlinFile(packageName, "SampleClass", root, imports, javadocComent)
+  }
+
   File createNonEmptyJavaFile(
       String packageName,
       String className = "SampleClass",
