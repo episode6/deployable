@@ -25,7 +25,7 @@ allprojects {
 }
 ```
 
-In each deployable sub-module apply the plugin to `build.gradle`
+In each deployable sub-module apply one of the plugins to `build.gradle`
 ```groovy
 // to deploy a JAR
 apply plugin: 'com.episode6.hackit.deployable.jar'
@@ -33,6 +33,28 @@ apply plugin: 'com.episode6.hackit.deployable.jar'
 // to deploy an AAR
 apply plugin: 'com.episode6.hackit.deployable.aar'
 ```
+
+If you need kotlin support, include dokka on your buildscript classpath (for javadoc support) and use one of the `kt` plugins instead
+```groovy
+// deployable JAR with Kotlin support
+
+buildscript {
+  repositories { jcenter() }
+  dependencies {
+    classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
+
+    // deployable's kt plugin applies the dokka plugin, so it must be
+    // included on the buildscript classpath
+    classpath "com.episode6.hackit.deployable:deployable:$deployableVersion"
+    classpath "org.jetbrains.dokka:dokka-gradle-plugin:$dokkaVersion"
+  }
+}
+
+apply plugin: 'kotlin'
+apply plugin: 'com.episode6.hackit.deployable.kt.jar'
+```
+
+**TODO: KOTLIN ANDROID**
 
 If this is a groovy project you'll want to pair the deployable.jar plugin with the groovydocs addon
 ```groovy
