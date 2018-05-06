@@ -76,6 +76,29 @@ public class ${className} {
     return nonEmptyJavaFile
   }
 
+  File createNonEmptyKotlinFile(
+      String packageName,
+      String className = "SampleClass",
+      File rootDir = root,
+      String imports = "",
+      String javadocComent = "test comment") {
+    File dir = rootDir.newFolder("src", "main", "kotlin").newFolderFromPackage(packageName)
+    File nonEmptyJavaFile = dir.newFile("${className}.kt")
+    nonEmptyJavaFile << """
+package ${packageName}
+
+${imports}
+
+/**
+ * ${javadocComent}
+ */
+class ${className} {
+
+}
+"""
+    return nonEmptyJavaFile
+  }
+
   File createNonEmptyGroovyFile(String packageName, String className = "SampleClass", File rootDir = root, String imports = "") {
     File dir = rootDir.newFolder("src", "main", "groovy").newFolderFromPackage(packageName)
     File nonEmptyGroovyFile = dir.newFile("${className}.groovy")
