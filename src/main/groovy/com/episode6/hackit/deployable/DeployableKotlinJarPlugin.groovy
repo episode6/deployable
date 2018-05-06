@@ -11,6 +11,11 @@ import org.gradle.api.tasks.bundling.Jar
 class DeployableKotlinJarPlugin implements Plugin<Project> {
   void apply(Project project) {
 
+    project.configurations {
+      api
+      compile.extendsFrom api
+    }
+
     project.plugins.apply(DeployablePlugin).pomPackaging = "jar"
 
     project.afterEvaluate {
