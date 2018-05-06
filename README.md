@@ -76,7 +76,7 @@ deployable.pom.developer.id=episode6
 deployable.pom.developer.name=episode6, Inc.
 ```
 
-In your computer's `~/.gradle/gradle.properties` add your nexus login info and signing key info
+In your system's `~/.gradle/gradle.properties` add your nexus login info and signing key info
 ```
 deployable.nexus.username=<username>
 deployable.nexus.password=<password>
