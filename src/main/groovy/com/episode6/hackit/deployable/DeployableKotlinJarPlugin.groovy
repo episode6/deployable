@@ -23,7 +23,7 @@ class DeployableKotlinJarPlugin implements Plugin<Project> {
 
       project.task("javadocJar", type: Jar, dependsOn: project.dokka) {
         classifier = 'javadoc'
-        from project.javadoc
+        from project.dokka
       }
 
       project.task("sourcesJar", type: Jar) {
