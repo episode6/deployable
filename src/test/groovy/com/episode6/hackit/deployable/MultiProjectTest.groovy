@@ -18,11 +18,17 @@ class MultiProjectTest extends Specification {
   enum LibType {
     JAVA,
     ANDROID,
-    GROOVY
+    GROOVY,
+    KOTLIN
   }
 
   static final String CHOP_IMPORT = """
 import com.episode6.hackit.chop.Chop;
+
+"""
+
+  static final String CHOP_IMPORT_KOTLIN = """
+import com.episode6.hackit.chop.Chop
 
 """
 
@@ -41,6 +47,8 @@ buildscript {
   }
   dependencies {
     classpath '${MyDependencyMap.lookupDep("com.android.tools.build:gradle")}'
+    classpath '${MyDependencyMap.lookupDep("org.jetbrains.kotlin:kotlin-gradle-plugin")}'
+    classpath '${MyDependencyMap.lookupDep("org.jetbrains.dokka:dokka-gradle-plugin")}'
   }
 }
 allprojects {
@@ -83,6 +91,22 @@ ${deps}
  """
   }
 
+  private static String kotlinBuildFile(String deps = "") {
+    return """
+plugins {
+ id 'com.episode6.hackit.deployable.kt.jar'
+}
+
+apply plugin: 'kotlin'
+
+dependencies {
+  implementation '${MyDependencyMap.lookupDep("org.jetbrains.kotlin:kotlin-stdlib-jdk7")}'
+${deps}
+}
+"""
+  }
+
+
   private static String androidBuildFile(String deps = "") {
     return """
 plugins {
@@ -119,17 +143,20 @@ ${deps}
     testProject.rootGradlePropertiesFile << testProject.testProperties.inGradlePropertiesFormat
     File javalib = testProject.newFolder("javalib")
     File groovylib = testProject.newFolder("groovylib")
+    File kotlinlib = testProject.newFolder("kotlinlib")
     File androidlib = testProject.newFolder("androidlib")
     testProject.rootGradleSettingFile << """
-include ':javalib', ':groovylib', ':androidlib'
+include ':javalib', ':groovylib', ':androidlib', ':kotlinlib'
 """
     testProject.rootGradleBuildFile << rootBuildFile(groupId, versionName)
     javalib.newFile("build.gradle") << javaBuildFile()
     groovylib.newFile("build.gradle") << groovyBuildFile(projectDeps("javalib"))
-    androidlib.newFile("build.gradle") << androidBuildFile(projectDeps("javalib", "groovylib"))
+    kotlinlib.newFile("build.gradle") << kotlinBuildFile(projectDeps("javalib"))
+    androidlib.newFile("build.gradle") << androidBuildFile(projectDeps("javalib", "groovylib", "kotlinlib"))
 
     testProject.createNonEmptyJavaFile("${groupId}.javalib", "SampleJavaClass", javalib)
     testProject.createNonEmptyGroovyFile("${groupId}.groovylib", "SampleGroovyClass", groovylib)
+    testProject.createNonEmptyKotlinFile("${groupId}.kotlinlib", "SampleKotlinClass", kotlinlib)
     testProject.createNonEmptyJavaFile("${groupId}.androidlib", "SampleAndroidClass", androidlib)
     androidlib.newFile("src", "main", "AndroidManifest.xml") << simpleAndroidManifest(groupId, "androidlib")
 
@@ -141,6 +168,11 @@ include ':javalib', ':groovylib', ':androidlib'
     MavenOutputVerifier groovylibVerifier = new MavenOutputVerifier(
         groupId: groupId,
         artifactId: "groovylib",
+        versionName: versionName,
+        testProject: testProject)
+    MavenOutputVerifier kotlinlibVerifier = new MavenOutputVerifier(
+        groupId: groupId,
+        artifactId: "kotlinlib",
         versionName: versionName,
         testProject: testProject)
     MavenOutputVerifier androidlibVerifier = new MavenOutputVerifier(
@@ -161,10 +193,15 @@ include ':javalib', ':groovylib', ':androidlib'
     groovylibVerifier.verifyJarFile("groovydoc")
     groovylibVerifier.verifyPomDependency(groupId, "javalib", versionName, "runtime")
 
+    result.task(":kotlinlib:deploy").outcome == TaskOutcome.SUCCESS
+    kotlinlibVerifier.verifyStandardOutput()
+    kotlinlibVerifier.verifyPomDependency(groupId, "javalib", versionName, "runtime")
+
     result.task(":androidlib:deploy").outcome == TaskOutcome.SUCCESS
     androidlibVerifier.verifyStandardOutput("aar")
     androidlibVerifier.verifyPomDependency(groupId, "javalib", versionName, "runtime")
     androidlibVerifier.verifyPomDependency(groupId, "groovylib", versionName, "runtime")
+    androidlibVerifier.verifyPomDependency(groupId, "kotlinlib", versionName, "runtime")
 
     where:
     groupId                             | versionName
@@ -213,6 +250,12 @@ include ':parentlib', ':childlib'
         childlib.newFile("build.gradle") << groovyBuildFile(childDeps)
         testProject.createNonEmptyGroovyFile("${groupId}.parentlib", "SampleParentClass", parentlib, CHOP_IMPORT)
         testProject.createNonEmptyGroovyFile("${groupId}.childlib", "SampleChildClass", childlib, CHOP_IMPORT)
+        break;
+      case LibType.KOTLIN:
+        parentlib.newFile("build.gradle") << kotlinBuildFile(parentDeps)
+        childlib.newFile("build.gradle") << kotlinBuildFile(childDeps)
+        testProject.createNonEmptyKotlinFile("${groupId}.parentlib", "SampleParentClass", parentlib, CHOP_IMPORT_KOTLIN)
+        testProject.createNonEmptyKotlinFile("${groupId}.childlib", "SampleChildClass", childlib, CHOP_IMPORT_KOTLIN)
         break;
     }
 
@@ -283,7 +326,14 @@ include ':parentlib', ':childlib'
     LibType.ANDROID | false | "mavenOptional"
     LibType.ANDROID | true  | "implementation"
     LibType.ANDROID | false | "implementation"
-
+    LibType.KOTLIN | true  | "mavenProvidedOptional"
+    LibType.KOTLIN | false | "mavenProvidedOptional"
+    LibType.KOTLIN | true  | "mavenProvided"
+    LibType.KOTLIN | false | "mavenProvided"
+    LibType.KOTLIN | true  | "mavenOptional"
+    LibType.KOTLIN | false | "mavenOptional"
+    LibType.KOTLIN | true  | "implementation"
+    LibType.KOTLIN | false | "implementation"
   }
 
   private static String projectDeps(String... dependentProjectNames) {
