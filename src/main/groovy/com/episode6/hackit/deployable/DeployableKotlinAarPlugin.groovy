@@ -15,7 +15,13 @@ class DeployableKotlinAarPlugin implements Plugin<Project> {
 
     project.afterEvaluate {
       project.plugins.apply('org.jetbrains.dokka-android')
-//      project.android.sourceSets.main.java.srcDirs += 'src/main/kotlin'
+
+      project.tasks.dokka {
+        classpath += project.files(project.android.bootClasspath)
+        externalDocumentationLink {
+          url = new URL("http://developer.android.com/reference/")
+        }
+      }
 
       project.task("javadocJar", type: Jar, dependsOn: project.dokka) {
         classifier = 'javadoc'
@@ -27,6 +33,12 @@ class DeployableKotlinAarPlugin implements Plugin<Project> {
       }
 
       project.android.libraryVariants.all { variant ->
+
+        project.tasks.dokka {
+          doFirst {
+            classpath += project.files(variant.javaCompile.classpath)
+          }
+        }
 
         def sourcesJarTask = project.task("android${variant.name.capitalize()}SourcesJar", type: Jar) {
           classifier = 'sources'
