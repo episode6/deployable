@@ -25,13 +25,52 @@ allprojects {
 }
 ```
 
-In each deployable sub-module apply the plugin to `build.gradle`
+In each deployable sub-module apply one of the plugins to `build.gradle`
 ```groovy
 // to deploy a JAR
 apply plugin: 'com.episode6.hackit.deployable.jar'
 
 // to deploy an AAR
 apply plugin: 'com.episode6.hackit.deployable.aar'
+```
+
+If you need kotlin support, you must also include dokka on your buildscript classpath (for javadoc support) and use one of the `kt` plugins instead
+```groovy
+// deployable JAR with Kotlin support
+
+buildscript {
+  repositories { jcenter() }
+  dependencies {
+    classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
+
+    // deployable's kt plugin applies the dokka plugin, so it must be
+    // included on the buildscript classpath
+    classpath "com.episode6.hackit.deployable:deployable:$deployableVersion"
+    classpath "org.jetbrains.dokka:dokka-gradle-plugin:$dokkaVersion"
+  }
+}
+
+apply plugin: 'kotlin'
+apply plugin: 'com.episode6.hackit.deployable.kt.jar'
+```
+
+Similarly for a kotlin-android library...
+```groovy
+// deployable AAR with Kotlin support
+
+buildscript {
+  repositories { jcenter() }
+  dependencies {
+    classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
+    classpath "com.android.tools.build:gradle:$androidGradlePluginVersion"
+    classpath "com.episode6.hackit.deployable:deployable:$deployableVersion"
+    classpath "org.jetbrains.dokka:dokka-android-gradle-plugin:$dokkaVersion"
+  }
+}
+
+apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+apply plugin: 'com.episode6.hackit.deployable.kt.aar'
 ```
 
 If this is a groovy project you'll want to pair the deployable.jar plugin with the groovydocs addon
@@ -54,7 +93,7 @@ deployable.pom.developer.id=episode6
 deployable.pom.developer.name=episode6, Inc.
 ```
 
-In your computer's `~/.gradle/gradle.properties` add your nexus login info and signing key info
+In your system's `~/.gradle/gradle.properties` add your nexus login info and signing key info
 ```
 deployable.nexus.username=<username>
 deployable.nexus.password=<password>

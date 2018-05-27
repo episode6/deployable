@@ -53,6 +53,10 @@ rootProject.name = '${rootProjectName}'
     return createNonEmptyJavaFile(packageName, "SampleClass", root, imports, javadocComent)
   }
 
+  File createNonEmptyKotlinFileWithImports(String packageName, String imports, String javadocComent = "test comment") {
+    return createNonEmptyKotlinFile(packageName, "SampleClass", root, imports, javadocComent)
+  }
+
   File createNonEmptyJavaFile(
       String packageName,
       String className = "SampleClass",
@@ -70,6 +74,29 @@ ${imports}
  * ${javadocComent}
  */
 public class ${className} {
+
+}
+"""
+    return nonEmptyJavaFile
+  }
+
+  File createNonEmptyKotlinFile(
+      String packageName,
+      String className = "SampleClass",
+      File rootDir = root,
+      String imports = "",
+      String javadocComent = "test comment") {
+    File dir = rootDir.newFolder("src", "main", "kotlin").newFolderFromPackage(packageName)
+    File nonEmptyJavaFile = dir.newFile("${className}.kt")
+    nonEmptyJavaFile << """
+package ${packageName}
+
+${imports}
+
+/**
+ * ${javadocComent}
+ */
+class ${className} {
 
 }
 """
