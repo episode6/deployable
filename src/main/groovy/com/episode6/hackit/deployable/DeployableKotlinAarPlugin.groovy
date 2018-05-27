@@ -16,6 +16,10 @@ class DeployableKotlinAarPlugin implements Plugin<Project> {
     project.afterEvaluate {
       project.plugins.apply('org.jetbrains.dokka-android')
 
+      project.android.sourceSets.each {
+        it.java.srcDirs += "src/${it.name}/kotlin"
+      }
+
       project.tasks.dokka {
         classpath += project.files(project.android.bootClasspath)
         externalDocumentationLink {
