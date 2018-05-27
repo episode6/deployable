@@ -61,6 +61,11 @@ repositories {
 android {
   compileSdkVersion 19
 }
+
+dependencies {
+  implementation '${MyDependencyMap.lookupDep("org.jetbrains.kotlin:kotlin-stdlib-jdk7")}'
+}
+
  """
   }
 
