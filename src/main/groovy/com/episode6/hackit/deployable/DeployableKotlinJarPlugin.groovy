@@ -21,6 +21,10 @@ class DeployableKotlinJarPlugin implements Plugin<Project> {
     project.afterEvaluate {
       project.plugins.apply('org.jetbrains.dokka')
 
+      project.tasks.dokka {
+        reportUndocumented = false
+      }
+
       project.task("javadocJar", type: Jar, dependsOn: project.dokka) {
         classifier = 'javadoc'
         from project.dokka

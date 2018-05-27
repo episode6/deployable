@@ -21,6 +21,7 @@ class DeployableKotlinAarPlugin implements Plugin<Project> {
         externalDocumentationLink {
           url = new URL("http://developer.android.com/reference/")
         }
+        reportUndocumented = false
       }
 
       project.task("javadocJar", type: Jar, dependsOn: project.dokka) {
