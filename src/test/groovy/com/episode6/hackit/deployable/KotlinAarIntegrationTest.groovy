@@ -398,7 +398,12 @@ mavenDependencies {
     result.task(":uploadArchives").outcome == TaskOutcome.SUCCESS
     result.task(":deploy").outcome == TaskOutcome.SUCCESS
     mavenOutputVerifier.verifyStandardOutput("aar")
-    mavenOutputVerifier.verifyNoDependencies()
+    mavenOutputVerifier.verifyNumberOfDependencies(1)
+    mavenOutputVerifier.verifyPomDependency(
+        "org.jetbrains.kotlin",
+        "kotlin-stdlib-jdk7",
+        MyDependencyMap.lookupVersion("org.jetbrains.kotlin:kotlin-stdlib-jdk7"),
+        "runtime")
 
     where:
     groupId                         | artifactId    | versionName
@@ -441,7 +446,12 @@ mavenDependencies {
         "chop-core",
         "0.1.8",
         "provided")
-    mavenOutputVerifier.verifyNumberOfDependencies(1)
+    mavenOutputVerifier.verifyPomDependency(
+        "org.jetbrains.kotlin",
+        "kotlin-stdlib-jdk7",
+        MyDependencyMap.lookupVersion("org.jetbrains.kotlin:kotlin-stdlib-jdk7"),
+        "provided")
+    mavenOutputVerifier.verifyNumberOfDependencies(2)
 
     where:
     groupId                         | artifactId    | versionName
@@ -484,7 +494,12 @@ mavenDependencies {
         "chop-core",
         "0.1.8",
         "compile")
-    mavenOutputVerifier.verifyNumberOfDependencies(1)
+    mavenOutputVerifier.verifyPomDependency(
+        "org.jetbrains.kotlin",
+        "kotlin-stdlib-jdk7",
+        MyDependencyMap.lookupVersion("org.jetbrains.kotlin:kotlin-stdlib-jdk7"),
+        "runtime")
+    mavenOutputVerifier.verifyNumberOfDependencies(2)
 
     where:
     groupId                         | artifactId    | versionName
