@@ -19,7 +19,8 @@ class MultiProjectTest extends Specification {
     JAVA,
     ANDROID,
     GROOVY,
-    KOTLIN
+    KOTLIN,
+    KANDROID
   }
 
   static final String CHOP_IMPORT = """
@@ -49,6 +50,7 @@ buildscript {
     classpath '${MyDependencyMap.lookupDep("com.android.tools.build:gradle")}'
     classpath '${MyDependencyMap.lookupDep("org.jetbrains.kotlin:kotlin-gradle-plugin")}'
     classpath '${MyDependencyMap.lookupDep("org.jetbrains.dokka:dokka-gradle-plugin")}'
+    classpath '${MyDependencyMap.lookupDep("org.jetbrains.dokka:dokka-android-gradle-plugin")}'
   }
 }
 allprojects {
@@ -125,6 +127,26 @@ ${deps}
 """
   }
 
+  private static String kotlinAndroidBuildFile(String deps = "") {
+    return """
+plugins {
+ id 'com.episode6.hackit.deployable.kt.aar'
+}
+
+apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+
+android {
+  compileSdkVersion 19
+}
+
+dependencies {
+  implementation '${MyDependencyMap.lookupDep("org.jetbrains.kotlin:kotlin-stdlib-jdk7")}'
+${deps}
+}
+"""
+  }
+
   private static String simpleAndroidManifest(String groupId, String artifactId) {
     return """
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
@@ -145,20 +167,24 @@ ${deps}
     File groovylib = testProject.newFolder("groovylib")
     File kotlinlib = testProject.newFolder("kotlinlib")
     File androidlib = testProject.newFolder("androidlib")
+    File kandroidlib = testProject.newFolder("kandroidlib")
     testProject.rootGradleSettingFile << """
-include ':javalib', ':groovylib', ':androidlib', ':kotlinlib'
+include ':javalib', ':groovylib', ':androidlib', ':kotlinlib', ':kandroidlib'
 """
     testProject.rootGradleBuildFile << rootBuildFile(groupId, versionName)
     javalib.newFile("build.gradle") << javaBuildFile()
     groovylib.newFile("build.gradle") << groovyBuildFile(projectDeps("javalib"))
     kotlinlib.newFile("build.gradle") << kotlinBuildFile(projectDeps("javalib"))
     androidlib.newFile("build.gradle") << androidBuildFile(projectDeps("javalib", "groovylib", "kotlinlib"))
+    kandroidlib.newFile("build.gradle") << kotlinAndroidBuildFile(projectDeps("javalib", "groovylib", "kotlinlib", "androidlib"))
 
     testProject.createNonEmptyJavaFile("${groupId}.javalib", "SampleJavaClass", javalib)
     testProject.createNonEmptyGroovyFile("${groupId}.groovylib", "SampleGroovyClass", groovylib)
     testProject.createNonEmptyKotlinFile("${groupId}.kotlinlib", "SampleKotlinClass", kotlinlib)
     testProject.createNonEmptyJavaFile("${groupId}.androidlib", "SampleAndroidClass", androidlib)
+    testProject.createNonEmptyKotlinFile("${groupId}.kandroidlib", "SampleKotlinAndroidClass", kandroidlib)
     androidlib.newFile("src", "main", "AndroidManifest.xml") << simpleAndroidManifest(groupId, "androidlib")
+    kandroidlib.newFile("src", "main", "AndroidManifest.xml") << simpleAndroidManifest(groupId, "kandroidlib")
 
     MavenOutputVerifier javalibVerifier = new MavenOutputVerifier(
         groupId: groupId,
@@ -178,6 +204,11 @@ include ':javalib', ':groovylib', ':androidlib', ':kotlinlib'
     MavenOutputVerifier androidlibVerifier = new MavenOutputVerifier(
         groupId: groupId,
         artifactId: "androidlib",
+        versionName: versionName,
+        testProject: testProject)
+    MavenOutputVerifier kandroidlibVerifier = new MavenOutputVerifier(
+        groupId: groupId,
+        artifactId: "kandroidlib",
         versionName: versionName,
         testProject: testProject)
 
@@ -202,6 +233,13 @@ include ':javalib', ':groovylib', ':androidlib', ':kotlinlib'
     androidlibVerifier.verifyPomDependency(groupId, "javalib", versionName, "runtime")
     androidlibVerifier.verifyPomDependency(groupId, "groovylib", versionName, "runtime")
     androidlibVerifier.verifyPomDependency(groupId, "kotlinlib", versionName, "runtime")
+
+    result.task(":kandroidlib:deploy").outcome == TaskOutcome.SUCCESS
+    kandroidlibVerifier.verifyStandardOutput("aar")
+    kandroidlibVerifier.verifyPomDependency(groupId, "javalib", versionName, "runtime")
+    kandroidlibVerifier.verifyPomDependency(groupId, "groovylib", versionName, "runtime")
+    kandroidlibVerifier.verifyPomDependency(groupId, "kotlinlib", versionName, "runtime")
+    kandroidlibVerifier.verifyPomDependency(groupId, "androidlib", versionName, "runtime")
 
     where:
     groupId                             | versionName
@@ -238,6 +276,14 @@ include ':parentlib', ':childlib'
         childlib.newFile("src", "main", "AndroidManifest.xml") << simpleAndroidManifest(groupId, "childlib")
         testProject.createNonEmptyJavaFile("${groupId}.parentlib", "SampleParentClass", parentlib, CHOP_IMPORT)
         testProject.createNonEmptyJavaFile("${groupId}.childlib", "SampleChildClass", childlib, CHOP_IMPORT)
+        break;
+      case LibType.KANDROID:
+        parentlib.newFile("build.gradle") << kotlinAndroidBuildFile(parentDeps)
+        childlib.newFile("build.gradle") << kotlinAndroidBuildFile(childDeps)
+        parentlib.newFile("src", "main", "AndroidManifest.xml") << simpleAndroidManifest(groupId, "parentlib")
+        childlib.newFile("src", "main", "AndroidManifest.xml") << simpleAndroidManifest(groupId, "childlib")
+        testProject.createNonEmptyKotlinFile("${groupId}.parentlib", "SampleParentClass", parentlib, CHOP_IMPORT_KOTLIN)
+        testProject.createNonEmptyKotlinFile("${groupId}.childlib", "SampleChildClass", childlib, CHOP_IMPORT_KOTLIN)
         break;
       case LibType.JAVA:
         parentlib.newFile("build.gradle") << javaBuildFile(parentDeps)
@@ -283,7 +329,7 @@ include ':parentlib', ':childlib'
 
     then:
     parentResult.task(":parentlib:deploy").outcome == TaskOutcome.SUCCESS
-    String packaging = libType == LibType.ANDROID ? "aar" : "jar"
+    String packaging = getPackaging(libType)
     parentlibVerifier.verifyStandardOutput(packaging)
     parentlibVerifier.verifyPomDependency(
         "com.episode6.hackit.chop",
@@ -334,6 +380,24 @@ include ':parentlib', ':childlib'
     LibType.KOTLIN | false | "mavenOptional"
     LibType.KOTLIN | true  | "implementation"
     LibType.KOTLIN | false | "implementation"
+    LibType.KANDROID    | true  | "mavenProvidedOptional"
+    LibType.KANDROID    | false | "mavenProvidedOptional"
+    LibType.KANDROID    | true  | "mavenProvided"
+    LibType.KANDROID    | false | "mavenProvided"
+    LibType.KANDROID    | true  | "mavenOptional"
+    LibType.KANDROID    | false | "mavenOptional"
+    LibType.KANDROID    | true  | "implementation"
+    LibType.KANDROID    | false | "implementation"
+  }
+
+  private static String getPackaging(LibType type) {
+    switch (type) {
+      case LibType.ANDROID:
+      case LibType.KANDROID:
+        return "aar"
+      default:
+        return "jar"
+    }
   }
 
   private static String projectDeps(String... dependentProjectNames) {
