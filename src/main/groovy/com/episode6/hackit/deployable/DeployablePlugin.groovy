@@ -39,11 +39,7 @@ class DeployablePlugin implements Plugin<Project> {
       description = "Validates this project's deployable properties to ensure it can generate a valid pom."
       group = "verification"
     }
-
-    project.tasks.findByPath("install")?.dependsOn project.validateDeployable
-    project.tasks.findByPath("check")?.dependsOn project.validateDeployable
-    project.tasks.findByPath("test")?.dependsOn project.validateDeployable
-
+    
     // add deploy alias for uploadArchives task (because it's more fun to type)
     project.task("deploy", dependsOn: project.uploadArchives) {
       description = "A simple alias for uploadArchives, because it's more fun to say."
@@ -52,6 +48,9 @@ class DeployablePlugin implements Plugin<Project> {
 
     project.afterEvaluate {
       mavenConfig.configure(deployable, pomPackaging)
+      project.tasks.findByPath("install")?.dependsOn project.validateDeployable
+      project.tasks.findByPath("check")?.dependsOn project.validateDeployable
+      project.tasks.findByPath("test")?.dependsOn project.validateDeployable
     }
   }
 }
