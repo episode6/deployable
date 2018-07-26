@@ -23,22 +23,10 @@ import com.episode6.hackit.chop.Chop
 
   private static String simpleBuildFile(String groupId, String versionName) {
     return """
-
-buildscript {
-  repositories {
-    jcenter()
-  }
-  dependencies {
-    classpath '${MyDependencyMap.lookupDep("org.jetbrains.kotlin:kotlin-gradle-plugin")}'
-    classpath '${MyDependencyMap.lookupDep("org.jetbrains.dokka:dokka-gradle-plugin")}'
-  }
-}
-
 plugins {
+ id 'kotlin'
  id 'com.episode6.hackit.deployable.kt.jar'
 }
-
-apply plugin: 'kotlin'
 
 repositories {
   jcenter()
@@ -75,10 +63,10 @@ dependencies {
     result.task(":javadocJar").outcome == TaskOutcome.SUCCESS
     result.task(":sourcesJar").outcome == TaskOutcome.SUCCESS
     result.task(":validateDeployable").outcome == TaskOutcome.SUCCESS
-    result.task(":signArchives").outcome == TaskOutcome.SUCCESS
-    result.task(":uploadArchives").outcome == TaskOutcome.SUCCESS
+    result.task(":signMavenArtifactsPublication").outcome == TaskOutcome.SUCCESS
+    result.task(":publishMavenArtifactsPublicationToMavenRepository").outcome == TaskOutcome.SUCCESS
     result.task(":deploy").outcome == TaskOutcome.SUCCESS
-    result.task(":install") == null
+    result.task(":publishMavenArtifactsPublicationToMavenLocal") == null
     mavenOutputVerifier.verifyStandardOutput()
 
     where:
@@ -103,9 +91,9 @@ dependencies {
     result.task(":javadocJar").outcome == TaskOutcome.SUCCESS
     result.task(":sourcesJar").outcome == TaskOutcome.SUCCESS
     result.task(":validateDeployable").outcome == TaskOutcome.SUCCESS
-    result.task(":signArchives").outcome == TaskOutcome.SUCCESS
-    result.task(":install").outcome == TaskOutcome.SUCCESS
-    result.task(":uploadArchives") == null
+    result.task(":signMavenArtifactsPublication").outcome == TaskOutcome.SUCCESS
+    result.task(":publishMavenArtifactsPublicationToMavenLocal").outcome == TaskOutcome.SUCCESS
+    result.task(":publishMavenArtifactsPublicationToMavenRepository") == null
 
     where:
     groupId                 | artifactId    | versionName
@@ -132,9 +120,9 @@ dependencies {
     def result = testProject.executeGradleTask("deploy")
 
     then:
-    result.task(":uploadArchives").outcome == TaskOutcome.SUCCESS
+    result.task(":publishMavenArtifactsPublicationToMavenRepository").outcome == TaskOutcome.SUCCESS
     result.task(":deploy").outcome == TaskOutcome.SUCCESS
-    result.task(":install") == null
+    result.task(":publishMavenArtifactsPublicationToMavenLocal") == null
     mavenOutputVerifier.verifyStandardOutput()
     mavenOutputVerifier.verifyPomDependency("com.episode6.hackit.chop", "chop-core", "0.1.8", "runtime")
 
@@ -164,9 +152,9 @@ dependencies {
     def result = testProject.executeGradleTask("deploy")
 
     then:
-    result.task(":uploadArchives").outcome == TaskOutcome.SUCCESS
+    result.task(":publishMavenArtifactsPublicationToMavenRepository").outcome == TaskOutcome.SUCCESS
     result.task(":deploy").outcome == TaskOutcome.SUCCESS
-    result.task(":install") == null
+    result.task(":publishMavenArtifactsPublicationToMavenLocal") == null
     mavenOutputVerifier.verifyStandardOutput()
     mavenOutputVerifier.verifyPomDependency("com.episode6.hackit.chop", "chop-core", "0.1.8", "compile")
 
@@ -196,9 +184,9 @@ dependencies {
     def result = testProject.executeGradleTask("deploy")
 
     then:
-    result.task(":uploadArchives").outcome == TaskOutcome.SUCCESS
+    result.task(":publishMavenArtifactsPublicationToMavenRepository").outcome == TaskOutcome.SUCCESS
     result.task(":deploy").outcome == TaskOutcome.SUCCESS
-    result.task(":install") == null
+    result.task(":publishMavenArtifactsPublicationToMavenLocal") == null
     mavenOutputVerifier.verifyStandardOutput()
     mavenOutputVerifier.verifyPomDependency("com.episode6.hackit.chop", "chop-core", "0.1.8", "provided")
 
@@ -228,9 +216,9 @@ dependencies {
     def result = testProject.executeGradleTask("deploy")
 
     then:
-    result.task(":uploadArchives").outcome == TaskOutcome.SUCCESS
+    result.task(":publishMavenArtifactsPublicationToMavenRepository").outcome == TaskOutcome.SUCCESS
     result.task(":deploy").outcome == TaskOutcome.SUCCESS
-    result.task(":install") == null
+    result.task(":publishMavenArtifactsPublicationToMavenLocal") == null
     mavenOutputVerifier.verifyStandardOutput()
     mavenOutputVerifier.verifyPomDependency("com.episode6.hackit.chop", "chop-core", "0.1.8", "runtime", true)
 
@@ -260,9 +248,9 @@ dependencies {
     def result = testProject.executeGradleTask("deploy")
 
     then:
-    result.task(":uploadArchives").outcome == TaskOutcome.SUCCESS
+    result.task(":publishMavenArtifactsPublicationToMavenRepository").outcome == TaskOutcome.SUCCESS
     result.task(":deploy").outcome == TaskOutcome.SUCCESS
-    result.task(":install") == null
+    result.task(":publishMavenArtifactsPublicationToMavenLocal") == null
     mavenOutputVerifier.verifyStandardOutput()
     mavenOutputVerifier.verifyPomDependency("com.episode6.hackit.chop", "chop-core", "0.1.8", "provided", true)
 
@@ -303,9 +291,9 @@ mavenDependencies {
     def result = testProject.executeGradleTask("deploy")
 
     then:
-    result.task(":uploadArchives").outcome == TaskOutcome.SUCCESS
+    result.task(":publishMavenArtifactsPublicationToMavenRepository").outcome == TaskOutcome.SUCCESS
     result.task(":deploy").outcome == TaskOutcome.SUCCESS
-    result.task(":install") == null
+    result.task(":publishMavenArtifactsPublicationToMavenLocal") == null
     mavenOutputVerifier.verifyStandardOutput()
     mavenOutputVerifier.verifyPomDependency(
         "com.episode6.hackit.chop",
@@ -355,9 +343,9 @@ mavenDependencies {
     def result = testProject.executeGradleTask("deploy")
 
     then:
-    result.task(":uploadArchives").outcome == TaskOutcome.SUCCESS
+    result.task(":publishMavenArtifactsPublicationToMavenRepository").outcome == TaskOutcome.SUCCESS
     result.task(":deploy").outcome == TaskOutcome.SUCCESS
-    result.task(":install") == null
+    result.task(":publishMavenArtifactsPublicationToMavenLocal") == null
     mavenOutputVerifier.verifyStandardOutput()
     mavenOutputVerifier.verifyPomDependency(
         "com.episode6.hackit.chop",
@@ -407,9 +395,9 @@ dependencies {
     def result = testProject.executeGradleTask("deploy")
 
     then:
-    result.task(":uploadArchives").outcome == TaskOutcome.SUCCESS
+    result.task(":publishMavenArtifactsPublicationToMavenRepository").outcome == TaskOutcome.SUCCESS
     result.task(":deploy").outcome == TaskOutcome.SUCCESS
-    result.task(":install") == null
+    result.task(":publishMavenArtifactsPublicationToMavenLocal") == null
     mavenOutputVerifier.verifyStandardOutput()
     mavenOutputVerifier.verifyPomDependency("com.episode6.hackit.chop", "chop-core", "0.1.8", "compile")
     mavenOutputVerifier.verifyPomDependency("io.reactivex.rxjava2", "rxjava", "2.1.12", "runtime")
@@ -452,9 +440,9 @@ mavenDependencies {
     def result = testProject.executeGradleTask("deploy")
 
     then:
-    result.task(":uploadArchives").outcome == TaskOutcome.SUCCESS
+    result.task(":publishMavenArtifactsPublicationToMavenRepository").outcome == TaskOutcome.SUCCESS
     result.task(":deploy").outcome == TaskOutcome.SUCCESS
-    result.task(":install") == null
+    result.task(":publishMavenArtifactsPublicationToMavenLocal") == null
     mavenOutputVerifier.verifyStandardOutput()
     mavenOutputVerifier.verifyNoDependencies()
 
@@ -492,9 +480,9 @@ mavenDependencies {
     def result = testProject.executeGradleTask("deploy")
 
     then:
-    result.task(":uploadArchives").outcome == TaskOutcome.SUCCESS
+    result.task(":publishMavenArtifactsPublicationToMavenRepository").outcome == TaskOutcome.SUCCESS
     result.task(":deploy").outcome == TaskOutcome.SUCCESS
-    result.task(":install") == null
+    result.task(":publishMavenArtifactsPublicationToMavenLocal") == null
     mavenOutputVerifier.verifyStandardOutput()
     mavenOutputVerifier.verifyNumberOfDependencies(1)
     mavenOutputVerifier.verifyPomDependency(
@@ -537,9 +525,9 @@ mavenDependencies {
     def result = testProject.executeGradleTask("deploy")
 
     then:
-    result.task(":uploadArchives").outcome == TaskOutcome.SUCCESS
+    result.task(":publishMavenArtifactsPublicationToMavenRepository").outcome == TaskOutcome.SUCCESS
     result.task(":deploy").outcome == TaskOutcome.SUCCESS
-    result.task(":install") == null
+    result.task(":publishMavenArtifactsPublicationToMavenLocal") == null
     mavenOutputVerifier.verifyStandardOutput()
     mavenOutputVerifier.verifyPomDependency(
         "org.spockframework",
@@ -587,9 +575,9 @@ mavenDependencies {
     def result = testProject.executeGradleTask("deploy")
 
     then:
-    result.task(":uploadArchives").outcome == TaskOutcome.SUCCESS
+    result.task(":publishMavenArtifactsPublicationToMavenRepository").outcome == TaskOutcome.SUCCESS
     result.task(":deploy").outcome == TaskOutcome.SUCCESS
-    result.task(":install") == null
+    result.task(":publishMavenArtifactsPublicationToMavenLocal") == null
     mavenOutputVerifier.verifyStandardOutput()
     mavenOutputVerifier.verifyPomDependency(
         "org.spockframework",

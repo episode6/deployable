@@ -65,6 +65,8 @@ dependencies {
 
   alsoUnderTest 'com.episode6.hackit.gdmc:gdmc'
   alsoUnderTest 'com.android.tools.build:gradle'
+  alsoUnderTest 'org.jetbrains.kotlin:kotlin-gradle-plugin'
+  alsoUnderTest 'org.jetbrains.dokka:dokka-gradle-plugin'
 }
 
 pluginUnderTestMetadata {
