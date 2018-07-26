@@ -122,7 +122,7 @@ class MavenConfigurator {
             mappedConfigs.values().each { mappedConfig ->
               def config = project.configurations.findByName(mappedConfig.gradleConfig)
               if (config != null) {
-                config.allDependencies.each {
+                config.dependencies.each {
                   def depNode = deps.appendNode('dependency')
                   depNode.appendNode('groupId', it.group)
                   depNode.appendNode('artifactId', it.name)

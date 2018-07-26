@@ -82,7 +82,6 @@ class MavenOutputVerifier {
   }
 
   void printPom() {
-    DeployablePluginExtension.PomExtension expectedPom = testProject.testProperties.deployable.pom
     File pomFile = getArtifactFile("pom")
     println pomFile.text
   }
