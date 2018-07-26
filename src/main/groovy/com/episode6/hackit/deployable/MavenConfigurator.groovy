@@ -147,11 +147,13 @@ class MavenConfigurator {
     mappedConfigs.values().each { mappedConfig ->
       def config = project.configurations.findByName(mappedConfig.gradleConfig)
       if (config != null) {
+        def unresolvedDeps = config.dependencies
         config = config.copyRecursive().setTransitive(false)
         config.setCanBeResolved(true)
-        config.resolvedConfiguration.getFirstLevelModuleDependencies().each { resolvedDep ->
-          def dep = config.dependencies.find {it.group == resolvedDep.moduleGroup && it.name == resolvedDep.moduleName}
-          if (dep instanceof ModuleDependency) {
+        def resolvedDeps = config.resolvedConfiguration.getFirstLevelModuleDependencies()
+        unresolvedDeps.each { unresolvedDep ->
+          def resolvedDep = resolvedDeps.find {unresolvedDep.group == it.moduleGroup && unresolvedDep.name == it.moduleName}
+          if (unresolvedDep instanceof ModuleDependency) {
             def depNode = deps.appendNode('dependency')
             depNode.appendNode('groupId', resolvedDep.moduleGroup)
             depNode.appendNode('artifactId', resolvedDep.moduleName)
@@ -160,9 +162,9 @@ class MavenConfigurator {
             if (mappedConfig.optional) {
               depNode.appendNode('optional', true)
             }
-            if (!dep.excludeRules.isEmpty()) {
+            if (!unresolvedDep.excludeRules.isEmpty()) {
               def exclusionsNode = depNode.appendNode('exclusions')
-              dep.excludeRules.each {
+              unresolvedDep.excludeRules.each {
                 def exNode = exclusionsNode.appendNode('exclusion')
                 exNode.appendNode('groupId', it.group == null ? "*" : it.group)
                 exNode.appendNode('artifactId', it.module == null ? "*" : it.module)
