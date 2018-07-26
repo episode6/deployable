@@ -63,6 +63,7 @@ dependencies {
   testImplementation("com.episode6.hackit.groovykit:gk-files")
   testImplementation('com.episode6.hackit.gdmc:gdmc')
 
+  // plugins used by integration tests
   alsoUnderTest 'com.episode6.hackit.gdmc:gdmc'
   alsoUnderTest 'com.android.tools.build:gradle'
   alsoUnderTest 'org.jetbrains.kotlin:kotlin-gradle-plugin'
@@ -71,7 +72,7 @@ dependencies {
 }
 
 pluginUnderTestMetadata {
-  pluginClasspath = pluginClasspath.plus(configurations.alsoUnderTest)
+  pluginClasspath += configurations.alsoUnderTest
 }
 
 test {
