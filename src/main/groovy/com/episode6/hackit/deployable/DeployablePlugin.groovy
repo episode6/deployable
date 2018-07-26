@@ -5,6 +5,7 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.publish.maven.plugins.MavenPublishPlugin
 import org.gradle.plugins.signing.SigningPlugin
+import org.gradle.api.publish.maven.tasks.PublishToMavenRepository
 
 /**
  * Base deployable plugin. It is not referenced directly in gradle, but applied by either the jar or aar plugin
@@ -50,6 +51,14 @@ class DeployablePlugin implements Plugin<Project> {
     project.task('install', dependsOn: project.publishToMavenLocal) {
       description = 'A simple alias for publishToMavenLocal to maintain compatibility with old versions of deployable.'
       group = 'publishing'
+    }
+
+    // disable any publications created by the java-gradle-plugin
+    // TODO: figure out a saner way to do this
+    project.tasks.withType(PublishToMavenRepository).whenTaskAdded { t ->
+      if (t.name.startsWith("publishPluginMaven")) {
+        t.enabled = false
+      }
     }
 
     project.afterEvaluate {
