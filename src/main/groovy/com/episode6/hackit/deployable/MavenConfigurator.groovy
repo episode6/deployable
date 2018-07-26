@@ -142,15 +142,16 @@ class MavenConfigurator {
 
       repositories {
         maven {
-          url DeployablePlugin.isReleaseBuild(project) ? deplodeployable.nexus.releaseRepoUrl : deployable.nexus.snapshotRepoUrl
+          def repoUrl = DeployablePlugin.isReleaseBuild(project) ? deplodeployable.nexus.releaseRepoUrl : deployable.nexus.snapshotRepoUrl
+          url repoUrl
 
-          if (deployable.nexus.username != null) {
+          if (URI.create(repoUrl).getScheme() == "file") {
+            authentication {} // empty auth block removes an error when using file:// repos
+          } else if (deployable.nexus.username != null) {
             credentials {
               username deployable.nexus.username
               password deployable.nexus.password
             }
-          } else {
-            authentication {} // empty auth block removes an error when using file:// repos
           }
         }
       }
@@ -159,7 +160,7 @@ class MavenConfigurator {
 
   private void configureSigning() {
     project.signing {
-      required DeployablePlugin.isReleaseBuild(project) && project.gradle.taskGraph.hasTask("publishMavenArtifactsPublicationToRepository")
+      required DeployablePlugin.isReleaseBuild(project) && project.gradle.taskGraph.hasTask("publishMavenArtifactsPublicationToMavenRepository")
       sign project.publishing.publications.mavenArtifacts
     }
   }

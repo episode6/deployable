@@ -55,7 +55,7 @@ class DeployablePlugin implements Plugin<Project> {
     project.afterEvaluate {
       mavenConfig.configure(deployable, pomPackaging)
       // TODO fix tasks
-      project.tasks.findByPath("publishMavenArtifactsPublicationToRepository")?.dependsOn project.validateDeployable
+      project.tasks.findByPath("publishMavenArtifactsPublicationToMavenRepository")?.dependsOn project.validateDeployable
       project.tasks.findByPath("publishMavenArtifactsPublicationToMavenLocal")?.dependsOn project.validateDeployable
       project.tasks.findByPath("check")?.dependsOn project.validateDeployable
       project.tasks.findByPath("test")?.dependsOn project.validateDeployable

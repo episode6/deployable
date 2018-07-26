@@ -48,15 +48,15 @@ version = '${versionName}'
     def result = testProject.executeGradleTask("deploy")
 
     then:
+    println result.output
     result.task(":jar").outcome == TaskOutcome.SUCCESS
     result.task(":javadoc").outcome == TaskOutcome.SUCCESS
     result.task(":javadocJar").outcome == TaskOutcome.SUCCESS
     result.task(":sourcesJar").outcome == TaskOutcome.SUCCESS
     result.task(":validateDeployable").outcome == TaskOutcome.SUCCESS
-    result.task(":signArchives").outcome == TaskOutcome.SUCCESS
-    result.task(":uploadArchives").outcome == TaskOutcome.SUCCESS
+    result.task(":signMavenArtifactsPublication").outcome == TaskOutcome.SUCCESS
+    result.task(":publishMavenArtifactsPublicationToMavenRepository").outcome == TaskOutcome.SUCCESS
     result.task(":deploy").outcome == TaskOutcome.SUCCESS
-    result.task(":install") == null
     mavenOutputVerifier.verifyStandardOutput()
 
     where:
@@ -81,9 +81,9 @@ version = '${versionName}'
     result.task(":javadocJar").outcome == TaskOutcome.SUCCESS
     result.task(":sourcesJar").outcome == TaskOutcome.SUCCESS
     result.task(":validateDeployable").outcome == TaskOutcome.SUCCESS
-    result.task(":signArchives").outcome == TaskOutcome.SUCCESS
+    result.task(":signMavenArtifactsPublication").outcome == TaskOutcome.SUCCESS
+    result.task(":publishMavenArtifactsPublicationToLocal").outcome == TaskOutcome.SUCCESS
     result.task(":install").outcome == TaskOutcome.SUCCESS
-    result.task(":uploadArchives") == null
 
     where:
     groupId                 | artifactId    | versionName
