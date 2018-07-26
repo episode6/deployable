@@ -4,10 +4,10 @@ import com.episode6.hackit.deployable.extension.DeployablePluginExtension
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.publish.maven.MavenPublication
+import org.gradle.authentication.http.BasicAuthentication
 
 /**
- *
- */
+ **/
 class MavenConfigurator {
   Project project
 
@@ -29,12 +29,10 @@ class MavenConfigurator {
     putConfigMapping("mavenOptional", "runtime", true)
   }
 
-
   void configure(DeployablePluginExtension deployable, String pomPackaging) {
     project.configurations {
       compileOnly {
-        extendsFrom(
-            mavenOptional,
+        extendsFrom(mavenOptional,
             mavenProvided,
             mavenProvidedOptional)
       }
@@ -86,64 +84,73 @@ class MavenConfigurator {
           artifactId project.name
           version project.version
 
-          configurePublicationArtifacts(it, deployable)
-
           pom {
-            name project.name
-            description deployable.pom.description
-            url deployable.pom.url
+            name = project.name
+            description = deployable.pom.description
+            url = deployable.pom.url
             packaging pomPackaging
             licenses {
               license {
-                name deployable.pom.license.name
-                url deployable.pom.license.url
-                distribution deployable.pom.license.distribution
+                name = deployable.pom.license.name
+                url = deployable.pom.license.url
+                distribution = deployable.pom.license.distribution
               }
             }
             developers {
               developer {
-                id deployable.pom.developer.id
-                name deployable.pom.developer.name
+                id = deployable.pom.developer.id
+                name = deployable.pom.developer.name
               }
             }
             scm {
-              url deployable.pom.scm.url
-              connection deployable.pom.scm.connection
-              developerConnection deployable.pom.scm.developerConnection
+              url = deployable.pom.scm.url
+              connection = deployable.pom.scm.connection
+              developerConnection = deployable.pom.scm.developerConnection
+            }
+          }
+
+          configurePublicationArtifacts(it, deployable)
+
+          pom.withXml {
+            def root = asNode()
+            def deps = root.dependencies
+            if (deps == null || deps.isEmpty()) {
+              deps = root.appendNode('dependencies')
+            } else {
+              deps = root.dependencies[0]
+            }
+            deps.children.clear() // start with no deps
+            mappedConfigs.values().each { mappedConfig ->
+              def config = project.configurations.findByName(mappedConfig.gradleConfig)
+              if (config != null) {
+                config.allDependencies.each {
+                  def depNode = deps.appendNode('dependency')
+                  depNode.appendNode('groupId', it.group)
+                  depNode.appendNode('artifactId', it.name)
+                  depNode.appendNode('version', it.version)
+                  depNode.appendNode('scope', mappedConfig.mavenScope)
+                  if (mappedConfig.optional) {
+                    depNode.appendNode('optional', true)
+                  }
+                }
+              }
             }
           }
         }
       }
 
-      pom.withXml {
-        def root = asNode()
-        def deps = root.dependencies
-        deps.children.clear() // start with no deps
-        mappedConfigs.values().each { mappedConfig ->
-          def config = project.configurations.findByName(mappedConfig.gradleConfig)
-          if (config != null) {
-            config.allDependencies.each {
-              def depNode = deps.appendNode('dependency')
-              depNode.appendNode('groupId', it.group)
-              depNode.appendNode('artifactId', it.name)
-              depNode.appendNode('version', it.version)
-              depNode.appendNode('scope', mappedConfig.mavenScope)
-              if (mappedConfig.optional) {
-                depNode.appendNode('optional', true)
-              }
-            }
-          }
-        }
-      }
 
       repositories {
         maven {
           url DeployablePlugin.isReleaseBuild(project) ? deplodeployable.nexus.releaseRepoUrl : deployable.nexus.snapshotRepoUrl
+
           if (deployable.nexus.username != null) {
             credentials {
               username deployable.nexus.username
               password deployable.nexus.password
             }
+          } else {
+            authentication {} // empty auth block removes an error when using file:// repos
           }
         }
       }
@@ -152,16 +159,13 @@ class MavenConfigurator {
 
   private void configureSigning() {
     project.signing {
-      required {
-        DeployablePlugin.isReleaseBuild(project) && project.gradle.taskGraph.hasTask("publishMavenArtifactsPublicationToRepository")
-      }
+      required DeployablePlugin.isReleaseBuild(project) && project.gradle.taskGraph.hasTask("publishMavenArtifactsPublicationToRepository")
       sign project.publishing.publications.mavenArtifacts
     }
   }
 
   private void putConfigMapping(String gradleConfig, String mavenScope, boolean optional = false) {
-    CustomConfigMapping mapping = new CustomConfigMapping(
-        gradleConfig: gradleConfig,
+    CustomConfigMapping mapping = new CustomConfigMapping(gradleConfig: gradleConfig,
         mavenScope: mavenScope,
         optional: optional)
     mappedConfigs.put(mapping.gradleConfig, mapping)
@@ -180,5 +184,4 @@ class MavenConfigurator {
       closure.call()
     }
   }
-
 }
