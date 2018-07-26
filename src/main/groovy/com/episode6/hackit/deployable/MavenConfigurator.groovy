@@ -111,29 +111,7 @@ class MavenConfigurator {
           configurePublicationArtifacts(it, deployable)
 
           pom.withXml {
-            def root = asNode()
-            def deps = root.dependencies
-            if (deps == null || deps.isEmpty()) {
-              deps = root.appendNode('dependencies')
-            } else {
-              deps = root.dependencies[0]
-            }
-            deps.children.clear() // start with no deps
-            mappedConfigs.values().each { mappedConfig ->
-              def config = project.configurations.findByName(mappedConfig.gradleConfig)
-              if (config != null) {
-                config.dependencies.each {
-                  def depNode = deps.appendNode('dependency')
-                  depNode.appendNode('groupId', it.group)
-                  depNode.appendNode('artifactId', it.name)
-                  depNode.appendNode('version', it.version)
-                  depNode.appendNode('scope', mappedConfig.mavenScope)
-                  if (mappedConfig.optional) {
-                    depNode.appendNode('optional', true)
-                  }
-                }
-              }
-            }
+            configureDependencies(asNode())
           }
         }
       }
@@ -152,6 +130,32 @@ class MavenConfigurator {
               password deployable.nexus.password
             }
           }
+        }
+      }
+    }
+  }
+
+  private void configureDependencies(Node pomRoot) {
+    def deps = pomRoot.dependencies
+    if (deps == null || deps.isEmpty()) {
+      deps = pomRoot.appendNode('dependencies')
+    } else {
+      deps = pomRoot.dependencies[0]
+    }
+    deps.children.clear() // start with no deps
+    mappedConfigs.values().each { mappedConfig ->
+      def config = project.configurations.findByName(mappedConfig.gradleConfig)
+      if (config != null) {
+        config.dependencies.each {
+          def depNode = deps.appendNode('dependency')
+          depNode.appendNode('groupId', it.group)
+          depNode.appendNode('artifactId', it.name)
+          depNode.appendNode('version', it.version)
+          depNode.appendNode('scope', mappedConfig.mavenScope)
+          if (mappedConfig.optional) {
+            depNode.appendNode('optional', true)
+          }
+
         }
       }
     }
