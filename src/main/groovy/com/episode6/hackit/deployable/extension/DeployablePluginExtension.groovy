@@ -2,6 +2,7 @@ package com.episode6.hackit.deployable.extension
 
 import com.episode6.hackit.nestable.NestablePluginExtension
 import org.gradle.api.Project
+import org.gradle.api.publish.maven.MavenPublication
 
 /**
  * Deployable plugin extension. Stores/retreives info that is used
@@ -93,11 +94,13 @@ class DeployablePluginExtension extends NestablePluginExtension {
 
   PomExtension pom
   NexusExtension nexus
+  List<Closure<MavenPublication>> publicationClosures
 
   DeployablePluginExtension(Project project) {
     super(project, "deployable")
     pom = new PomExtension(this)
     nexus = new NexusExtension(this)
+    publicationClosures = new LinkedList<>()
   }
 
   PomExtension pom(Closure closure) {
@@ -106,6 +109,10 @@ class DeployablePluginExtension extends NestablePluginExtension {
 
   NexusExtension nexus(Closure closure) {
     return nexus.applyClosure(closure)
+  }
+
+  void publication(Closure<MavenPublication> closure) {
+    publicationClosures.add(closure)
   }
 
   @Override

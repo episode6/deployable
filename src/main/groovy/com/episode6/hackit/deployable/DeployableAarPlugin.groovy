@@ -15,6 +15,10 @@ class DeployableAarPlugin implements Plugin<Project> {
     DeployablePlugin deployablePlugin = project.plugins.apply(DeployablePlugin)
     deployablePlugin.pomPackaging = "aar"
 
+    project.deployable.publication {
+      artifact project.bundleRelease
+    }
+
     project.afterEvaluate {
 
       project.android.libraryVariants.all { variant ->
@@ -47,9 +51,9 @@ class DeployableAarPlugin implements Plugin<Project> {
         }
 
         if (variant.name == "release") {
-          project.artifacts {
-            archives javadocJarTask
-            archives sourcesJarTask
+          project.deployable.publication {
+            artifact javadocJarTask
+            artifact sourcesJarTask
           }
         }
       }

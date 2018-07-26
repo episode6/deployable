@@ -82,6 +82,12 @@ class MavenConfigurator {
     project.publishing {
       publications {
         mavenArtifacts(MavenPublication) {
+          groupId project.group
+          artifactId project.name
+          version project.version
+
+          configurePublicationArtifacts(it, deployable)
+
           pom {
             name project.name
             description deployable.pom.description
@@ -165,6 +171,14 @@ class MavenConfigurator {
     String gradleConfig
     String mavenScope
     boolean optional
+  }
+
+  private static void configurePublicationArtifacts(MavenPublication publication, DeployablePluginExtension deployable) {
+    deployable.publicationClosures.each { closure ->
+      closure.setDelegate(publication)
+      closure.setResolveStrategy(Closure.DELEGATE_FIRST)
+      closure.call()
+    }
   }
 
 }
