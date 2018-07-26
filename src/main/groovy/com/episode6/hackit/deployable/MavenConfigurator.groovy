@@ -3,6 +3,7 @@ package com.episode6.hackit.deployable
 import com.episode6.hackit.deployable.extension.DeployablePluginExtension
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
+import org.gradle.api.artifacts.ModuleDependency
 import org.gradle.api.publish.maven.MavenPublication
 
 /**
@@ -155,7 +156,7 @@ class MavenConfigurator {
           if (mappedConfig.optional) {
             depNode.appendNode('optional', true)
           }
-          if (!dep.excludeRules.isEmpty()) {
+          if (dep instanceof ModuleDependency && !dep.excludeRules.isEmpty()) {
             def exclusionsNode = depNode.appendNode('exclusions')
             dep.excludeRules.each {
               def exNode = exclusionsNode.appendNode('exclusion')
