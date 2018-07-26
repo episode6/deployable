@@ -1,9 +1,11 @@
 package com.episode6.hackit.deployable
 
 import com.episode6.hackit.deployable.extension.DeployablePluginExtension
+import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.ModuleDependency
+import org.gradle.api.artifacts.ProjectDependency
 import org.gradle.api.publish.maven.MavenPublication
 
 /**
@@ -150,14 +152,32 @@ class MavenConfigurator {
         def unresolvedDeps = config.dependencies
         config = config.copyRecursive().setTransitive(false)
         config.setCanBeResolved(true)
-        def resolvedDeps = config.resolvedConfiguration.getFirstLevelModuleDependencies()
+        def resolvedDeps = config.resolvedConfiguration.lenientConfiguration.getFirstLevelModuleDependencies()
         unresolvedDeps.each { unresolvedDep ->
           def resolvedDep = resolvedDeps.find {unresolvedDep.group == it.moduleGroup && unresolvedDep.name == it.moduleName}
           if (unresolvedDep instanceof ModuleDependency) {
+
+            def groupId
+            def artifactId
+            def version
+
+            if (unresolvedDep instanceof ProjectDependency) {
+              Project depProj = unresolvedDep.getDependencyProject()
+              groupId = depProj.group
+              artifactId = depProj.name
+              version = depProj.version
+            } else if (resolvedDep != null) {
+              groupId = resolvedDep.moduleGroup
+              artifactId = resolvedDep.moduleName
+              version = resolvedDep.moduleVersion
+            } else {
+              throw new GradleException("Couldn't figure out dependency: ${unresolvedDep}")
+            }
+
             def depNode = deps.appendNode('dependency')
-            depNode.appendNode('groupId', resolvedDep.moduleGroup)
-            depNode.appendNode('artifactId', resolvedDep.moduleName)
-            depNode.appendNode('version', resolvedDep.moduleVersion)
+            depNode.appendNode('groupId', groupId)
+            depNode.appendNode('artifactId', artifactId)
+            depNode.appendNode('version', version)
             depNode.appendNode('scope', mappedConfig.mavenScope)
             if (mappedConfig.optional) {
               depNode.appendNode('optional', true)
