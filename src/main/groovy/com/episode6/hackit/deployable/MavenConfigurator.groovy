@@ -4,7 +4,6 @@ import com.episode6.hackit.deployable.extension.DeployablePluginExtension
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.publish.maven.MavenPublication
-import org.gradle.authentication.http.BasicAuthentication
 
 /**
  **/
@@ -142,7 +141,7 @@ class MavenConfigurator {
 
       repositories {
         maven {
-          def repoUrl = DeployablePlugin.isReleaseBuild(project) ? deplodeployable.nexus.releaseRepoUrl : deployable.nexus.snapshotRepoUrl
+          def repoUrl = DeployablePlugin.isReleaseBuild(project) ? deployable.nexus.releaseRepoUrl : deployable.nexus.snapshotRepoUrl
           url repoUrl
 
           if (URI.create(repoUrl).getScheme() == "file") {
@@ -160,7 +159,7 @@ class MavenConfigurator {
 
   private void configureSigning() {
     project.signing {
-      required DeployablePlugin.isReleaseBuild(project) && project.gradle.taskGraph.hasTask("publishMavenArtifactsPublicationToMavenRepository")
+      required { DeployablePlugin.isReleaseBuild(project) && project.gradle.taskGraph.hasTask("publishMavenArtifactsPublicationToMavenRepository") }
       sign project.publishing.publications.mavenArtifacts
     }
   }

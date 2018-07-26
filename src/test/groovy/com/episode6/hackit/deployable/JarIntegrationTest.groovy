@@ -45,10 +45,9 @@ version = '${versionName}'
         testProject: testProject)
 
     when:
-    def result = testProject.executeGradleTask("deploy")
+    def result = testProject.executeGradleTask("deploy", '--stacktrace')
 
     then:
-    println result.output
     result.task(":jar").outcome == TaskOutcome.SUCCESS
     result.task(":javadoc").outcome == TaskOutcome.SUCCESS
     result.task(":javadocJar").outcome == TaskOutcome.SUCCESS
@@ -82,7 +81,7 @@ version = '${versionName}'
     result.task(":sourcesJar").outcome == TaskOutcome.SUCCESS
     result.task(":validateDeployable").outcome == TaskOutcome.SUCCESS
     result.task(":signMavenArtifactsPublication").outcome == TaskOutcome.SUCCESS
-    result.task(":publishMavenArtifactsPublicationToLocal").outcome == TaskOutcome.SUCCESS
+    result.task(":publishMavenArtifactsPublicationToMavenLocal").outcome == TaskOutcome.SUCCESS
     result.task(":install").outcome == TaskOutcome.SUCCESS
 
     where:
@@ -114,7 +113,7 @@ dependencies {
     def result = testProject.executeGradleTask("deploy")
 
     then:
-    result.task(":uploadArchives").outcome == TaskOutcome.SUCCESS
+    result.task(":publishMavenArtifactsPublicationToMavenRepository").outcome == TaskOutcome.SUCCESS
     result.task(":deploy").outcome == TaskOutcome.SUCCESS
     result.task(":install") == null
     mavenOutputVerifier.verifyStandardOutput()
@@ -150,7 +149,7 @@ dependencies {
     def result = testProject.executeGradleTask("deploy")
 
     then:
-    result.task(":uploadArchives").outcome == TaskOutcome.SUCCESS
+    result.task(":publishMavenArtifactsPublicationToMavenRepository").outcome == TaskOutcome.SUCCESS
     result.task(":deploy").outcome == TaskOutcome.SUCCESS
     result.task(":install") == null
     mavenOutputVerifier.verifyStandardOutput()
@@ -186,7 +185,7 @@ dependencies {
     def result = testProject.executeGradleTask("deploy")
 
     then:
-    result.task(":uploadArchives").outcome == TaskOutcome.SUCCESS
+    result.task(":publishMavenArtifactsPublicationToMavenRepository").outcome == TaskOutcome.SUCCESS
     result.task(":deploy").outcome == TaskOutcome.SUCCESS
     result.task(":install") == null
     mavenOutputVerifier.verifyStandardOutput()
@@ -222,7 +221,7 @@ dependencies {
     def result = testProject.executeGradleTask("deploy")
 
     then:
-    result.task(":uploadArchives").outcome == TaskOutcome.SUCCESS
+    result.task(":publishMavenArtifactsPublicationToMavenRepository").outcome == TaskOutcome.SUCCESS
     result.task(":deploy").outcome == TaskOutcome.SUCCESS
     result.task(":install") == null
     mavenOutputVerifier.verifyStandardOutput()
@@ -265,7 +264,7 @@ dependencies {
     def result = testProject.executeGradleTask("deploy")
 
     then:
-    result.task(":uploadArchives").outcome == TaskOutcome.SUCCESS
+    result.task(":publishMavenArtifactsPublicationToMavenRepository").outcome == TaskOutcome.SUCCESS
     result.task(":deploy").outcome == TaskOutcome.SUCCESS
     result.task(":install") == null
     mavenOutputVerifier.verifyStandardOutput()
@@ -311,7 +310,7 @@ dependencies {
     def result = testProject.executeGradleTask("deploy")
 
     then:
-    result.task(":uploadArchives").outcome == TaskOutcome.SUCCESS
+    result.task(":publishMavenArtifactsPublicationToMavenRepository").outcome == TaskOutcome.SUCCESS
     result.task(":deploy").outcome == TaskOutcome.SUCCESS
     result.task(":install") == null
     mavenOutputVerifier.verifyStandardOutput()
@@ -363,7 +362,7 @@ mavenDependencies {
     def result = testProject.executeGradleTask("deploy")
 
     then:
-    result.task(":uploadArchives").outcome == TaskOutcome.SUCCESS
+    result.task(":publishMavenArtifactsPublicationToMavenRepository").outcome == TaskOutcome.SUCCESS
     result.task(":deploy").outcome == TaskOutcome.SUCCESS
     result.task(":install") == null
     mavenOutputVerifier.verifyStandardOutput()
@@ -419,7 +418,7 @@ mavenDependencies {
     def result = testProject.executeGradleTask("deploy")
 
     then:
-    result.task(":uploadArchives").outcome == TaskOutcome.SUCCESS
+    result.task(":publishMavenArtifactsPublicationToMavenRepository").outcome == TaskOutcome.SUCCESS
     result.task(":deploy").outcome == TaskOutcome.SUCCESS
     result.task(":install") == null
     mavenOutputVerifier.verifyStandardOutput()
@@ -471,7 +470,7 @@ dependencies {
     def result = testProject.executeGradleTask("deploy")
 
     then:
-    result.task(":uploadArchives").outcome == TaskOutcome.SUCCESS
+    result.task(":publishMavenArtifactsPublicationToMavenRepository").outcome == TaskOutcome.SUCCESS
     result.task(":deploy").outcome == TaskOutcome.SUCCESS
     result.task(":install") == null
     mavenOutputVerifier.verifyStandardOutput()
@@ -516,7 +515,7 @@ mavenDependencies {
     def result = testProject.executeGradleTask("deploy")
 
     then:
-    result.task(":uploadArchives").outcome == TaskOutcome.SUCCESS
+    result.task(":publishMavenArtifactsPublicationToMavenRepository").outcome == TaskOutcome.SUCCESS
     result.task(":deploy").outcome == TaskOutcome.SUCCESS
     result.task(":install") == null
     mavenOutputVerifier.verifyStandardOutput()
@@ -556,7 +555,7 @@ mavenDependencies {
     def result = testProject.executeGradleTask("deploy")
 
     then:
-    result.task(":uploadArchives").outcome == TaskOutcome.SUCCESS
+    result.task(":publishMavenArtifactsPublicationToMavenRepository").outcome == TaskOutcome.SUCCESS
     result.task(":deploy").outcome == TaskOutcome.SUCCESS
     result.task(":install") == null
     mavenOutputVerifier.verifyStandardOutput()
@@ -596,7 +595,7 @@ mavenDependencies {
     def result = testProject.executeGradleTask("deploy")
 
     then:
-    result.task(":uploadArchives").outcome == TaskOutcome.SUCCESS
+    result.task(":publishMavenArtifactsPublicationToMavenRepository").outcome == TaskOutcome.SUCCESS
     result.task(":deploy").outcome == TaskOutcome.SUCCESS
     result.task(":install") == null
     mavenOutputVerifier.verifyStandardOutput()
@@ -641,7 +640,7 @@ mavenDependencies {
     def result = testProject.executeGradleTask("deploy")
 
     then:
-    result.task(":uploadArchives").outcome == TaskOutcome.SUCCESS
+    result.task(":publishMavenArtifactsPublicationToMavenRepository").outcome == TaskOutcome.SUCCESS
     result.task(":deploy").outcome == TaskOutcome.SUCCESS
     result.task(":install") == null
     mavenOutputVerifier.verifyStandardOutput()
