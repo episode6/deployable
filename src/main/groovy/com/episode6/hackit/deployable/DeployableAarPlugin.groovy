@@ -53,8 +53,6 @@ class DeployableAarPlugin implements Plugin<Project> {
           }
         }
       }
-
-      AndroidHacks.applyPomImplementationOverride(project, deployablePlugin)
     }
   }
 }

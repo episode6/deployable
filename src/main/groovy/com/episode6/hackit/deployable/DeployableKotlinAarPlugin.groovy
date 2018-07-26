@@ -58,8 +58,6 @@ class DeployableKotlinAarPlugin implements Plugin<Project> {
           }
         }
       }
-
-      AndroidHacks.applyPomImplementationOverride(project, deployablePlugin)
     }
   }
 }
