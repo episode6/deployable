@@ -146,16 +146,23 @@ class MavenConfigurator {
     mappedConfigs.values().each { mappedConfig ->
       def config = project.configurations.findByName(mappedConfig.gradleConfig)
       if (config != null) {
-        config.dependencies.each {
+        config.dependencies.each { dep ->
           def depNode = deps.appendNode('dependency')
-          depNode.appendNode('groupId', it.group)
-          depNode.appendNode('artifactId', it.name)
-          depNode.appendNode('version', it.version)
+          depNode.appendNode('groupId', dep.group)
+          depNode.appendNode('artifactId', dep.name)
+          depNode.appendNode('version', dep.version)
           depNode.appendNode('scope', mappedConfig.mavenScope)
           if (mappedConfig.optional) {
             depNode.appendNode('optional', true)
           }
-
+          if (!dep.excludeRules.isEmpty()) {
+            def exclusionsNode = depNode.appendNode('exclusions')
+            dep.excludeRules.each {
+              def exNode = exclusionsNode.appendNode('exclusion')
+              exNode.appendNode('groupId', it.group == null ? "*" : it.group)
+              exNode.appendNode('artifactId', it.module == null ? "*" : it.module)
+            }
+          }
         }
       }
     }
