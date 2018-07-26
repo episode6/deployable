@@ -67,6 +67,7 @@ dependencies {
   alsoUnderTest 'com.android.tools.build:gradle'
   alsoUnderTest 'org.jetbrains.kotlin:kotlin-gradle-plugin'
   alsoUnderTest 'org.jetbrains.dokka:dokka-gradle-plugin'
+  alsoUnderTest 'org.jetbrains.dokka:dokka-android-gradle-plugin'
 }
 
 pluginUnderTestMetadata {
