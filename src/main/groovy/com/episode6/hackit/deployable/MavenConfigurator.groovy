@@ -147,21 +147,26 @@ class MavenConfigurator {
     mappedConfigs.values().each { mappedConfig ->
       def config = project.configurations.findByName(mappedConfig.gradleConfig)
       if (config != null) {
-        config.dependencies.each { dep ->
-          def depNode = deps.appendNode('dependency')
-          depNode.appendNode('groupId', dep.group)
-          depNode.appendNode('artifactId', dep.name)
-          depNode.appendNode('version', dep.version)
-          depNode.appendNode('scope', mappedConfig.mavenScope)
-          if (mappedConfig.optional) {
-            depNode.appendNode('optional', true)
-          }
-          if (dep instanceof ModuleDependency && !dep.excludeRules.isEmpty()) {
-            def exclusionsNode = depNode.appendNode('exclusions')
-            dep.excludeRules.each {
-              def exNode = exclusionsNode.appendNode('exclusion')
-              exNode.appendNode('groupId', it.group == null ? "*" : it.group)
-              exNode.appendNode('artifactId', it.module == null ? "*" : it.module)
+        config = config.copyRecursive().setTransitive(false)
+        config.setCanBeResolved(true)
+        config.resolvedConfiguration.getFirstLevelModuleDependencies().each { resolvedDep ->
+          def dep = config.dependencies.find {it.group == resolvedDep.moduleGroup && it.name == resolvedDep.moduleName}
+          if (dep instanceof ModuleDependency) {
+            def depNode = deps.appendNode('dependency')
+            depNode.appendNode('groupId', resolvedDep.moduleGroup)
+            depNode.appendNode('artifactId', resolvedDep.moduleName)
+            depNode.appendNode('version', resolvedDep.moduleVersion)
+            depNode.appendNode('scope', mappedConfig.mavenScope)
+            if (mappedConfig.optional) {
+              depNode.appendNode('optional', true)
+            }
+            if (!dep.excludeRules.isEmpty()) {
+              def exclusionsNode = depNode.appendNode('exclusions')
+              dep.excludeRules.each {
+                def exNode = exclusionsNode.appendNode('exclusion')
+                exNode.appendNode('groupId', it.group == null ? "*" : it.group)
+                exNode.appendNode('artifactId', it.module == null ? "*" : it.module)
+              }
             }
           }
         }
@@ -171,7 +176,9 @@ class MavenConfigurator {
 
   private void configureSigning() {
     project.signing {
-      required { DeployablePlugin.isReleaseBuild(project) && project.gradle.taskGraph.hasTask("publishMavenArtifactsPublicationToMavenRepository") }
+      required {
+        DeployablePlugin.isReleaseBuild(project) && project.gradle.taskGraph.hasTask("publishMavenArtifactsPublicationToMavenRepository")
+      }
       sign project.publishing.publications.mavenArtifacts
     }
   }
