@@ -388,7 +388,6 @@ dependencies {
   mavenOptional 'org.assertj:assertj-core:3.9.1'
   mavenProvided 'org.mockito:mockito-core:2.9.0'
   mavenProvidedOptional 'com.squareup.dagger:dagger:1.2.5'
-  testImplementation 'org.spockframework:spock-core:1.1-groovy-2.4'
 }
 """
     when:
@@ -404,7 +403,6 @@ dependencies {
     mavenOutputVerifier.verifyPomDependency("org.assertj", "assertj-core", "3.9.1", "runtime", true)
     mavenOutputVerifier.verifyPomDependency("org.mockito", "mockito-core", "2.9.0", "provided")
     mavenOutputVerifier.verifyPomDependency("com.squareup.dagger", "dagger", "1.2.5", "provided", true)
-    mavenOutputVerifier.verifyPomDependency("org.spockframework", "spock-core", "1.1-groovy-2.4", "test")
 
     where:
     groupId                 | artifactId    | versionName

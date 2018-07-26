@@ -25,7 +25,6 @@ class MavenConfigurator {
 
     putConfigMapping("implementation", "runtime")
     putConfigMapping("api", "compile")
-    putConfigMapping("testImplementation", "test")
     putConfigMapping("mavenProvided", "provided")
     putConfigMapping("mavenProvidedOptional", "provided", true)
     putConfigMapping("mavenOptional", "runtime", true)
@@ -149,10 +148,12 @@ class MavenConfigurator {
     mappedConfigs.values().each { mappedConfig ->
       def config = project.configurations.findByName(mappedConfig.gradleConfig)
       if (config != null) {
+
         def unresolvedDeps = config.dependencies
         config = config.copyRecursive().setTransitive(false)
         config.setCanBeResolved(true)
         def resolvedDeps = config.resolvedConfiguration.lenientConfiguration.getFirstLevelModuleDependencies()
+
         unresolvedDeps.each { unresolvedDep ->
           def resolvedDep = resolvedDeps.find {unresolvedDep.group == it.moduleGroup && unresolvedDep.name == it.moduleName}
           if (unresolvedDep instanceof ModuleDependency) {
