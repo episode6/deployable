@@ -17,7 +17,7 @@ buildscript {
 }
 
 group = "com.episode6.hackit.deployable"
-version = "0.1.13-SNAPSHOT"
+version = "0.2.0-SNAPSHOT"
 
 wrapper {
   gradleVersion = "4.9"
