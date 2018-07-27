@@ -41,18 +41,6 @@ import com.episode6.hackit.chop.Chop
 
   private static String rootBuildFile(String groupId, String versionName) {
     return """
-buildscript {
-  repositories {
-    jcenter()
-    google()
-  }
-  dependencies {
-    classpath '${MyDependencyMap.lookupDep("com.android.tools.build:gradle")}'
-    classpath '${MyDependencyMap.lookupDep("org.jetbrains.kotlin:kotlin-gradle-plugin")}'
-    classpath '${MyDependencyMap.lookupDep("org.jetbrains.dokka:dokka-gradle-plugin")}'
-    classpath '${MyDependencyMap.lookupDep("org.jetbrains.dokka:dokka-android-gradle-plugin")}'
-  }
-}
 allprojects {
   repositories {
     jcenter()
@@ -96,10 +84,9 @@ ${deps}
   private static String kotlinBuildFile(String deps = "") {
     return """
 plugins {
+ id 'kotlin'
  id 'com.episode6.hackit.deployable.kt.jar'
 }
-
-apply plugin: 'kotlin'
 
 dependencies {
   implementation '${MyDependencyMap.lookupDep("org.jetbrains.kotlin:kotlin-stdlib-jdk7")}'
@@ -112,10 +99,9 @@ ${deps}
   private static String androidBuildFile(String deps = "") {
     return """
 plugins {
+ id 'com.android.library'
  id 'com.episode6.hackit.deployable.aar'
 }
-
-apply plugin: 'com.android.library'
 
 android {
   compileSdkVersion 19
@@ -130,11 +116,10 @@ ${deps}
   private static String kotlinAndroidBuildFile(String deps = "") {
     return """
 plugins {
+ id 'com.android.library'
+ id 'kotlin-android'
  id 'com.episode6.hackit.deployable.kt.aar'
 }
-
-apply plugin: 'com.android.library'
-apply plugin: 'kotlin-android'
 
 android {
   compileSdkVersion 19

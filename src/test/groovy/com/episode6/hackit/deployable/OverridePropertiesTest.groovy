@@ -114,8 +114,8 @@ deployable {
     result.task(":javadocJar").outcome == TaskOutcome.SUCCESS
     result.task(":sourcesJar").outcome == TaskOutcome.SUCCESS
     result.task(":validateDeployable").outcome == TaskOutcome.SUCCESS
-    result.task(":signArchives").outcome == TaskOutcome.SUCCESS
-    result.task(":uploadArchives").outcome == TaskOutcome.SUCCESS
+    result.task(":signMavenArtifactsPublication").outcome == TaskOutcome.SUCCESS
+    result.task(":publishMavenArtifactsPublicationToMavenRepository").outcome == TaskOutcome.SUCCESS
     result.task(":deploy").outcome == TaskOutcome.SUCCESS
     result.task(":install") == null
     // check one of the properties to make sure it was overridden, let mavenOutputVerifier handle the rest

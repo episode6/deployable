@@ -1,58 +1,48 @@
 package com.episode6.hackit.deployable
 
 import com.episode6.hackit.deployable.extension.DeployablePluginExtension
+import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
-import org.gradle.api.artifacts.Dependency
-import org.gradle.api.artifacts.maven.MavenDeployment
+import org.gradle.api.artifacts.ModuleDependency
+import org.gradle.api.artifacts.ProjectDependency
+import org.gradle.api.publish.maven.MavenPublication
 
 /**
- *
- */
+ **/
 class MavenConfigurator {
   Project project
 
-  private int scopePriority = 451
-
   private ConfigToScopeMapper mapper = new ConfigToScopeMapper()
-  private Map<String, BuiltInConfig2ScopeMapping> builtInConfigs = new HashMap<>()
-  private Set<Configuration> optionalConfigs = new HashSet<>()
+  private MavenDependencyConfigurator dependencyConfigurator;
 
   void prepare() {
+    dependencyConfigurator = new MavenDependencyConfigurator(project: project)
+
     project.configurations {
       mavenOptional
       mavenProvided
       mavenProvidedOptional
     }
 
-    putBuiltInConfig("implementation", "runtime")
-    putBuiltInConfig("api", "compile")
-    putBuiltInConfig("testImplementation", "test")
-    putBuiltInConfig("mavenProvided", "provided")
-    putBuiltInConfig("mavenProvidedOptional", "provided", true)
-    putBuiltInConfig("mavenOptional", "runtime", true)
+    dependencyConfigurator.putConfigMapping("implementation", "runtime")
+    dependencyConfigurator.putConfigMapping("api", "compile")
+    dependencyConfigurator.putConfigMapping("mavenProvided", "provided")
+    dependencyConfigurator.putConfigMapping("mavenProvidedOptional", "provided", true)
+    dependencyConfigurator.putConfigMapping("mavenOptional", "runtime", true)
   }
-
 
   void configure(DeployablePluginExtension deployable, String pomPackaging) {
     project.configurations {
       compileOnly {
-        extendsFrom(
-            mavenOptional,
+        extendsFrom(mavenOptional,
             mavenProvided,
             mavenProvidedOptional)
       }
     }
 
-    new HashMap<String, BuiltInConfig2ScopeMapping>(builtInConfigs).each { name, config ->
-      if (config.optional) {
-        mapper.mapOptional(config.gradleConfig, config.mavenScope, config.priority)
-      } else {
-        mapper.map(config.gradleConfig, config.mavenScope, config.priority)
-      }
-    }
-
     configurePom(deployable, pomPackaging)
+    configureRepositories(deployable)
     configureSigning()
   }
 
@@ -62,142 +52,92 @@ class MavenConfigurator {
     closure.call()
   }
 
-  String getMavenScopeForGradleConfig(String gradleConfigName) {
-    if (builtInConfigs.containsKey(gradleConfigName)) {
-      return builtInConfigs.get(gradleConfigName).mavenScope
-    }
-    def config = project.configurations.findByName(gradleConfigName)
-    if (config == null) {
-      return null
-    }
-    return getMavenScopeForGradleConfig(config)
-  }
-
-  String getMavenScopeForGradleConfig(Configuration config) {
-    if (!project.conf2ScopeMappings.mappings.containsKey(config)) {
-      return null
-    }
-    return project.conf2ScopeMappings.mappings.get(config).scope
-  }
-
   class ConfigToScopeMapper implements GroovyInterceptable {
 
     void unmap(String gradleConfigName) {
-      def config = project.configurations.findByName(gradleConfigName)
-      if (config != null) {
-        unmap(config)
-      }
+      dependencyConfigurator.removeConfigMapping(gradleConfigName)
     }
 
     void unmap(Configuration gradleConfig) {
-      builtInConfigs.remove(gradleConfig.name)
-      project.conf2ScopeMappings.mappings.remove(gradleConfig)
-      optionalConfigs.remove(gradleConfig)
+      dependencyConfigurator.removeConfigMapping(gradleConfig.name)
     }
 
     void map(String gradleConfigName, String mavenScope) {
-      def config = project.configurations.findByName(gradleConfigName)
-      if (config != null) {
-        map(config, mavenScope)
-      }
+      dependencyConfigurator.putConfigMapping(gradleConfigName, mavenScope)
     }
 
     void mapOptional(String gradleConfigName, String mavenScope) {
-      def config = project.configurations.findByName(gradleConfigName)
-      if (config != null) {
-        mapOptional(config, mavenScope)
-      }
-    }
-
-    void map(String gradleConfigName, String mavenScope, int priority) {
-      def config = project.configurations.findByName(gradleConfigName)
-      if (config != null) {
-        map(config, mavenScope, priority)
-      }
-    }
-
-    void mapOptional(String gradleConfigName, String mavenScope, int priority) {
-      def config = project.configurations.findByName(gradleConfigName)
-      if (config != null) {
-        mapOptional(config, mavenScope, priority)
-      }
+      dependencyConfigurator.putConfigMapping(gradleConfigName, mavenScope, true)
     }
 
     void map(Configuration gradleConfig, String mavenScope) {
-      map(gradleConfig, mavenScope, scopePriority)
-      scopePriority++
-    }
-
-    void map(Configuration gradleConfig, String mavenScope, int priority) {
-      unmap(gradleConfig)
-      project.conf2ScopeMappings.addMapping(priority, gradleConfig, mavenScope)
+      map(gradleConfig.name, mavenScope)
     }
 
     void mapOptional(Configuration gradleConfig, String mavenScope) {
-      map(gradleConfig, mavenScope)
-      optionalConfigs.add(gradleConfig)
-    }
-
-    void mapOptional(Configuration gradleConfig, String mavenScope, int priority) {
-      map(gradleConfig, mavenScope, priority)
-      optionalConfigs.add(gradleConfig)
+      mapOptional(gradleConfig.name, mavenScope)
     }
   }
 
   private void configurePom(DeployablePluginExtension deployable, String pomPackaging) {
-    project.uploadArchives {
-      it.dependsOn project.validateDeployable
 
-      it.repositories {
-        it.mavenDeployer {
-          beforeDeployment { MavenDeployment deployment -> project.signing.signPom(deployment) }
+    project.publishing {
+      publications {
+        mavenArtifacts(MavenPublication) {
+          groupId project.group
+          artifactId project.name
+          version project.version
 
-          repository(url: deployable.nexus.releaseRepoUrl) {
-            authentication(userName: deployable.nexus.username, password: deployable.nexus.password)
-          }
-          snapshotRepository(url: deployable.nexus.snapshotRepoUrl) {
-            authentication(userName: deployable.nexus.username, password: deployable.nexus.password)
-          }
-
-          // apply optional dependencies
-          pom.whenConfigured { pom ->
-            optionalConfigs.each { Configuration gradleConfig ->
-              String mavenScope = getMavenScopeForGradleConfig(gradleConfig)
-              if (mavenScope) {
-                gradleConfig.getAllDependencies().each { Dependency dep ->
-                  pom.dependencies.find { pomDep ->
-                    pomDep.groupId == dep.group && pomDep.artifactId == dep.name && pomDep.scope == mavenScope
-                  }.optional = true
-                }
-              }
-            }
-          }
-
-          pom.project {
-            name project.name
+          pom {
+            name = project.name
+            description = deployable.pom.description
+            url = deployable.pom.url
             packaging pomPackaging
-            description deployable.pom.description
-            url deployable.pom.url
-
-            scm {
-              url deployable.pom.scm.url
-              connection deployable.pom.scm.connection
-              developerConnection deployable.pom.scm.developerConnection
-            }
-
             licenses {
               license {
-                name deployable.pom.license.name
-                url deployable.pom.license.url
-                distribution deployable.pom.license.distribution
+                name = deployable.pom.license.name
+                url = deployable.pom.license.url
+                distribution = deployable.pom.license.distribution
               }
             }
-
             developers {
               developer {
-                id deployable.pom.developer.id
-                name deployable.pom.developer.name
+                id = deployable.pom.developer.id
+                name = deployable.pom.developer.name
               }
+            }
+            scm {
+              url = deployable.pom.scm.url
+              connection = deployable.pom.scm.connection
+              developerConnection = deployable.pom.scm.developerConnection
+            }
+          }
+
+          configurePublicationArtifacts(it, deployable)
+
+          pom.withXml {
+            def rootPom = asNode()
+            dependencyConfigurator.configureDependencies(rootPom)
+            configurePublicationPomXml(rootPom, deployable)
+          }
+        }
+      }
+    }
+  }
+
+  private void configureRepositories(DeployablePluginExtension deployable) {
+    project.publishing {
+      repositories {
+        maven {
+          def repoUrl = DeployablePlugin.isReleaseBuild(project) ? deployable.nexus.releaseRepoUrl : deployable.nexus.snapshotRepoUrl
+          url repoUrl
+
+          if (URI.create(repoUrl).getScheme() == "file") {
+            authentication {} // empty auth block removes an error when using file:// repos
+          } else if (deployable.nexus.username != null) {
+            credentials {
+              username deployable.nexus.username
+              password deployable.nexus.password
             }
           }
         }
@@ -208,29 +148,25 @@ class MavenConfigurator {
   private void configureSigning() {
     project.signing {
       required {
-        DeployablePlugin.isReleaseBuild(project) &&
-            (project.gradle.taskGraph.hasTask("uploadArchives") ||
-                project.gradle.taskGraph.hasTask("uploadArchives"))
+        DeployablePlugin.isReleaseBuild(project) && project.gradle.taskGraph.hasTask("publishMavenArtifactsPublicationToMavenRepository")
       }
-      sign project.configurations.archives
+      sign project.publishing.publications.mavenArtifacts
     }
   }
 
-  private void putBuiltInConfig(String gradleConfig, String mavenScope, boolean optional = false) {
-    BuiltInConfig2ScopeMapping mapping = new BuiltInConfig2ScopeMapping(
-        gradleConfig: gradleConfig,
-        mavenScope: mavenScope,
-        priority: scopePriority,
-        optional: optional)
-    scopePriority++
-    builtInConfigs.put(mapping.gradleConfig, mapping)
+  private static void configurePublicationArtifacts(MavenPublication publication, DeployablePluginExtension deployable) {
+    deployable.publicationClosures.each { closure ->
+      closure.setDelegate(publication)
+      closure.setResolveStrategy(Closure.DELEGATE_FIRST)
+      closure.call()
+    }
   }
 
-  private static class BuiltInConfig2ScopeMapping {
-    String gradleConfig
-    String mavenScope
-    int priority
-    boolean optional
+  private static void configurePublicationPomXml(Node rootPom, DeployablePluginExtension deployable) {
+    deployable.pomXmlClosures.each { closure ->
+      closure.setDelegate(rootPom)
+      closure.setResolveStrategy(Closure.DELEGATE_FIRST)
+      closure.call()
+    }
   }
-
 }

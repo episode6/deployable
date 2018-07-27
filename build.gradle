@@ -12,24 +12,24 @@ buildscript {
   }
   dependencies {
     classpath compileDependencies
-    classpath 'com.episode6.hackit.gdmc:gdmc:0.1.8'
+    classpath 'com.episode6.hackit.gdmc:gdmc:0.1.9'
   }
 }
 
 group = "com.episode6.hackit.deployable"
-version = "0.1.13-SNAPSHOT"
+version = "0.2.0-SNAPSHOT"
 
-task wrapper(type: Wrapper) {
-  gradleVersion = "4.4"
+wrapper {
+  gradleVersion = "4.9"
   distributionType = "all"
 }
 
 repositories {
   jcenter()
+  google()
 }
 
 apply plugin: 'groovy'
-apply plugin: 'java-gradle-plugin'
 
 // Apply this plugin to itself so we don't need to duplicate the deploy logic.
 GroovyScriptEngine scriptEngine = new GroovyScriptEngine([
@@ -37,10 +37,16 @@ GroovyScriptEngine scriptEngine = new GroovyScriptEngine([
       file('src/main/resources').absolutePath
     ].toArray(new String[2]),
     this.class.classLoader)
-apply plugin: scriptEngine.loadScriptByName('com/episode6/hackit/deployable/DeployableJarPlugin.groovy')
-apply plugin: scriptEngine.loadScriptByName('com/episode6/hackit/deployable/addon/GroovyDocAddonPlugin.groovy')
+apply plugin: scriptEngine.loadScriptByName('com/episode6/hackit/deployable/DeployableGradlePluginPlugin.groovy')
 
 apply plugin: 'com.episode6.hackit.gdmc'
+
+configurations {
+  // A place for dependencies that must be placed in the pluginClasspath for testing
+  // but do not need to be compile dependencies. (i.e. this is for plugins we need to
+  // test for compatibility with)
+  alsoUnderTest
+}
 
 dependencies {
   implementation localGroovy()
@@ -54,6 +60,17 @@ dependencies {
   testImplementation("org.bouncycastle:bcpg-jdk15on")
   testImplementation("com.episode6.hackit.groovykit:gk-files")
   testImplementation('com.episode6.hackit.gdmc:gdmc')
+
+  // plugins used by integration tests
+  alsoUnderTest 'com.episode6.hackit.gdmc:gdmc'
+  alsoUnderTest 'com.android.tools.build:gradle'
+  alsoUnderTest 'org.jetbrains.kotlin:kotlin-gradle-plugin'
+  alsoUnderTest 'org.jetbrains.dokka:dokka-gradle-plugin'
+  alsoUnderTest 'org.jetbrains.dokka:dokka-android-gradle-plugin'
+}
+
+pluginUnderTestMetadata {
+  pluginClasspath += configurations.alsoUnderTest
 }
 
 test {
