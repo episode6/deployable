@@ -53,14 +53,6 @@ class DeployablePlugin implements Plugin<Project> {
       group = 'publishing'
     }
 
-    // disable any publications created by the java-gradle-plugin
-    // TODO: figure out a saner way to do this
-    project.tasks.withType(PublishToMavenRepository).whenTaskAdded { t ->
-      if (t.name.startsWith("publishPluginMaven")) {
-        t.enabled = false
-      }
-    }
-
     project.afterEvaluate {
       mavenConfig.configure(deployable, pomPackaging)
       // TODO fix tasks

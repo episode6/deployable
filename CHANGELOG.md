@@ -5,6 +5,7 @@
     - Api stays mostly the same, deploy and install tasks are still valid
 - Customizing deployable artifacts has changed, we now use the `deployable.publication { artifact task }`
 - Add config block to customize pom as xml (after deployable has done its initial setup) `deployable.withPomXml { }`
+- Add new plugin `com.episode6.hackit.deployable.gradle-plugin` to workaround java-gradle-plugins build in publish config
 
 
 ### v0.1.12 - released 5/28/2018
