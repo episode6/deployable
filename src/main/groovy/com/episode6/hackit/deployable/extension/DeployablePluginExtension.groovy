@@ -94,13 +94,15 @@ class DeployablePluginExtension extends NestablePluginExtension {
 
   PomExtension pom
   NexusExtension nexus
-  List<Closure<MavenPublication>> publicationClosures
+  List<Closure> publicationClosures
+  List<Closure> pomXmlClosures
 
   DeployablePluginExtension(Project project) {
     super(project, "deployable")
     pom = new PomExtension(this)
     nexus = new NexusExtension(this)
     publicationClosures = new LinkedList<>()
+    pomXmlClosures = new LinkedList<>()
   }
 
   PomExtension pom(Closure closure) {
@@ -111,8 +113,12 @@ class DeployablePluginExtension extends NestablePluginExtension {
     return nexus.applyClosure(closure)
   }
 
-  void publication(Closure<MavenPublication> closure) {
+  void publication(Closure closure) {
     publicationClosures.add(closure)
+  }
+
+  void withPomXml(Closure closure) {
+    pomXmlClosures.add(closure)
   }
 
   @Override

@@ -115,7 +115,9 @@ class MavenConfigurator {
           configurePublicationArtifacts(it, deployable)
 
           pom.withXml {
-            dependencyConfigurator.configureDependencies(asNode())
+            def rootPom = asNode()
+            dependencyConfigurator.configureDependencies(rootPom)
+            configurePublicationPomXml(rootPom, deployable)
           }
         }
       }
@@ -151,6 +153,14 @@ class MavenConfigurator {
   private static void configurePublicationArtifacts(MavenPublication publication, DeployablePluginExtension deployable) {
     deployable.publicationClosures.each { closure ->
       closure.setDelegate(publication)
+      closure.setResolveStrategy(Closure.DELEGATE_FIRST)
+      closure.call()
+    }
+  }
+
+  private static void configurePublicationPomXml(Node rootPom, DeployablePluginExtension deployable) {
+    deployable.pomXmlClosures.each { closure ->
+      closure.setDelegate(rootPom)
       closure.setResolveStrategy(Closure.DELEGATE_FIRST)
       closure.call()
     }
