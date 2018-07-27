@@ -14,20 +14,22 @@ class MavenConfigurator {
   Project project
 
   private ConfigToScopeMapper mapper = new ConfigToScopeMapper()
-  private Map<String, CustomConfigMapping> mappedConfigs = new HashMap<>()
+  private MavenDependencyConfigurator dependencyConfigurator;
 
   void prepare() {
+    dependencyConfigurator = new MavenDependencyConfigurator(project: project)
+
     project.configurations {
       mavenOptional
       mavenProvided
       mavenProvidedOptional
     }
 
-    putConfigMapping("implementation", "runtime")
-    putConfigMapping("api", "compile")
-    putConfigMapping("mavenProvided", "provided")
-    putConfigMapping("mavenProvidedOptional", "provided", true)
-    putConfigMapping("mavenOptional", "runtime", true)
+    dependencyConfigurator.putConfigMapping("implementation", "runtime")
+    dependencyConfigurator.putConfigMapping("api", "compile")
+    dependencyConfigurator.putConfigMapping("mavenProvided", "provided")
+    dependencyConfigurator.putConfigMapping("mavenProvidedOptional", "provided", true)
+    dependencyConfigurator.putConfigMapping("mavenOptional", "runtime", true)
   }
 
   void configure(DeployablePluginExtension deployable, String pomPackaging) {
@@ -52,19 +54,19 @@ class MavenConfigurator {
   class ConfigToScopeMapper implements GroovyInterceptable {
 
     void unmap(String gradleConfigName) {
-      mappedConfigs.remove(gradleConfigName)
+      dependencyConfigurator.removeConfigMapping(gradleConfigName)
     }
 
     void unmap(Configuration gradleConfig) {
-      mappedConfigs.remove(gradleConfig.name)
+      dependencyConfigurator.removeConfigMapping(gradleConfig.name)
     }
 
     void map(String gradleConfigName, String mavenScope) {
-      putConfigMapping(gradleConfigName, mavenScope)
+      dependencyConfigurator.putConfigMapping(gradleConfigName, mavenScope)
     }
 
     void mapOptional(String gradleConfigName, String mavenScope) {
-      putConfigMapping(gradleConfigName, mavenScope, true)
+      dependencyConfigurator.putConfigMapping(gradleConfigName, mavenScope, true)
     }
 
     void map(Configuration gradleConfig, String mavenScope) {
@@ -113,7 +115,7 @@ class MavenConfigurator {
           configurePublicationArtifacts(it, deployable)
 
           pom.withXml {
-            configureDependencies(asNode())
+            dependencyConfigurator.configureDependencies(asNode())
           }
         }
       }
@@ -137,66 +139,6 @@ class MavenConfigurator {
     }
   }
 
-  private void configureDependencies(Node pomRoot) {
-    def deps = pomRoot.dependencies
-    if (deps == null || deps.isEmpty()) {
-      deps = pomRoot.appendNode('dependencies')
-    } else {
-      deps = pomRoot.dependencies[0]
-    }
-    deps.children.clear() // start with no deps
-    mappedConfigs.values().each { mappedConfig ->
-      def config = project.configurations.findByName(mappedConfig.gradleConfig)
-      if (config != null) {
-
-        def unresolvedDeps = config.dependencies
-        config = config.copyRecursive().setTransitive(false)
-        config.setCanBeResolved(true)
-        def resolvedDeps = config.resolvedConfiguration.lenientConfiguration.getFirstLevelModuleDependencies()
-
-        unresolvedDeps.each { unresolvedDep ->
-          def resolvedDep = resolvedDeps.find {unresolvedDep.group == it.moduleGroup && unresolvedDep.name == it.moduleName}
-          if (unresolvedDep instanceof ModuleDependency) {
-
-            def groupId
-            def artifactId
-            def version
-
-            if (unresolvedDep instanceof ProjectDependency) {
-              Project depProj = unresolvedDep.getDependencyProject()
-              groupId = depProj.group
-              artifactId = depProj.name
-              version = depProj.version
-            } else if (resolvedDep != null) {
-              groupId = resolvedDep.moduleGroup
-              artifactId = resolvedDep.moduleName
-              version = resolvedDep.moduleVersion
-            } else {
-              throw new GradleException("Couldn't figure out dependency: ${unresolvedDep}")
-            }
-
-            def depNode = deps.appendNode('dependency')
-            depNode.appendNode('groupId', groupId)
-            depNode.appendNode('artifactId', artifactId)
-            depNode.appendNode('version', version)
-            depNode.appendNode('scope', mappedConfig.mavenScope)
-            if (mappedConfig.optional) {
-              depNode.appendNode('optional', true)
-            }
-            if (!unresolvedDep.excludeRules.isEmpty()) {
-              def exclusionsNode = depNode.appendNode('exclusions')
-              unresolvedDep.excludeRules.each {
-                def exNode = exclusionsNode.appendNode('exclusion')
-                exNode.appendNode('groupId', it.group == null ? "*" : it.group)
-                exNode.appendNode('artifactId', it.module == null ? "*" : it.module)
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-
   private void configureSigning() {
     project.signing {
       required {
@@ -204,19 +146,6 @@ class MavenConfigurator {
       }
       sign project.publishing.publications.mavenArtifacts
     }
-  }
-
-  private void putConfigMapping(String gradleConfig, String mavenScope, boolean optional = false) {
-    CustomConfigMapping mapping = new CustomConfigMapping(gradleConfig: gradleConfig,
-        mavenScope: mavenScope,
-        optional: optional)
-    mappedConfigs.put(mapping.gradleConfig, mapping)
-  }
-
-  private static class CustomConfigMapping {
-    String gradleConfig
-    String mavenScope
-    boolean optional
   }
 
   private static void configurePublicationArtifacts(MavenPublication publication, DeployablePluginExtension deployable) {
