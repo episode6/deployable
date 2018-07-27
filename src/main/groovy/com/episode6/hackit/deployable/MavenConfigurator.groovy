@@ -42,6 +42,7 @@ class MavenConfigurator {
     }
 
     configurePom(deployable, pomPackaging)
+    configureRepositories(deployable)
     configureSigning()
   }
 
@@ -121,8 +122,11 @@ class MavenConfigurator {
           }
         }
       }
+    }
+  }
 
-
+  private void configureRepositories(DeployablePluginExtension deployable) {
+    project.publishing {
       repositories {
         maven {
           def repoUrl = DeployablePlugin.isReleaseBuild(project) ? deployable.nexus.releaseRepoUrl : deployable.nexus.snapshotRepoUrl
