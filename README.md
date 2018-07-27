@@ -1,6 +1,6 @@
 Deployable for Gradle
 =====================
-Gradle plugins to ease the pain of deploying jars and aars to maven repositories. This currently uses the old `maven` plugin instead of the new `maven-publish` plugin.
+Gradle plugins to ease the pain of deploying jars and aars to maven repositories.
 
 ## Usage
 Add Deployable to the classpath in your root `build.gradle`
@@ -143,7 +143,7 @@ deployable {
 ```
 
 Finally, deploy using
-`./gradlew uploadArchives` or the new deploy alias `./gradlew deploy`
+`./gradlew publish` or the new deploy alias `./gradlew deploy`
 
 Deployable also adds some basic support for maven's `provided` scope and `optional` flag via custom scopes...
 ```groovy
