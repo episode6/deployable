@@ -126,15 +126,20 @@ class MavenConfigurator {
   }
 
   private void configureRepositories(DeployablePluginExtension deployable) {
+    def repoUrl = getRepoUrl(deployable)
+
+    if (!repoUrl) {
+      return
+    }
+
     project.publishing {
       repositories {
         maven {
-          def repoUrl = DeployablePlugin.isReleaseBuild(project) ? deployable.nexus.releaseRepoUrl : deployable.nexus.snapshotRepoUrl
           url repoUrl
 
           if (URI.create(repoUrl).getScheme() == "file") {
             authentication {} // empty auth block removes an error when using file:// repos
-          } else if (deployable.nexus.username != null) {
+          } else if (deployable.nexus.username || deployable.nexus.password) {
             credentials {
               username deployable.nexus.username
               password deployable.nexus.password
@@ -143,6 +148,16 @@ class MavenConfigurator {
         }
       }
     }
+  }
+
+  private String getRepoUrl(DeployablePluginExtension deployable) {
+    if (deployable.nexus.releaseRepoUrl == null) {
+      return deployable.nexus.snapshotRepoUrl
+    }
+    if (deployable.nexus.snapshotRepoUrl == null) {
+      return deployable.nexus.releaseRepoUrl
+    }
+    return DeployablePlugin.isReleaseBuild(project) ? deployable.nexus.releaseRepoUrl : deployable.nexus.snapshotRepoUrl
   }
 
   private void configureSigning() {
