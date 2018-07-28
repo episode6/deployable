@@ -162,7 +162,7 @@ dependencies {
 }
 ```
 
-To map dependencies of extra configurations use the `mavenDependencies` method...
+To map dependencies of extra configurations to the maven pom use the `deployable.pom.dependencyConfigurations` block...
 ```groovy
 configurations {
     someCompileConfig
@@ -171,7 +171,7 @@ configurations {
     someProvidedOptionalConfig
 }
 
-mavenDependencies {
+deployable.pom.dependencyConfigurations {
     // map with configuration reference
     map configurations.someCompileConfig, "compile"
 
