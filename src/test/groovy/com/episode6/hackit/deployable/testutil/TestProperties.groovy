@@ -58,13 +58,7 @@ class TestProperties {
     StringBuilder builder = new StringBuilder()
     builder = buildGradlePropertiesForNestedExtension(deployable, builder)
     builder = buildGradlePropertiesForKeyringBundle(builder)
-    return builder.toString() + """
-
-kotlin.compiler.execution.strategy="in-process"
-
--Dkotlin.compiler.execution.strategy="in-process"
-
-"""
+    return builder.toString()
   }
 
   private StringBuilder buildGradlePropertiesForNestedExtension(NestablePluginExtension nestedExtension, StringBuilder stringBuilder) {
