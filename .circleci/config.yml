@@ -27,7 +27,7 @@ jobs:
       - run: git submodule update --init
       - run: ./gradlew clean
       - run: ./gradlew assemble
-      - run: ./gradlew check
+      - run: ./gradlew check -Dkotlin.compiler.execution.strategy="in-process"
       - run:
           name: Save test results
           command: |
