@@ -13,6 +13,7 @@ class IntegrationTestProject extends TemporaryFolder {
   File rootGradlePropertiesFile
   File rootGradleSettingFile
 
+  boolean initMavenRepos = true
   File snapshotMavenRepoDir
   File releaseMavenRepoDir
 
@@ -27,8 +28,10 @@ class IntegrationTestProject extends TemporaryFolder {
     rootGradlePropertiesFile = newFile("gradle.properties")
     rootGradleSettingFile = newFile("settings.gradle")
 
-    setSnapshotMavenRepoDir(newFolder("mavenSnapshot"))
-    setReleaseMavenRepoDir(newFolder("mavenRelease"))
+    if (initMavenRepos) {
+      setSnapshotMavenRepoDir(newFolder("mavenSnapshot"))
+      setReleaseMavenRepoDir(newFolder("mavenRelease"))
+    }
   }
 
   void setSnapshotMavenRepoDir(File snapshotMavenRepoDir) {

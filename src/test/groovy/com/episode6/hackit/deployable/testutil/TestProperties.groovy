@@ -39,11 +39,6 @@ class TestProperties {
           name "DeveloperName"
         }
       }
-
-      nexus {
-        username "nexusUsername"
-        password "nexusPassword"
-      }
     }
   }
 

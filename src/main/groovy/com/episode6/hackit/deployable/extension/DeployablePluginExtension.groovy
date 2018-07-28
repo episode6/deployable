@@ -11,7 +11,9 @@ import org.gradle.api.publish.maven.MavenPublication
 class DeployablePluginExtension extends NestablePluginExtension {
   private static final String[] OPTIONAL_PROPERTIES = [
       "deployable.nexus.username",
-      "deployable.nexus.password"]
+      "deployable.nexus.password",
+      "deployable.nexus.releaseRepoUrl",
+      "deployable.nexus.snapshotRepoUrl"]
 
   static class PomExtension extends NestablePluginExtension {
 
@@ -67,28 +69,6 @@ class DeployablePluginExtension extends NestablePluginExtension {
 
     NexusExtension(NestablePluginExtension parent) {
       super(parent, "nexus")
-    }
-
-    String getReleaseRepoUrl() {
-      if (releaseRepoUrl != null) {
-        return releaseRepoUrl
-      }
-
-      String fromProperties = getOptionalProjectProperty("releaseRepoUrl")
-      return fromProperties == null ?
-          "https://oss.sonatype.org/service/local/staging/deploy/maven2/" :
-          fromProperties
-    }
-
-    String getSnapshotRepoUrl() {
-      if (snapshotRepoUrl != null) {
-        return snapshotRepoUrl
-      }
-
-      String fromProperties = getOptionalProjectProperty("snapshotRepoUrl")
-      return fromProperties == null ?
-          "https://oss.sonatype.org/content/repositories/snapshots/" :
-          fromProperties
     }
   }
 

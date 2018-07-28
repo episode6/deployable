@@ -91,6 +91,9 @@ deployable.pom.license.url=https://github.com/episode6/deployable/blob/master/LI
 deployable.pom.license.distribution=repo
 deployable.pom.developer.id=episode6
 deployable.pom.developer.name=episode6, Inc.
+
+deployable.nexus.releaseRepoUrl=https://oss.sonatype.org/service/local/staging/deploy/maven2/
+deployable.nexus.snapshotRepoUrl=https://oss.sonatype.org/content/repositories/snapshots/
 ```
 
 In your system's `~/.gradle/gradle.properties` add your nexus login info and signing key info
@@ -101,12 +104,6 @@ deployable.nexus.password=<password>
 signing.keyId=<keyId>
 signing.password=<keyPassword>
 signing.secretKeyRingFile=<pathToKeyringFile>
-```
-
-You can optionally override the repository urls by adding the following to your `gradle.properties`
-```
-deployable.nexus.releaseRepoUrl=https://oss.sonatype.org/service/local/staging/deploy/maven2/
-deployable.nexus.snapshotRepoUrl=https://oss.sonatype.org/content/repositories/snapshots/
 ```
 
 Most of deployable's properties can alternatively be set or overridden directly in your `build.gradle`
