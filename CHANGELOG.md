@@ -2,12 +2,11 @@
 
 ### v0.2.0-SNAPSHOT - unreleased
 - Re-write plugin to use `maven-publish` instead of old `maven` plugin
-    - Api stays mostly the same, deploy and install tasks are still valid
-- **[breaking]** Customizing deployable artifacts has changed, we now use the `deployable.publication { artifact task }` and `deployable.mainArtifact { artifact task }` blocks
+- **[BREAKING]** Customizing deployable artifacts has changed, we now use the `deployable.publication { artifact task }` and `deployable.mainArtifact { artifact task }` blocks
+- **[BREAKING]** Stop providing default values for repo urls. If no urls are specified, no repo will be set up.
+- **[BREAKING]** Moved `mavenDependencies {}` block to `deployable.pom.dependencyConfigurations {}`. Api remains mostly the same, but scope priorities are no longer used. We also added a `clear()` method.
 - Add config block to customize pom as xml (after deployable has done its initial setup) `deployable.pom.withXml { }`
 - Add new plugin `com.episode6.hackit.deployable.gradle-plugin` to workaround java-gradle-plugins build in publish config
-- **[breaking]** Stop providing default values for repo urls. If no urls are specified, no repo will be set up.
-- **[breaking]** Moved `mavenDependencies {}` block to `deployable.pom.dependencyConfigurations {}`. Api remains mostly the same, but scopes are no longer used and we now offer a `clear()` method.
 
 
 ### v0.1.12 - released 5/28/2018
