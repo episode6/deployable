@@ -34,7 +34,7 @@ class DeployableKotlinAarPlugin implements Plugin<Project> {
     }
 
     project.deployable {
-      primaryPublication {
+      mainArtifact {
         artifact project.bundleRelease
       }
       publication {

@@ -24,7 +24,7 @@ class DeployableJarPlugin implements Plugin<Project> {
     }
 
     project.deployable {
-      primaryPublication {
+      mainArtifact {
         artifact project.jar
       }
       publication {
