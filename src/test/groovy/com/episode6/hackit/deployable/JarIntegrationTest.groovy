@@ -353,7 +353,7 @@ dependencies {
   someOtherConfig 'com.episode6.hackit.chop:chop-core:0.1.8'
 }
 
-mavenDependencies {
+deployable.pom.dependencyConfigurations {
   map configurations.someConfig, "provided"
   map "someOtherConfig", "compile"
 }
@@ -409,7 +409,7 @@ dependencies {
   someOtherConfig 'com.episode6.hackit.chop:chop-core:0.1.8'
 }
 
-mavenDependencies {
+deployable.pom.dependencyConfigurations {
   mapOptional configurations.someConfig, "compile"
   mapOptional "someOtherConfig", "provided"
 }
@@ -505,7 +505,7 @@ dependencies {
   implementation 'com.episode6.hackit.chop:chop-core:0.1.8'
 }
 
-mavenDependencies {
+deployable.pom.dependencyConfigurations {
   unmap "implementation"
 }
 """
@@ -545,7 +545,7 @@ dependencies {
   mavenOptional 'com.episode6.hackit.chop:chop-core:0.1.8'
 }
 
-mavenDependencies {
+deployable.pom.dependencyConfigurations {
   unmap "mavenOptional"
 }
 """
@@ -585,7 +585,7 @@ dependencies {
   implementation 'org.spockframework:spock-core:1.1-groovy-2.4'
 }
 
-mavenDependencies {
+deployable.pom.dependencyConfigurations {
   map configurations.implementation, "provided"
 }
 """
@@ -630,7 +630,7 @@ dependencies {
   mavenProvidedOptional 'org.spockframework:spock-core:1.1-groovy-2.4'
 }
 
-mavenDependencies {
+deployable.pom.dependencyConfigurations {
   map "mavenProvidedOptional", "compile"
 }
 """
