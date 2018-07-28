@@ -110,6 +110,7 @@ class MavenConfigurator {
             }
           }
 
+          configureWithClosure(it, deployable.primaryPublication)
           configurePublicationArtifacts(it, deployable)
 
           pom.withXml {
@@ -168,17 +169,19 @@ class MavenConfigurator {
 
   private static void configurePublicationArtifacts(MavenPublication publication, DeployablePluginExtension deployable) {
     deployable.publicationClosures.each { closure ->
-      closure.setDelegate(publication)
-      closure.setResolveStrategy(Closure.DELEGATE_FIRST)
-      closure.call()
+      configureWithClosure(publication, closure)
     }
   }
 
   private static void configurePublicationPomXml(Node rootPom, DeployablePluginExtension deployable) {
     deployable.pom.xmlClosures.each { closure ->
-      closure.setDelegate(rootPom)
-      closure.setResolveStrategy(Closure.DELEGATE_FIRST)
-      closure.call()
+      configureWithClosure(rootPom, closure)
     }
+  }
+
+  private static void configureWithClosure(Object delegate, Closure closure) {
+    closure.setDelegate(delegate)
+    closure.setResolveStrategy(Closure.DELEGATE_FIRST)
+    closure.call()
   }
 }

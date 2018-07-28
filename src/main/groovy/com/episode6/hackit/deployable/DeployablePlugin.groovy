@@ -5,7 +5,6 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.publish.maven.plugins.MavenPublishPlugin
 import org.gradle.plugins.signing.SigningPlugin
-import org.gradle.api.publish.maven.tasks.PublishToMavenRepository
 
 /**
  * Base deployable plugin. It is not referenced directly in gradle, but applied by either the jar or aar plugin

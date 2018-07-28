@@ -33,9 +33,13 @@ class DeployableKotlinAarPlugin implements Plugin<Project> {
       from project.dokka
     }
 
-    project.deployable.publication {
-      artifact project.bundleRelease
-      artifact project.javadocJar
+    project.deployable {
+      primaryPublication {
+        artifact project.bundleRelease
+      }
+      publication {
+        artifact project.javadocJar
+      }
     }
 
     project.android.libraryVariants.all { variant ->

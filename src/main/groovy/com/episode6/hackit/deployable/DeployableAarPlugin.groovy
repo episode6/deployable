@@ -14,7 +14,7 @@ class DeployableAarPlugin implements Plugin<Project> {
     DeployablePlugin deployablePlugin = project.plugins.apply(DeployablePlugin)
     deployablePlugin.pomPackaging = "aar"
 
-    project.deployable.publication {
+    project.deployable.primaryPublication {
       artifact project.bundleRelease
     }
 

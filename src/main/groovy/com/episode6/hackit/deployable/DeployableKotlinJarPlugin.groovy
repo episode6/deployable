@@ -34,10 +34,14 @@ class DeployableKotlinJarPlugin implements Plugin<Project> {
       classifier = 'sources'
     }
 
-    project.deployable.publication {
-      artifact project.jar
-      artifact project.javadocJar
-      artifact project.sourcesJar
+    project.deployable {
+      primaryPublication {
+        artifact project.jar
+      }
+      publication {
+        artifact project.javadocJar
+        artifact project.sourcesJar
+      }
     }
   }
 }

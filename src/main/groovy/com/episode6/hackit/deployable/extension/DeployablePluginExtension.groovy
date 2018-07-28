@@ -77,6 +77,7 @@ class DeployablePluginExtension extends NestablePluginExtension {
     }
   }
 
+  Closure primaryPublication = {}
   final List<Closure> publicationClosures = new LinkedList<>()
 
   PomExtension pom
