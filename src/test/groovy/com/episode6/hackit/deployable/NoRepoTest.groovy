@@ -6,7 +6,7 @@ import org.junit.Rule
 import spock.lang.Specification
 
 /**
- *
+ * Tests usage of deployable with no repository configured (which is now allowed)
  */
 class NoRepoTest extends Specification {
 

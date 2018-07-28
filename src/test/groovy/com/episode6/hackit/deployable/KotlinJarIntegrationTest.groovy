@@ -55,7 +55,7 @@ dependencies {
         testProject: testProject)
 
     when:
-    def result = testProject.executeGradleTask("deploy", "--debug")
+    def result = testProject.executeGradleTask("deploy")
 
     then:
     result.task(":jar").outcome == TaskOutcome.SUCCESS
