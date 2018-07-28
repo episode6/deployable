@@ -110,7 +110,7 @@ class MavenConfigurator {
             }
           }
 
-          configureWithClosure(it, deployable.primaryPublication)
+          configureWithClosure(it, deployable.mainArtifact)
           configurePublicationArtifacts(it, deployable)
 
           pom.withXml {

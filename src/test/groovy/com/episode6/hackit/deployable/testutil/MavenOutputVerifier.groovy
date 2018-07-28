@@ -49,6 +49,15 @@ class MavenOutputVerifier {
         verifyJarFile("javadoc")
   }
 
+  boolean verifyStandardOutputSkipMainArtifact(String artifactPackaging = "jar") {
+    return verifyRootMavenMetaData() &&
+        verifyVersionSpecificMavenMetaData() &&
+        verifyPomData() &&
+        verifyMissingJarFile(null, artifactPackaging) &&
+        verifyJarFile("sources") &&
+        verifyJarFile("javadoc")
+  }
+
   boolean verifyRootMavenMetaData() {
     def mavenMetaData = getMavenProjectDir().newFile("maven-metadata.xml").asXml()
 
@@ -196,6 +205,12 @@ class MavenOutputVerifier {
     jar.close()
 
     assert verifySignatureOfFile(jarFile)
+    return true
+  }
+
+  boolean verifyMissingJarFile(String descriptor = null, String extension = "jar") {
+    File jarFile = getArtifactFile(extension, descriptor)
+    assert !jarFile.exists()
     return true
   }
 
