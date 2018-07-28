@@ -2,7 +2,6 @@ package com.episode6.hackit.deployable.extension
 
 import com.episode6.hackit.nestable.NestablePluginExtension
 import org.gradle.api.Project
-import org.gradle.api.publish.maven.MavenPublication
 
 /**
  * Deployable plugin extension. Stores/retreives info that is used
@@ -49,6 +48,8 @@ class DeployablePluginExtension extends NestablePluginExtension {
     String description = null
     String url = null
 
+    final List<Closure> xmlClosures = new LinkedList<>()
+
     ScmExtension scm
     LicenseExtension license
     DeveloperExtension developer
@@ -58,6 +59,10 @@ class DeployablePluginExtension extends NestablePluginExtension {
       scm = new ScmExtension(this)
       license = new LicenseExtension(this)
       developer = new DeveloperExtension(this)
+    }
+
+    void withXml(Closure closure) {
+      xmlClosures.add(closure)
     }
   }
 
@@ -72,17 +77,15 @@ class DeployablePluginExtension extends NestablePluginExtension {
     }
   }
 
+  final List<Closure> publicationClosures = new LinkedList<>()
+
   PomExtension pom
   NexusExtension nexus
-  List<Closure> publicationClosures
-  List<Closure> pomXmlClosures
 
   DeployablePluginExtension(Project project) {
     super(project, "deployable")
     pom = new PomExtension(this)
     nexus = new NexusExtension(this)
-    publicationClosures = new LinkedList<>()
-    pomXmlClosures = new LinkedList<>()
   }
 
   PomExtension pom(Closure closure) {
@@ -95,10 +98,6 @@ class DeployablePluginExtension extends NestablePluginExtension {
 
   void publication(Closure closure) {
     publicationClosures.add(closure)
-  }
-
-  void withPomXml(Closure closure) {
-    pomXmlClosures.add(closure)
   }
 
   @Override

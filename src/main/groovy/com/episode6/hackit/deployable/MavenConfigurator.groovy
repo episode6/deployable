@@ -1,11 +1,8 @@
 package com.episode6.hackit.deployable
 
 import com.episode6.hackit.deployable.extension.DeployablePluginExtension
-import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
-import org.gradle.api.artifacts.ModuleDependency
-import org.gradle.api.artifacts.ProjectDependency
 import org.gradle.api.publish.maven.MavenPublication
 
 /**
@@ -178,7 +175,7 @@ class MavenConfigurator {
   }
 
   private static void configurePublicationPomXml(Node rootPom, DeployablePluginExtension deployable) {
-    deployable.pomXmlClosures.each { closure ->
+    deployable.pom.xmlClosures.each { closure ->
       closure.setDelegate(rootPom)
       closure.setResolveStrategy(Closure.DELEGATE_FIRST)
       closure.call()
