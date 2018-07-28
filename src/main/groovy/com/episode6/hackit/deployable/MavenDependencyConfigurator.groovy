@@ -1,5 +1,6 @@
 package com.episode6.hackit.deployable
 
+import com.episode6.hackit.deployable.extension.DeployablePluginExtension
 import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.gradle.api.artifacts.*
@@ -7,25 +8,13 @@ import org.gradle.api.artifacts.*
 class MavenDependencyConfigurator {
 
   Project project
-
-  private Map<String, CustomConfigMapping> mappedConfigs = new HashMap<>()
-
-  void putConfigMapping(String gradleConfig, String mavenScope, boolean optional = false) {
-    CustomConfigMapping mapping = new CustomConfigMapping(gradleConfig: gradleConfig,
-        mavenScope: mavenScope,
-        optional: optional)
-    mappedConfigs.put(mapping.gradleConfig, mapping)
-  }
-
-  void removeConfigMapping(String gradleConfig) {
-    mappedConfigs.remove(gradleConfig)
-  }
+  DeployablePluginExtension deployable
 
   void configureDependencies(Node pomRoot) {
     def depsNode = getDependencyNode(pomRoot)
     depsNode.children.clear() // start with no deps
 
-    mappedConfigs.values().each { mappedConfig ->
+    deployable.pom.dependencyConfigurations.map.values().each { mappedConfig ->
       def config = project.configurations.findByName(mappedConfig.gradleConfig)
       if (config == null) {
         return
@@ -97,12 +86,6 @@ class MavenDependencyConfigurator {
     String group
     String name
     String version
-  }
-
-  private static class CustomConfigMapping {
-    String gradleConfig
-    String mavenScope
-    boolean optional
   }
 
   private interface DepToXmlMapper {

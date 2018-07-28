@@ -2,6 +2,7 @@ package com.episode6.hackit.deployable.extension
 
 import com.episode6.hackit.nestable.NestablePluginExtension
 import org.gradle.api.Project
+import org.gradle.api.artifacts.Configuration
 
 /**
  * Deployable plugin extension. Stores/retreives info that is used
@@ -45,12 +46,64 @@ class DeployablePluginExtension extends NestablePluginExtension {
       }
     }
 
+    static class DependencyConfigurationsExtension extends NestablePluginExtension {
+
+      final Map<String, CustomConfigMapping> map = new HashMap<>()
+
+      DependencyConfigurationsExtension(NestablePluginExtension parent) {
+        super(parent, "dependencyConfigurations")
+      }
+
+      void clear() {
+        map.clear()
+      }
+
+      void unmap(String gradleConfigName) {
+        map.remove(gradleConfigName)
+      }
+
+      void unmap(Configuration gradleConfig) {
+        unmap(gradleConfig.name)
+      }
+
+      void map(String gradleConfigName, String mavenScope) {
+        map.put(gradleConfigName, new CustomConfigMapping(
+            gradleConfig: gradleConfigName,
+            mavenScope: mavenScope,
+            optional: false
+        ))
+      }
+
+      void map(Configuration gradleConfig, String mavenScope) {
+        map(gradleConfig.name, mavenScope)
+      }
+
+      void mapOptional(String gradleConfigName, String mavenScope) {
+        map.put(gradleConfigName, new CustomConfigMapping(
+            gradleConfig: gradleConfigName,
+            mavenScope: mavenScope,
+            optional: true
+        ))
+      }
+
+      void mapOptional(Configuration gradleConfig, String mavenScope) {
+        mapOptional(gradleConfig.name, mavenScope)
+      }
+
+      static class CustomConfigMapping {
+        String gradleConfig
+        String mavenScope
+        boolean optional
+      }
+    }
+
     String description = null
     String url = null
 
     ScmExtension scm
     LicenseExtension license
     DeveloperExtension developer
+    DependencyConfigurationsExtension dependencyConfigurations
 
     final List<Closure> xmlClosures = new LinkedList<>()
 
@@ -59,10 +112,15 @@ class DeployablePluginExtension extends NestablePluginExtension {
       scm = new ScmExtension(this)
       license = new LicenseExtension(this)
       developer = new DeveloperExtension(this)
+      dependencyConfigurations = new DependencyConfigurationsExtension(this)
     }
 
     void withXml(Closure closure) {
       xmlClosures.add(closure)
+    }
+
+    DependencyConfigurationsExtension dependencyConfigurations(Closure closure) {
+      return dependencyConfigurations.applyClosure(closure)
     }
   }
 
