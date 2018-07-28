@@ -48,11 +48,11 @@ class DeployablePluginExtension extends NestablePluginExtension {
     String description = null
     String url = null
 
-    final List<Closure> xmlClosures = new LinkedList<>()
-
     ScmExtension scm
     LicenseExtension license
     DeveloperExtension developer
+
+    final List<Closure> xmlClosures = new LinkedList<>()
 
     PomExtension(NestablePluginExtension parent) {
       super(parent, "pom")
