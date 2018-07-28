@@ -151,10 +151,6 @@ class DeployablePluginExtension extends NestablePluginExtension {
     void amend(Closure closure) {
       additionalConfigurationClosures.add(closure)
     }
-
-    void clear() {
-      additionalConfigurationClosures.clear()
-    }
   }
 
 
