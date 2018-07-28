@@ -64,7 +64,6 @@ version = '${versionName}'
     def result = testProject.executeGradleTask("deploy")
 
     then:
-    println result.output
     result.task(":jar") == null
     result.task(":javadoc") == null
     result.task(":javadocJar") == null
