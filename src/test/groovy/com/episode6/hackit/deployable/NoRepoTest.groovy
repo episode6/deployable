@@ -53,4 +53,33 @@ version = '${versionName}'
     "com.norepo.release.override.example" | "releaselib"  | "0.0.2"
   }
 
+  def "test deploy project with no repo"(String groupId, String artifactId, String versionName) {
+    given:
+    testProject.rootProjectName = artifactId
+    testProject.rootGradlePropertiesFile << testProject.testProperties.inGradlePropertiesFormat
+    testProject.rootGradleBuildFile << simpleBuildFile(groupId, versionName)
+    testProject.createNonEmptyJavaFile("${groupId}.${artifactId}")
+
+    when:
+    def result = testProject.executeGradleTask("deploy")
+
+    then:
+    println result.output
+    result.task(":jar") == null
+    result.task(":javadoc") == null
+    result.task(":javadocJar") == null
+    result.task(":sourcesJar") == null
+    result.task(":validateDeployable") == null
+    result.task(":signMavenArtifactsPublication") == null
+    result.task(":publishMavenArtifactsPublicationToMavenRepository") == null
+    result.task(":install") == null
+    result.task(":publish").outcome == TaskOutcome.UP_TO_DATE
+    result.task(":deploy").outcome == TaskOutcome.UP_TO_DATE
+
+    where:
+    groupId                               | artifactId    | versionName
+    "com.norepo.snapshot.example"         | "snapshotlib" | "0.0.3-SNAPSHOT"
+    "com.norepo.release.override.example" | "releaselib"  | "0.0.2"
+  }
+
 }
