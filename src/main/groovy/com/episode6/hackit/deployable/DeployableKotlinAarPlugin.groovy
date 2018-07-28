@@ -33,11 +33,11 @@ class DeployableKotlinAarPlugin implements Plugin<Project> {
       from project.dokka
     }
 
-    project.deployable {
-      mainArtifact {
+    project.deployable.publication {
+      main {
         artifact project.bundleRelease
       }
-      publication {
+      amend {
         artifact project.javadocJar
       }
     }
@@ -57,7 +57,7 @@ class DeployableKotlinAarPlugin implements Plugin<Project> {
       }
 
       if (variant.name == "release") {
-        project.deployable.publication {
+        project.deployable.publication.amend {
           artifact sourcesJarTask
         }
       }

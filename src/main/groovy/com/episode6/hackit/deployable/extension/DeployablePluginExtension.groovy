@@ -135,16 +135,38 @@ class DeployablePluginExtension extends NestablePluginExtension {
     }
   }
 
-  Closure mainArtifact = {}
-  final List<Closure> publicationClosures = new LinkedList<>()
+  static class PublicationExtension extends NestablePluginExtension {
+
+    Closure main = {}
+    final List<Closure> additionalConfigurationClosures = new LinkedList<>()
+
+    PublicationExtension(NestablePluginExtension parent) {
+      super(parent, "publication")
+    }
+
+    void main(Closure closure) {
+      main = closure
+    }
+
+    void amend(Closure closure) {
+      additionalConfigurationClosures.add(closure)
+    }
+
+    void clear() {
+      additionalConfigurationClosures.clear()
+    }
+  }
+
 
   PomExtension pom
   NexusExtension nexus
+  PublicationExtension publication
 
   DeployablePluginExtension(Project project) {
     super(project, "deployable")
     pom = new PomExtension(this)
     nexus = new NexusExtension(this)
+    publication = new PublicationExtension(this)
   }
 
   PomExtension pom(Closure closure) {
@@ -155,8 +177,8 @@ class DeployablePluginExtension extends NestablePluginExtension {
     return nexus.applyClosure(closure)
   }
 
-  void publication(Closure closure) {
-    publicationClosures.add(closure)
+  PublicationExtension publication(Closure closure) {
+    return publication.applyClosure(closure)
   }
 
   @Override

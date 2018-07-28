@@ -14,7 +14,7 @@ class DeployableAarPlugin implements Plugin<Project> {
     DeployablePlugin deployablePlugin = project.plugins.apply(DeployablePlugin)
     deployablePlugin.pomPackaging = "aar"
 
-    project.deployable.mainArtifact {
+    project.deployable.publication.main {
       artifact project.bundleRelease
     }
 
@@ -48,7 +48,7 @@ class DeployableAarPlugin implements Plugin<Project> {
       }
 
       if (variant.name == "release") {
-        project.deployable.publication {
+        project.deployable.publication.amend {
           artifact javadocJarTask
           artifact sourcesJarTask
         }

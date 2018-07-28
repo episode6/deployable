@@ -147,7 +147,7 @@ plugins {
 group = '${groupId}'
 version = '${versionName}'
 
-deployable.mainArtifact {
+deployable.publication.main {
 }
 """
 

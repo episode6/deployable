@@ -2,7 +2,7 @@
 
 ### v0.2.0-SNAPSHOT - unreleased
 - Re-write plugin to use `maven-publish` instead of old `maven` plugin
-- **[BREAKING]** Customizing deployable artifacts has changed, we now use the `deployable.publication { artifact task }` and `deployable.mainArtifact { artifact task }` blocks
+- **[BREAKING]** Customizing deployable artifacts has changed, we now use the `deployable.publication.main { artifact mainOutputTask }` and `deployable.publication.amend { artifact additionalTask }` blocks
 - **[BREAKING]** Stop providing default values for repo urls. If no urls are specified, no repo will be set up.
 - **[BREAKING]** Moved `mavenDependencies {}` block to `deployable.pom.dependencyConfigurations {}`. Api remains mostly the same, but scope priorities are no longer used. We also added a `clear()` method.
 - Add config block to customize pom as xml (after deployable has done its initial setup) `deployable.pom.withXml { }`

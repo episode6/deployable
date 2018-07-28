@@ -78,10 +78,10 @@ class MavenConfigurator {
             }
           }
 
-          configureWithClosure(it, deployable.mainArtifact)
-          deployable.publicationClosures.each { closure ->
+          deployable.publication.additionalConfigurationClosures.each { closure ->
             configureWithClosure(it, closure)
           }
+          configureWithClosure(it, deployable.publication.main)
 
           pom.withXml {
             def rootPom = asNode()
