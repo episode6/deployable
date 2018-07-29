@@ -142,7 +142,7 @@ deployable {
 Finally, deploy using
 `./gradlew publish` or the new deploy alias `./gradlew deploy`
 
-Deployable also adds some basic support for maven's `provided` scope and `optional` flag via custom scopes...
+Deployable includes built-in mapping for dependencies declared in `api` and `implementation` configurations (into the dependency section of the maven pom output). We also add `mavenOptional`, `mavenProvided` and `mavenProvidedOptional` configurations which will also be mapped automatically.
 ```groovy
 dependencies {
     // api -> maven: 'compile'
@@ -162,7 +162,7 @@ dependencies {
 }
 ```
 
-To map dependencies of extra configurations to the maven pom use the `deployable.pom.dependencyConfigurations` block...
+To map dependencies of other configurations to the maven pom use the `deployable.pom.dependencyConfigurations` block...
 ```groovy
 configurations {
     someCompileConfig
@@ -171,20 +171,25 @@ configurations {
     someProvidedOptionalConfig
 }
 
-deployable.pom.dependencyConfigurations {
-    // map with configuration reference
-    map configurations.someCompileConfig, "compile"
+deployable {
+    pom {
+        dependencyConfigurations {
 
-    // map with configuration name (and ignore if it doesnt exist)
-    map "someProvidedConfig", "provided"
+            // clear all built-in mappings
+            clear()
 
-    // map optional configs using mapOptional
-    mapOptional configurations.someCompileOptionalConfig, "compile"
-    mapOptional "someProvidedOptionalConfig", "provided"
+            // remove a specific gradle configuration from being mapped to the maven pom
+            unmap "implementation"
 
-    // remove the mapping of a gradle configuration
-    unamp configurations.api
-    unmap "implementation"
+            // map configurations either by reference or just its name (if it might not exist)
+            map configurations.someCompileConfig, "compile"
+            map "someProvidedConfig", "provided"
+
+            // map optional configs using mapOptional
+            mapOptional configurations.someCompileOptionalConfig, "compile"
+            mapOptional "someProvidedOptionalConfig", "provided"
+        }
+    }
 }
 
 dependencies {
@@ -192,6 +197,24 @@ dependencies {
     someProvidedConfig 'com.example:provided-dep:1.0'
     someCompileOptionalConfig 'com.example:compile-optional-dep:1.0'
     someProvidedOptionalConfig 'com.example:provided-optional-dep:1.0'
+}
+```
+
+To modify or amend the actual publication or included artifacts (i.e. what jars will actually be signed and published), use the `deployable.publishing` block.
+```groovy
+deployable {
+    publishing {
+
+        // replace the main artifact published by this project
+        main {
+            artifact altJarTask
+        }
+
+        // add more artifacts or configuration to the publication
+        amend {
+            artifact extraDocsTask
+        }
+    }
 }
 ```
 
