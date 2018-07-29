@@ -1,23 +1,19 @@
 package com.episode6.hackit.deployable
 
 import com.episode6.hackit.deployable.extension.DeployablePluginExtension
-import org.gradle.api.GradleException
 import org.gradle.api.Project
-import org.gradle.api.artifacts.Configuration
-import org.gradle.api.artifacts.ModuleDependency
-import org.gradle.api.artifacts.ProjectDependency
 import org.gradle.api.publish.maven.MavenPublication
 
 /**
  **/
 class MavenConfigurator {
   Project project
+  DeployablePluginExtension deployable
 
-  private ConfigToScopeMapper mapper = new ConfigToScopeMapper()
   private MavenDependencyConfigurator dependencyConfigurator;
 
   void prepare() {
-    dependencyConfigurator = new MavenDependencyConfigurator(project: project)
+    dependencyConfigurator = new MavenDependencyConfigurator(project: project, deployable: deployable)
 
     project.configurations {
       mavenOptional
@@ -25,14 +21,16 @@ class MavenConfigurator {
       mavenProvidedOptional
     }
 
-    dependencyConfigurator.putConfigMapping("implementation", "runtime")
-    dependencyConfigurator.putConfigMapping("api", "compile")
-    dependencyConfigurator.putConfigMapping("mavenProvided", "provided")
-    dependencyConfigurator.putConfigMapping("mavenProvidedOptional", "provided", true)
-    dependencyConfigurator.putConfigMapping("mavenOptional", "runtime", true)
+    deployable.pom.dependencyConfigurations {
+      map "implementation", "runtime"
+      map "api", "compile"
+      map "mavenProvided", "provided"
+      mapOptional "mavenProvidedOptional", "provided"
+      mapOptional "mavenOptional", "runtime"
+    }
   }
 
-  void configure(DeployablePluginExtension deployable, String pomPackaging) {
+  void configure(String pomPackaging) {
     project.configurations {
       compileOnly {
         extendsFrom(mavenOptional,
@@ -41,45 +39,12 @@ class MavenConfigurator {
       }
     }
 
-    configurePom(deployable, pomPackaging)
-    configureRepositories(deployable)
+    configurePom(pomPackaging)
+    configureRepositories()
     configureSigning()
   }
 
-  void mapConfigs(Closure closure) {
-    closure.setDelegate(mapper)
-    closure.setResolveStrategy(Closure.DELEGATE_FIRST)
-    closure.call()
-  }
-
-  class ConfigToScopeMapper implements GroovyInterceptable {
-
-    void unmap(String gradleConfigName) {
-      dependencyConfigurator.removeConfigMapping(gradleConfigName)
-    }
-
-    void unmap(Configuration gradleConfig) {
-      dependencyConfigurator.removeConfigMapping(gradleConfig.name)
-    }
-
-    void map(String gradleConfigName, String mavenScope) {
-      dependencyConfigurator.putConfigMapping(gradleConfigName, mavenScope)
-    }
-
-    void mapOptional(String gradleConfigName, String mavenScope) {
-      dependencyConfigurator.putConfigMapping(gradleConfigName, mavenScope, true)
-    }
-
-    void map(Configuration gradleConfig, String mavenScope) {
-      map(gradleConfig.name, mavenScope)
-    }
-
-    void mapOptional(Configuration gradleConfig, String mavenScope) {
-      mapOptional(gradleConfig.name, mavenScope)
-    }
-  }
-
-  private void configurePom(DeployablePluginExtension deployable, String pomPackaging) {
+  private void configurePom(String pomPackaging) {
 
     project.publishing {
       publications {
@@ -113,19 +78,24 @@ class MavenConfigurator {
             }
           }
 
-          configurePublicationArtifacts(it, deployable)
+          configureWithClosure(it, deployable.publication.main)
+          deployable.publication.additionalConfigurationClosures.each { closure ->
+            configureWithClosure(it, closure)
+          }
 
           pom.withXml {
             def rootPom = asNode()
             dependencyConfigurator.configureDependencies(rootPom)
-            configurePublicationPomXml(rootPom, deployable)
+            deployable.pom.xmlClosures.each { closure ->
+              configureWithClosure(rootPom, closure)
+            }
           }
         }
       }
     }
   }
 
-  private void configureRepositories(DeployablePluginExtension deployable) {
+  private void configureRepositories() {
     def repoUrl = getRepoUrl(deployable)
 
     if (!repoUrl) {
@@ -169,19 +139,9 @@ class MavenConfigurator {
     }
   }
 
-  private static void configurePublicationArtifacts(MavenPublication publication, DeployablePluginExtension deployable) {
-    deployable.publicationClosures.each { closure ->
-      closure.setDelegate(publication)
-      closure.setResolveStrategy(Closure.DELEGATE_FIRST)
-      closure.call()
-    }
-  }
-
-  private static void configurePublicationPomXml(Node rootPom, DeployablePluginExtension deployable) {
-    deployable.pomXmlClosures.each { closure ->
-      closure.setDelegate(rootPom)
-      closure.setResolveStrategy(Closure.DELEGATE_FIRST)
-      closure.call()
-    }
+  private static void configureWithClosure(Object delegate, Closure closure) {
+    closure.setDelegate(delegate)
+    closure.setResolveStrategy(Closure.DELEGATE_FIRST)
+    closure.call()
   }
 }

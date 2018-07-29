@@ -337,7 +337,7 @@ dependencies {
   implementation 'com.episode6.hackit.chop:chop-core:0.1.8'
 }
 
-mavenDependencies {
+deployable.pom.dependencyConfigurations {
   unmap "implementation"
 }
 """
@@ -375,7 +375,7 @@ dependencies {
   mavenOptional 'com.episode6.hackit.chop:chop-core:0.1.8'
 }
 
-mavenDependencies {
+deployable.pom.dependencyConfigurations {
   unmap "mavenOptional"
 }
 """
@@ -418,7 +418,7 @@ dependencies {
   implementation 'com.episode6.hackit.chop:chop-core:0.1.8'
 }
 
-mavenDependencies {
+deployable.pom.dependencyConfigurations {
   map configurations.implementation, "provided"
 }
 """
@@ -466,7 +466,7 @@ dependencies {
   mavenProvided 'com.episode6.hackit.chop:chop-core:0.1.8'
 }
 
-mavenDependencies {
+deployable.pom.dependencyConfigurations {
   map "mavenProvided", "compile"
 }
 """

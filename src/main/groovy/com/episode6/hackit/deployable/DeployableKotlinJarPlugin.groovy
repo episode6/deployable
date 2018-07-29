@@ -35,9 +35,13 @@ class DeployableKotlinJarPlugin implements Plugin<Project> {
     }
 
     project.deployable.publication {
-      artifact project.jar
-      artifact project.javadocJar
-      artifact project.sourcesJar
+      main {
+        artifact project.jar
+      }
+      amend {
+        artifact project.javadocJar
+        artifact project.sourcesJar
+      }
     }
   }
 }

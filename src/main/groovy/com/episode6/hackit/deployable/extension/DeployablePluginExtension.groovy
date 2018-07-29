@@ -2,7 +2,7 @@ package com.episode6.hackit.deployable.extension
 
 import com.episode6.hackit.nestable.NestablePluginExtension
 import org.gradle.api.Project
-import org.gradle.api.publish.maven.MavenPublication
+import org.gradle.api.artifacts.Configuration
 
 /**
  * Deployable plugin extension. Stores/retreives info that is used
@@ -46,18 +46,81 @@ class DeployablePluginExtension extends NestablePluginExtension {
       }
     }
 
+    static class DependencyConfigurationsExtension extends NestablePluginExtension {
+
+      final Map<String, CustomConfigMapping> map = new HashMap<>()
+
+      DependencyConfigurationsExtension(NestablePluginExtension parent) {
+        super(parent, "dependencyConfigurations")
+      }
+
+      void clear() {
+        map.clear()
+      }
+
+      void unmap(String gradleConfigName) {
+        map.remove(gradleConfigName)
+      }
+
+      void unmap(Configuration gradleConfig) {
+        unmap(gradleConfig.name)
+      }
+
+      void map(String gradleConfigName, String mavenScope) {
+        map.put(gradleConfigName, new CustomConfigMapping(
+            gradleConfig: gradleConfigName,
+            mavenScope: mavenScope,
+            optional: false
+        ))
+      }
+
+      void map(Configuration gradleConfig, String mavenScope) {
+        map(gradleConfig.name, mavenScope)
+      }
+
+      void mapOptional(String gradleConfigName, String mavenScope) {
+        map.put(gradleConfigName, new CustomConfigMapping(
+            gradleConfig: gradleConfigName,
+            mavenScope: mavenScope,
+            optional: true
+        ))
+      }
+
+      void mapOptional(Configuration gradleConfig, String mavenScope) {
+        mapOptional(gradleConfig.name, mavenScope)
+      }
+
+      static class CustomConfigMapping {
+        String gradleConfig
+        String mavenScope
+        boolean optional
+      }
+    }
+
     String description = null
     String url = null
 
     ScmExtension scm
     LicenseExtension license
     DeveloperExtension developer
+    DependencyConfigurationsExtension dependencyConfigurations
+
+    final List<Closure> xmlClosures = new LinkedList<>()
 
     PomExtension(NestablePluginExtension parent) {
       super(parent, "pom")
       scm = new ScmExtension(this)
       license = new LicenseExtension(this)
       developer = new DeveloperExtension(this)
+      dependencyConfigurations = new DependencyConfigurationsExtension(this)
+    }
+
+    void withXml(Closure closure) {
+      xmlClosures.add(closure)
+    }
+
+    DependencyConfigurationsExtension dependencyConfigurations(Closure closure) {
+      return dependencyConfigurations.applyClosure(closure)
     }
   }
 
@@ -72,17 +135,34 @@ class DeployablePluginExtension extends NestablePluginExtension {
     }
   }
 
+  static class PublicationExtension extends NestablePluginExtension {
+
+    Closure main = {}
+    final List<Closure> additionalConfigurationClosures = new LinkedList<>()
+
+    PublicationExtension(NestablePluginExtension parent) {
+      super(parent, "publication")
+    }
+
+    void main(Closure closure) {
+      main = closure
+    }
+
+    void amend(Closure closure) {
+      additionalConfigurationClosures.add(closure)
+    }
+  }
+
+
   PomExtension pom
   NexusExtension nexus
-  List<Closure> publicationClosures
-  List<Closure> pomXmlClosures
+  PublicationExtension publication
 
   DeployablePluginExtension(Project project) {
     super(project, "deployable")
     pom = new PomExtension(this)
     nexus = new NexusExtension(this)
-    publicationClosures = new LinkedList<>()
-    pomXmlClosures = new LinkedList<>()
+    publication = new PublicationExtension(this)
   }
 
   PomExtension pom(Closure closure) {
@@ -93,12 +173,8 @@ class DeployablePluginExtension extends NestablePluginExtension {
     return nexus.applyClosure(closure)
   }
 
-  void publication(Closure closure) {
-    publicationClosures.add(closure)
-  }
-
-  void withPomXml(Closure closure) {
-    pomXmlClosures.add(closure)
+  PublicationExtension publication(Closure closure) {
+    return publication.applyClosure(closure)
   }
 
   @Override

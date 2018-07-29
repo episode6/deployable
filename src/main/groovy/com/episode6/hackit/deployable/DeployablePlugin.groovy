@@ -5,7 +5,6 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.publish.maven.plugins.MavenPublishPlugin
 import org.gradle.plugins.signing.SigningPlugin
-import org.gradle.api.publish.maven.tasks.PublishToMavenRepository
 
 /**
  * Base deployable plugin. It is not referenced directly in gradle, but applied by either the jar or aar plugin
@@ -24,17 +23,13 @@ class DeployablePlugin implements Plugin<Project> {
     project.plugins.apply(MavenPublishPlugin)
     project.plugins.apply(SigningPlugin)
 
-    mavenConfig = new MavenConfigurator(project: project)
-    mavenConfig.prepare()
-
-    project.ext.mavenDependencies = { Closure closure ->
-      mavenConfig.mapConfigs(closure)
-    }
-
     DeployablePluginExtension deployable = project.extensions.create(
         "deployable",
         DeployablePluginExtension,
         project)
+
+    mavenConfig = new MavenConfigurator(project: project, deployable: deployable)
+    mavenConfig.prepare()
 
     project.task("validateDeployable", type: DeployableValidationTask) {
       description = "Validates this project's deployable properties to ensure it can generate a valid pom."
@@ -54,7 +49,7 @@ class DeployablePlugin implements Plugin<Project> {
     }
 
     project.afterEvaluate {
-      mavenConfig.configure(deployable, pomPackaging)
+      mavenConfig.configure(pomPackaging)
       // TODO fix tasks
       project.tasks.findByPath("publishMavenArtifactsPublicationToMavenRepository")?.dependsOn project.validateDeployable
       project.tasks.findByPath("publishMavenArtifactsPublicationToMavenLocal")?.dependsOn project.validateDeployable

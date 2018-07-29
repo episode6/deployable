@@ -34,8 +34,12 @@ class DeployableKotlinAarPlugin implements Plugin<Project> {
     }
 
     project.deployable.publication {
-      artifact project.bundleRelease
-      artifact project.javadocJar
+      main {
+        artifact project.bundleRelease
+      }
+      amend {
+        artifact project.javadocJar
+      }
     }
 
     project.android.libraryVariants.all { variant ->
@@ -53,7 +57,7 @@ class DeployableKotlinAarPlugin implements Plugin<Project> {
       }
 
       if (variant.name == "release") {
-        project.deployable.publication {
+        project.deployable.publication.amend {
           artifact sourcesJarTask
         }
       }
