@@ -2,7 +2,7 @@ Deployable for Gradle
 =====================
 Gradle plugins to ease the pain of deploying jars and aars to maven repositories.
 
-## Usage
+## Setup
 Add Deployable to the classpath in your root `build.gradle`
 ```groovy
 buildscript {
@@ -42,6 +42,7 @@ apply plugin: 'com.episode6.hackit.deployable.kt.jar'
 apply plugin: 'com.episode6.hackit.deployable.kt.aar'
 ```
 
+#### Kotlin Setup
 If you need kotlin support, you must also include dokka on your buildscript classpath (for javadoc support) and use one of the `kt` plugins instead
 ```groovy
 // deployable JAR with Kotlin support
@@ -81,12 +82,14 @@ apply plugin: 'kotlin-android'
 apply plugin: 'com.episode6.hackit.deployable.kt.aar'
 ```
 
+#### Groovy Setup
 If this is a groovy project you'll want to pair the deployable.jar plugin with the groovydocs addon
 ```groovy
 apply plugin: 'com.episode6.hackit.deployable.jar'
 apply plugin: 'com.episode6.hackit.deployable.addon.groovydocs'
 ```
 
+#### gradle.properties setup
 Add the common pom elements to your root `gradle.properties`
 ```
 deployable.pom.description=Gradle plugins to ease the pain of creating deployable jars and aars
@@ -113,7 +116,9 @@ signing.keyId=<keyId>
 signing.password=<keyPassword>
 signing.secretKeyRingFile=<pathToKeyringFile>
 ```
+**WARNING**: DON'T PUT PASSWORDS IN YOUR REPO! The above file belongs in your home directory at `~/.gradle/gradle.properties`
 
+#### build.gradle setup
 Most of deployable's properties can alternatively be set or overridden directly in your `build.gradle`
 ```groovy
 apply plugin: 'java-library'
@@ -147,9 +152,11 @@ deployable {
 }
 ```
 
+#### Deploy
 Finally, deploy using
 `./gradlew publish` or the new deploy alias `./gradlew deploy`
 
+#### Default Dependency Mapping
 Deployable includes built-in mapping for dependencies declared in `api` and `implementation` configurations (into the dependency section of the maven pom output). We also add `mavenOptional`, `mavenProvided` and `mavenProvidedOptional` configurations which will also be mapped automatically.
 ```groovy
 dependencies {
@@ -170,6 +177,7 @@ dependencies {
 }
 ```
 
+#### Customize Dependencies
 To map dependencies of other configurations to the maven pom use the `deployable.pom.dependencyConfigurations` block...
 ```groovy
 configurations {
@@ -208,6 +216,7 @@ dependencies {
 }
 ```
 
+#### Customize Published Artifacts
 To modify or amend the actual publication or included artifacts (i.e. what jars will actually be signed and published), use the `deployable.publishing` block.
 ```groovy
 deployable {
