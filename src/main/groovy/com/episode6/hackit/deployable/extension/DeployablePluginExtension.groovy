@@ -3,6 +3,7 @@ package com.episode6.hackit.deployable.extension
 import com.episode6.hackit.nestable.NestablePluginExtension
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
+import org.gradle.api.publish.maven.MavenPublication
 
 /**
  * Deployable plugin extension. Stores/retreives info that is used
@@ -144,12 +145,18 @@ class DeployablePluginExtension extends NestablePluginExtension {
       super(parent, "publication")
     }
 
-    void main(Closure closure) {
+    MavenPublication main(Closure closure) {
       main = closure
+      // method return type fools IntelliJ into figuring out the right delegate for this closure,
+      // but we generate the publication and call the closure lazily, so we can't actually return it here
+      return null
     }
 
-    void amend(Closure closure) {
+    MavenPublication amend(Closure closure) {
       additionalConfigurationClosures.add(closure)
+      // method return type fools IntelliJ into figuring out the right delegate for this closure,
+      // but we generate the publication and call the closure lazily, so we can't actually return it here
+      return null
     }
   }
 
