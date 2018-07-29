@@ -1,9 +1,11 @@
 package com.episode6.hackit.deployable
 
 import com.episode6.hackit.deployable.extension.DeployablePluginExtension
-import org.gradle.api.GradleException
 import org.gradle.api.Project
-import org.gradle.api.artifacts.*
+import org.gradle.api.artifacts.Configuration
+import org.gradle.api.artifacts.ModuleDependency
+import org.gradle.api.artifacts.ProjectDependency
+import org.gradle.api.artifacts.ResolvedDependency
 
 class MavenDependencyConfigurator {
 
@@ -20,7 +22,7 @@ class MavenDependencyConfigurator {
         return
       }
 
-      eachDependency(config) { ModuleDependency unresolvedDep, DepId depId ->
+      eachDependency(config) { DepId depId ->
         def depNode = depsNode.appendNode('dependency')
         depNode.appendNode('groupId', depId.group)
         depNode.appendNode('artifactId', depId.name)
@@ -29,9 +31,9 @@ class MavenDependencyConfigurator {
         if (mappedConfig.optional) {
           depNode.appendNode('optional', true)
         }
-        if (!unresolvedDep.excludeRules.isEmpty()) {
+        if (!depId.unresolved.excludeRules.isEmpty()) {
           def exclusionsNode = depNode.appendNode('exclusions')
-          unresolvedDep.excludeRules.each { exRule ->
+          depId.unresolved.excludeRules.each { exRule ->
             def exNode = exclusionsNode.appendNode('exclusion')
             exNode.appendNode('groupId', exclusionValue(exRule.group))
             exNode.appendNode('artifactId', exclusionValue(exRule.module))
@@ -49,10 +51,12 @@ class MavenDependencyConfigurator {
     def unresolvedDeps = config.dependencies
     def resolvedDeps = getResolvedDeps(config)
 
-    unresolvedDeps.findAll { it instanceof ModuleDependency }.collect { (ModuleDependency) it }.each { unresolvedDep ->
-      def resolvedDep = resolvedDeps.find { unresolvedDep.group == it.moduleGroup && unresolvedDep.name == it.moduleName }
-      def depId = getDepId(unresolvedDep, resolvedDep)
-      mapper.map(unresolvedDep, depId)
+    unresolvedDeps.findAll { it instanceof ModuleDependency }.collect {
+      ModuleDependency unresolvedDep = (ModuleDependency) it
+      ResolvedDependency resolvedDep = resolvedDeps.find { unresolvedDep.group == it.moduleGroup && unresolvedDep.name == it.moduleName }
+      return getDepId(unresolvedDep, resolvedDep)
+    }.findAll { it != null }.each {
+      mapper.map(it)
     }
   }
 
@@ -71,24 +75,26 @@ class MavenDependencyConfigurator {
     }
   }
 
-  private static DepId getDepId(Dependency unresolvedDep, ResolvedDependency resolvedDep) {
+  private static DepId getDepId(ModuleDependency unresolvedDep, ResolvedDependency resolvedDep) {
     if (unresolvedDep instanceof ProjectDependency) {
       Project depProj = unresolvedDep.getDependencyProject()
-      return new DepId(group: depProj.group, name: depProj.name, version: depProj.version)
+      return new DepId(group: depProj.group, name: depProj.name, version: depProj.version, unresolved: unresolvedDep)
     } else if (resolvedDep != null) {
-      return new DepId(group: resolvedDep.moduleGroup, name: resolvedDep.moduleName, version: resolvedDep.moduleVersion)
-    } else {
-      throw new GradleException("Couldn't figure out dependency: ${unresolvedDep}")
+      return new DepId(group: resolvedDep.moduleGroup, name: resolvedDep.moduleName, version: resolvedDep.moduleVersion, unresolved: unresolvedDep)
     }
+
+    println "Warning: Deployable skipped mapping dependency: ${unresolvedDep}"
+    return null
   }
 
   private static class DepId {
+    ModuleDependency unresolved
     String group
     String name
     String version
   }
 
   private interface DepToXmlMapper {
-    void map(Dependency unresolvedDep, DepId depId)
+    void map(DepId depId)
   }
 }
