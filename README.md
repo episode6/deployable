@@ -235,6 +235,18 @@ deployable {
 }
 ```
 
+#### Customize POM as XML
+If you need to make some additional changes to the pom xml output at the last-mile, use the `deployable.pom.withXml {}` block
+```groovy
+deployable {
+    pom {
+        withXml {
+            appendNode("someNewNode")
+        }
+    }
+}
+```
+
 ### Why does it exist?
 This was my first gradle plugin and groovy project so it is still rough around a few edges. The main goal here was to abstract away as much of the boilerplate of publishing a maven-deployable library as possible, and make it quick and painless to create and deploy new open-source libraries. Having an abstraction-layer on top of 3rd party tools also grants the flexibility to adapt and should enable future support for more types of repos without requiring changes to individual project configuration.
 
