@@ -227,7 +227,7 @@ deployable {
 ```
 
 ### Why does it exist?
-This is my first gradle plugin and groovy project so it may be rough around the edges. There are probably better tools out there for your open source libraries, but this will be building block for upcoming episode6 open source projects.
+This was my first gradle plugin and groovy project so it is still rough around a few edges. The main goal here was to abstract away as much of the boilerplate of publishing a maven-deployable library as possible, and make it quick and painless to create and deploy new open-source libraries. Having an abstraction-layer on top of 3rd party tools also grants the flexibility to adapt and should enable future support for more types of repos without requiring changes to individual project configuration.
 
 ### License
 MIT: https://github.com/episode6/deployable/blob/master/LICENSE
