@@ -1,5 +1,7 @@
 # Deployable ChangeLog
 
+### v0.2.1-SNAPSHOT - unreleased
+
 ### v0.2.0-SNAPSHOT - unreleased
 - Re-write plugin to use `maven-publish` instead of old `maven` plugin
 - **[BREAKING]** Customizing deployable artifacts (formerly via maven's `archives {}` block has changed, we now use the `deployable.publication.main { artifact mainOutputTask }` and `deployable.publication.amend { artifact additionalTask }` blocks. See [README for more info](README.md#customize-published-artifacts)
