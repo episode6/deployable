@@ -30,8 +30,16 @@ In each deployable sub-module apply one of the plugins to `build.gradle`
 // to deploy a JAR
 apply plugin: 'com.episode6.hackit.deployable.jar'
 
-// to deploy an AAR
+// to deploy an Android AAR
 apply plugin: 'com.episode6.hackit.deployable.aar'
+
+// to deploy a JAR with kotlin support
+// (requires org.jetbrains.dokka:dokka-gradle-plugin on the classpath)
+apply plugin: 'com.episode6.hackit.deployable.kt.jar'
+
+// to deploy an Android AAR with kotlin support
+// (requires org.jetbrains.dokka:dokka-android-gradle-plugin on the classpath)
+apply plugin: 'com.episode6.hackit.deployable.kt.aar'
 ```
 
 If you need kotlin support, you must also include dokka on your buildscript classpath (for javadoc support) and use one of the `kt` plugins instead
@@ -42,9 +50,6 @@ buildscript {
   repositories { jcenter() }
   dependencies {
     classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
-
-    // deployable's kt plugin applies the dokka plugin, so it must be
-    // included on the buildscript classpath
     classpath "com.episode6.hackit.deployable:deployable:$deployableVersion"
     classpath "org.jetbrains.dokka:dokka-gradle-plugin:$dokkaVersion"
   }
@@ -59,7 +64,10 @@ Similarly for a kotlin-android library...
 // deployable AAR with Kotlin support
 
 buildscript {
-  repositories { jcenter() }
+  repositories {
+    jcenter()
+    google()
+  }
   dependencies {
     classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
     classpath "com.android.tools.build:gradle:$androidGradlePluginVersion"
