@@ -1,7 +1,6 @@
 package com.episode6.hackit.deployable
 
 import com.episode6.hackit.deployable.extension.DeployablePluginExtension
-import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.ModuleDependency
@@ -56,7 +55,7 @@ class MavenDependencyConfigurator {
       ModuleDependency unresolvedDep = (ModuleDependency) it
       ResolvedDependency resolvedDep = resolvedDeps.find { unresolvedDep.group == it.moduleGroup && unresolvedDep.name == it.moduleName }
       return getDepId(unresolvedDep, resolvedDep)
-    }.each {
+    }.findAll { it != null }.each {
       mapper.map(it)
     }
   }
@@ -82,9 +81,10 @@ class MavenDependencyConfigurator {
       return new DepId(group: depProj.group, name: depProj.name, version: depProj.version, unresolved: unresolvedDep)
     } else if (resolvedDep != null) {
       return new DepId(group: resolvedDep.moduleGroup, name: resolvedDep.moduleName, version: resolvedDep.moduleVersion, unresolved: unresolvedDep)
-    } else {
-      throw new GradleException("Couldn't figure out dependency: ${unresolvedDep}")
     }
+
+    println "Warning: Deployable skipped mapping dependency: ${unresolvedDep}"
+    return null
   }
 
   private static class DepId {
