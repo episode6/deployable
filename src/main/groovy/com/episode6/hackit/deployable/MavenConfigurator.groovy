@@ -33,7 +33,8 @@ class MavenConfigurator {
   void configure(String pomPackaging) {
     project.configurations {
       compileOnly {
-        extendsFrom(mavenOptional,
+        extendsFrom(
+            mavenOptional,
             mavenProvided,
             mavenProvidedOptional)
       }
