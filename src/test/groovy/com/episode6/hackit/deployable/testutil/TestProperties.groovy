@@ -39,11 +39,6 @@ class TestProperties {
           name "DeveloperName"
         }
       }
-
-      nexus {
-        username "nexusUsername"
-        password "nexusPassword"
-      }
     }
   }
 
@@ -52,11 +47,11 @@ class TestProperties {
   }
 
   void setReleaseRepo(File releaseMavenRepoFile) {
-    deployable.nexus.releaseRepoUrl = "file://localhost${releaseMavenRepoFile.absolutePath}"
+    deployable.nexus.releaseRepoUrl = "file://${releaseMavenRepoFile.absolutePath}"
   }
 
   void setSnapshotRepo(File snapshotMavenRepoFile) {
-    deployable.nexus.snapshotRepoUrl = "file://localhost${snapshotMavenRepoFile.absolutePath}"
+    deployable.nexus.snapshotRepoUrl = "file://${snapshotMavenRepoFile.absolutePath}"
   }
 
   String getInGradlePropertiesFormat() {

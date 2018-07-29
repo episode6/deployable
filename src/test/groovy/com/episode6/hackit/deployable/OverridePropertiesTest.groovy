@@ -114,13 +114,49 @@ deployable {
     result.task(":javadocJar").outcome == TaskOutcome.SUCCESS
     result.task(":sourcesJar").outcome == TaskOutcome.SUCCESS
     result.task(":validateDeployable").outcome == TaskOutcome.SUCCESS
-    result.task(":signArchives").outcome == TaskOutcome.SUCCESS
-    result.task(":uploadArchives").outcome == TaskOutcome.SUCCESS
+    result.task(":signMavenArtifactsPublication").outcome == TaskOutcome.SUCCESS
+    result.task(":publishMavenArtifactsPublicationToMavenRepository").outcome == TaskOutcome.SUCCESS
     result.task(":deploy").outcome == TaskOutcome.SUCCESS
     result.task(":install") == null
     // check one of the properties to make sure it was overridden, let mavenOutputVerifier handle the rest
     mavenOutputVerifier.getArtifactFile("pom").asXml().licenses.license.name.text() == "The MIT OVERRIDE License (MIT)"
     mavenOutputVerifier.verifyStandardOutput()
+
+    where:
+    groupId                          | artifactId    | versionName
+    "com.snapshot.override.example"  | "snapshotlib" | "0.0.1-SNAPSHOT"
+    "com.release.override.example"   | "releaselib"  | "0.0.2"
+  }
+
+  def "test override main artifact"(String groupId, String artifactId, String versionName) {
+    given:
+    testProject.rootProjectName = artifactId
+    testProject.createNonEmptyJavaFile("${groupId}.${artifactId}")
+    MavenOutputVerifier mavenOutputVerifier = new MavenOutputVerifier(
+        groupId: groupId,
+        artifactId: artifactId,
+        versionName: versionName,
+        testProject: testProject)
+    testProject.rootGradlePropertiesFile << testProject.testProperties.inGradlePropertiesFormat
+    testProject.rootGradleBuildFile << """
+plugins {
+ id 'java'
+ id 'com.episode6.hackit.deployable.jar'
+}
+
+group = '${groupId}'
+version = '${versionName}'
+
+deployable.publication.main {
+}
+"""
+
+    when:
+    def result = testProject.executeGradleTask("deploy")
+
+    then:
+    result.task(":deploy").outcome == TaskOutcome.SUCCESS
+    mavenOutputVerifier.verifyStandardOutputSkipMainArtifact()
 
     where:
     groupId                          | artifactId    | versionName

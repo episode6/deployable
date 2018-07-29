@@ -23,10 +23,14 @@ class DeployableJarPlugin implements Plugin<Project> {
       classifier = 'sources'
     }
 
-    project.artifacts {
-      archives project.jar
-      archives project.javadocJar
-      archives project.sourcesJar
+    project.deployable.publication {
+      main {
+        artifact project.jar
+      }
+      amend {
+        artifact project.javadocJar
+        artifact project.sourcesJar
+      }
     }
   }
 }

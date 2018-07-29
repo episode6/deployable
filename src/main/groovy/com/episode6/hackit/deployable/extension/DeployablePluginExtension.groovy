@@ -2,6 +2,8 @@ package com.episode6.hackit.deployable.extension
 
 import com.episode6.hackit.nestable.NestablePluginExtension
 import org.gradle.api.Project
+import org.gradle.api.artifacts.Configuration
+import org.gradle.api.publish.maven.MavenPublication
 
 /**
  * Deployable plugin extension. Stores/retreives info that is used
@@ -10,7 +12,9 @@ import org.gradle.api.Project
 class DeployablePluginExtension extends NestablePluginExtension {
   private static final String[] OPTIONAL_PROPERTIES = [
       "deployable.nexus.username",
-      "deployable.nexus.password"]
+      "deployable.nexus.password",
+      "deployable.nexus.releaseRepoUrl",
+      "deployable.nexus.snapshotRepoUrl"]
 
   static class PomExtension extends NestablePluginExtension {
 
@@ -43,18 +47,81 @@ class DeployablePluginExtension extends NestablePluginExtension {
       }
     }
 
+    static class DependencyConfigurationsExtension extends NestablePluginExtension {
+
+      final Map<String, CustomConfigMapping> map = new HashMap<>()
+
+      DependencyConfigurationsExtension(NestablePluginExtension parent) {
+        super(parent, "dependencyConfigurations")
+      }
+
+      void clear() {
+        map.clear()
+      }
+
+      void unmap(String gradleConfigName) {
+        map.remove(gradleConfigName)
+      }
+
+      void unmap(Configuration gradleConfig) {
+        unmap(gradleConfig.name)
+      }
+
+      void map(String gradleConfigName, String mavenScope) {
+        map.put(gradleConfigName, new CustomConfigMapping(
+            gradleConfig: gradleConfigName,
+            mavenScope: mavenScope,
+            optional: false
+        ))
+      }
+
+      void map(Configuration gradleConfig, String mavenScope) {
+        map(gradleConfig.name, mavenScope)
+      }
+
+      void mapOptional(String gradleConfigName, String mavenScope) {
+        map.put(gradleConfigName, new CustomConfigMapping(
+            gradleConfig: gradleConfigName,
+            mavenScope: mavenScope,
+            optional: true
+        ))
+      }
+
+      void mapOptional(Configuration gradleConfig, String mavenScope) {
+        mapOptional(gradleConfig.name, mavenScope)
+      }
+
+      static class CustomConfigMapping {
+        String gradleConfig
+        String mavenScope
+        boolean optional
+      }
+    }
+
     String description = null
     String url = null
 
     ScmExtension scm
     LicenseExtension license
     DeveloperExtension developer
+    DependencyConfigurationsExtension dependencyConfigurations
+
+    final List<Closure> xmlClosures = new LinkedList<>()
 
     PomExtension(NestablePluginExtension parent) {
       super(parent, "pom")
       scm = new ScmExtension(this)
       license = new LicenseExtension(this)
       developer = new DeveloperExtension(this)
+      dependencyConfigurations = new DependencyConfigurationsExtension(this)
+    }
+
+    void withXml(Closure closure) {
+      xmlClosures.add(closure)
+    }
+
+    DependencyConfigurationsExtension dependencyConfigurations(Closure closure) {
+      return dependencyConfigurations.applyClosure(closure)
     }
   }
 
@@ -67,37 +134,42 @@ class DeployablePluginExtension extends NestablePluginExtension {
     NexusExtension(NestablePluginExtension parent) {
       super(parent, "nexus")
     }
+  }
 
-    String getReleaseRepoUrl() {
-      if (releaseRepoUrl != null) {
-        return releaseRepoUrl
-      }
+  static class PublicationExtension extends NestablePluginExtension {
 
-      String fromProperties = getOptionalProjectProperty("releaseRepoUrl")
-      return fromProperties == null ?
-          "https://oss.sonatype.org/service/local/staging/deploy/maven2/" :
-          fromProperties
+    Closure main = {}
+    final List<Closure> additionalConfigurationClosures = new LinkedList<>()
+
+    PublicationExtension(NestablePluginExtension parent) {
+      super(parent, "publication")
     }
 
-    String getSnapshotRepoUrl() {
-      if (snapshotRepoUrl != null) {
-        return snapshotRepoUrl
-      }
+    MavenPublication main(Closure closure) {
+      main = closure
+      // method return type fools IntelliJ into figuring out the right delegate for this closure,
+      // but we generate the publication and call the closure lazily, so we can't actually return it here
+      return null
+    }
 
-      String fromProperties = getOptionalProjectProperty("snapshotRepoUrl")
-      return fromProperties == null ?
-          "https://oss.sonatype.org/content/repositories/snapshots/" :
-          fromProperties
+    MavenPublication amend(Closure closure) {
+      additionalConfigurationClosures.add(closure)
+      // method return type fools IntelliJ into figuring out the right delegate for this closure,
+      // but we generate the publication and call the closure lazily, so we can't actually return it here
+      return null
     }
   }
 
+
   PomExtension pom
   NexusExtension nexus
+  PublicationExtension publication
 
   DeployablePluginExtension(Project project) {
     super(project, "deployable")
     pom = new PomExtension(this)
     nexus = new NexusExtension(this)
+    publication = new PublicationExtension(this)
   }
 
   PomExtension pom(Closure closure) {
@@ -106,6 +178,10 @@ class DeployablePluginExtension extends NestablePluginExtension {
 
   NexusExtension nexus(Closure closure) {
     return nexus.applyClosure(closure)
+  }
+
+  PublicationExtension publication(Closure closure) {
+    return publication.applyClosure(closure)
   }
 
   @Override

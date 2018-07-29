@@ -31,21 +31,11 @@ import com.episode6.hackit.chop.Chop;
 
   private static String simpleBuildFile(String groupId, String versionName) {
     return """
-buildscript {
-  repositories {
-    jcenter()
-    google()
-  }
-  dependencies {
-    classpath '${MyDependencyMap.lookupDep("com.android.tools.build:gradle")}'
-  }
-}
 
 plugins {
- id 'com.episode6.hackit.deployable.aar'
+ id 'com.android.library' 
+ id 'com.episode6.hackit.deployable.aar' 
 }
-
-apply plugin: 'com.android.library'
 
 group = '${groupId}'
 version = '${versionName}'
@@ -84,8 +74,8 @@ android {
     result.task(":androidReleaseJavadocsJar").outcome == TaskOutcome.SUCCESS
     result.task(":androidReleaseSourcesJar").outcome == TaskOutcome.SUCCESS
     result.task(":validateDeployable").outcome == TaskOutcome.SUCCESS
-    result.task(":signArchives").outcome == TaskOutcome.SUCCESS
-    result.task(":uploadArchives").outcome == TaskOutcome.SUCCESS
+    result.task(":signMavenArtifactsPublication").outcome == TaskOutcome.SUCCESS
+    result.task(":publishMavenArtifactsPublicationToMavenRepository").outcome == TaskOutcome.SUCCESS
     result.task(":deploy").outcome == TaskOutcome.SUCCESS
     mavenOutputVerifier.verifyStandardOutput("aar")
 
@@ -118,7 +108,7 @@ dependencies {
     def result = testProject.executeGradleTask("deploy", "--stacktrace")
 
     then:
-    result.task(":uploadArchives").outcome == TaskOutcome.SUCCESS
+    result.task(":publishMavenArtifactsPublicationToMavenRepository").outcome == TaskOutcome.SUCCESS
     result.task(":deploy").outcome == TaskOutcome.SUCCESS
     mavenOutputVerifier.verifyStandardOutput("aar")
     mavenOutputVerifier.verifyPomDependency(
@@ -154,7 +144,7 @@ dependencies {
     def result = testProject.executeGradleTask("deploy")
 
     then:
-    result.task(":uploadArchives").outcome == TaskOutcome.SUCCESS
+    result.task(":publishMavenArtifactsPublicationToMavenRepository").outcome == TaskOutcome.SUCCESS
     result.task(":deploy").outcome == TaskOutcome.SUCCESS
     mavenOutputVerifier.verifyStandardOutput("aar")
     mavenOutputVerifier.verifyPomDependency(
@@ -190,7 +180,7 @@ dependencies {
     def result = testProject.executeGradleTask("deploy")
 
     then:
-    result.task(":uploadArchives").outcome == TaskOutcome.SUCCESS
+    result.task(":publishMavenArtifactsPublicationToMavenRepository").outcome == TaskOutcome.SUCCESS
     result.task(":deploy").outcome == TaskOutcome.SUCCESS
     mavenOutputVerifier.verifyStandardOutput("aar")
     mavenOutputVerifier.verifyPomDependency(
@@ -227,7 +217,7 @@ dependencies {
     def result = testProject.executeGradleTask("deploy")
 
     then:
-    result.task(":uploadArchives").outcome == TaskOutcome.SUCCESS
+    result.task(":publishMavenArtifactsPublicationToMavenRepository").outcome == TaskOutcome.SUCCESS
     result.task(":deploy").outcome == TaskOutcome.SUCCESS
     mavenOutputVerifier.verifyStandardOutput("aar")
     mavenOutputVerifier.verifyPomDependency(
@@ -264,7 +254,7 @@ dependencies {
     def result = testProject.executeGradleTask("deploy")
 
     then:
-    result.task(":uploadArchives").outcome == TaskOutcome.SUCCESS
+    result.task(":publishMavenArtifactsPublicationToMavenRepository").outcome == TaskOutcome.SUCCESS
     result.task(":deploy").outcome == TaskOutcome.SUCCESS
     mavenOutputVerifier.verifyStandardOutput("aar")
     mavenOutputVerifier.verifyPomDependency(
@@ -307,7 +297,7 @@ dependencies {
     def result = testProject.executeGradleTask("deploy", "--stacktrace")
 
     then:
-    result.task(":uploadArchives").outcome == TaskOutcome.SUCCESS
+    result.task(":publishMavenArtifactsPublicationToMavenRepository").outcome == TaskOutcome.SUCCESS
     result.task(":deploy").outcome == TaskOutcome.SUCCESS
     mavenOutputVerifier.verifyStandardOutput("aar")
     mavenOutputVerifier.verifyPomDependency(
@@ -341,7 +331,7 @@ dependencies {
   implementation 'com.episode6.hackit.chop:chop-core:0.1.8'
 }
 
-mavenDependencies {
+deployable.pom.dependencyConfigurations {
   unmap "implementation"
 }
 """
@@ -349,7 +339,7 @@ mavenDependencies {
     def result = testProject.executeGradleTask("deploy", "--stacktrace")
 
     then:
-    result.task(":uploadArchives").outcome == TaskOutcome.SUCCESS
+    result.task(":publishMavenArtifactsPublicationToMavenRepository").outcome == TaskOutcome.SUCCESS
     result.task(":deploy").outcome == TaskOutcome.SUCCESS
     mavenOutputVerifier.verifyStandardOutput("aar")
     mavenOutputVerifier.verifyNoDependencies()
@@ -379,7 +369,7 @@ dependencies {
   mavenOptional 'com.episode6.hackit.chop:chop-core:0.1.8'
 }
 
-mavenDependencies {
+deployable.pom.dependencyConfigurations {
   unmap "mavenOptional"
 }
 """
@@ -387,7 +377,7 @@ mavenDependencies {
     def result = testProject.executeGradleTask("deploy", "--stacktrace")
 
     then:
-    result.task(":uploadArchives").outcome == TaskOutcome.SUCCESS
+    result.task(":publishMavenArtifactsPublicationToMavenRepository").outcome == TaskOutcome.SUCCESS
     result.task(":deploy").outcome == TaskOutcome.SUCCESS
     mavenOutputVerifier.verifyStandardOutput("aar")
     mavenOutputVerifier.verifyNoDependencies()
@@ -417,7 +407,7 @@ dependencies {
   implementation 'com.episode6.hackit.chop:chop-core:0.1.8'
 }
 
-mavenDependencies {
+deployable.pom.dependencyConfigurations {
   map configurations.implementation, "provided"
 }
 """
@@ -425,7 +415,7 @@ mavenDependencies {
     def result = testProject.executeGradleTask("deploy", "--stacktrace")
 
     then:
-    result.task(":uploadArchives").outcome == TaskOutcome.SUCCESS
+    result.task(":publishMavenArtifactsPublicationToMavenRepository").outcome == TaskOutcome.SUCCESS
     result.task(":deploy").outcome == TaskOutcome.SUCCESS
     mavenOutputVerifier.verifyStandardOutput("aar")
     mavenOutputVerifier.verifyPomDependency(
@@ -460,7 +450,7 @@ dependencies {
   mavenProvided 'com.episode6.hackit.chop:chop-core:0.1.8'
 }
 
-mavenDependencies {
+deployable.pom.dependencyConfigurations {
   map "mavenProvided", "compile"
 }
 """
@@ -468,7 +458,7 @@ mavenDependencies {
     def result = testProject.executeGradleTask("deploy", "--stacktrace")
 
     then:
-    result.task(":uploadArchives").outcome == TaskOutcome.SUCCESS
+    result.task(":publishMavenArtifactsPublicationToMavenRepository").outcome == TaskOutcome.SUCCESS
     result.task(":deploy").outcome == TaskOutcome.SUCCESS
     mavenOutputVerifier.verifyStandardOutput("aar")
     mavenOutputVerifier.verifyPomDependency(

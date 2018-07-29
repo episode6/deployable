@@ -6,39 +6,41 @@ import org.gradle.api.tasks.bundling.Jar
 
 /**
  * Plugin to make Kotlin Jars deployable
- * Referenced as 'com.episode6.hackit.deployable.kt.jar'
- */
+ * Referenced as 'com.episode6.hackit.deployable.kt.jar'*/
 class DeployableKotlinJarPlugin implements Plugin<Project> {
   void apply(Project project) {
 
-    project.configurations {
-      api
-      compile.extendsFrom api
+    if (project.configurations.findByName("api") == null) {
+      project.configurations {
+        api
+        compile.extendsFrom api
+      }
     }
 
     project.plugins.apply(DeployablePlugin).pomPackaging = "jar"
+    project.plugins.apply('org.jetbrains.dokka')
 
-    project.afterEvaluate {
-      project.plugins.apply('org.jetbrains.dokka')
+    project.tasks.dokka {
+      reportUndocumented = false
+    }
 
-      project.tasks.dokka {
-        reportUndocumented = false
+    project.task("javadocJar", type: Jar, dependsOn: project.dokka) {
+      classifier = 'javadoc'
+      from project.dokka
+    }
+
+    project.task("sourcesJar", type: Jar) {
+      from project.sourceSets.main.allSource
+      classifier = 'sources'
+    }
+
+    project.deployable.publication {
+      main {
+        artifact project.jar
       }
-
-      project.task("javadocJar", type: Jar, dependsOn: project.dokka) {
-        classifier = 'javadoc'
-        from project.dokka
-      }
-
-      project.task("sourcesJar", type: Jar) {
-        from project.sourceSets.main.allSource
-        classifier = 'sources'
-      }
-
-      project.artifacts {
-        archives project.jar
-        archives project.javadocJar
-        archives project.sourcesJar
+      amend {
+        artifact project.javadocJar
+        artifact project.sourcesJar
       }
     }
   }

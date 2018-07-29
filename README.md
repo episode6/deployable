@@ -1,8 +1,8 @@
 Deployable for Gradle
 =====================
-Gradle plugins to ease the pain of deploying jars and aars to maven repositories. This currently uses the old `maven` plugin instead of the new `maven-publish` plugin.
+Gradle plugins to ease the pain of deploying jars and aars to maven repositories.
 
-## Usage
+## Setup
 Add Deployable to the classpath in your root `build.gradle`
 ```groovy
 buildscript {
@@ -10,7 +10,7 @@ buildscript {
     jcenter()
   }
   dependencies {
-    classpath 'com.episode6.hackit.deployable:deployable:0.1.12'
+    classpath 'com.episode6.hackit.deployable:deployable:0.2.0'
   }
 }
 ```
@@ -28,10 +28,19 @@ In each deployable sub-module apply one of the plugins to `build.gradle`
 // to deploy a JAR
 apply plugin: 'com.episode6.hackit.deployable.jar'
 
-// to deploy an AAR
+// to deploy an Android AAR
 apply plugin: 'com.episode6.hackit.deployable.aar'
+
+// to deploy a JAR with kotlin support
+// (requires org.jetbrains.dokka:dokka-gradle-plugin on the classpath)
+apply plugin: 'com.episode6.hackit.deployable.kt.jar'
+
+// to deploy an Android AAR with kotlin support
+// (requires org.jetbrains.dokka:dokka-android-gradle-plugin on the classpath)
+apply plugin: 'com.episode6.hackit.deployable.kt.aar'
 ```
 
+#### Kotlin Setup
 If you need kotlin support, you must also include dokka on your buildscript classpath (for javadoc support) and use one of the `kt` plugins instead
 ```groovy
 // deployable JAR with Kotlin support
@@ -40,9 +49,6 @@ buildscript {
   repositories { jcenter() }
   dependencies {
     classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
-
-    // deployable's kt plugin applies the dokka plugin, so it must be
-    // included on the buildscript classpath
     classpath "com.episode6.hackit.deployable:deployable:$deployableVersion"
     classpath "org.jetbrains.dokka:dokka-gradle-plugin:$dokkaVersion"
   }
@@ -57,7 +63,10 @@ Similarly for a kotlin-android library...
 // deployable AAR with Kotlin support
 
 buildscript {
-  repositories { jcenter() }
+  repositories {
+    jcenter()
+    google()
+  }
   dependencies {
     classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
     classpath "com.android.tools.build:gradle:$androidGradlePluginVersion"
@@ -71,12 +80,14 @@ apply plugin: 'kotlin-android'
 apply plugin: 'com.episode6.hackit.deployable.kt.aar'
 ```
 
+#### Groovy Setup
 If this is a groovy project you'll want to pair the deployable.jar plugin with the groovydocs addon
 ```groovy
 apply plugin: 'com.episode6.hackit.deployable.jar'
 apply plugin: 'com.episode6.hackit.deployable.addon.groovydocs'
 ```
 
+#### gradle.properties setup
 Add the common pom elements to your root `gradle.properties`
 ```
 deployable.pom.description=Gradle plugins to ease the pain of creating deployable jars and aars
@@ -89,6 +100,9 @@ deployable.pom.license.url=https://github.com/episode6/deployable/blob/master/LI
 deployable.pom.license.distribution=repo
 deployable.pom.developer.id=episode6
 deployable.pom.developer.name=episode6, Inc.
+
+deployable.nexus.releaseRepoUrl=https://oss.sonatype.org/service/local/staging/deploy/maven2/
+deployable.nexus.snapshotRepoUrl=https://oss.sonatype.org/content/repositories/snapshots/
 ```
 
 In your system's `~/.gradle/gradle.properties` add your nexus login info and signing key info
@@ -100,13 +114,9 @@ signing.keyId=<keyId>
 signing.password=<keyPassword>
 signing.secretKeyRingFile=<pathToKeyringFile>
 ```
+**WARNING**: DON'T PUT PASSWORDS IN YOUR REPO! The above file belongs in your home directory at `~/.gradle/gradle.properties`
 
-You can optionally override the repository urls by adding the following to your `gradle.properties`
-```
-deployable.nexus.releaseRepoUrl=https://oss.sonatype.org/service/local/staging/deploy/maven2/
-deployable.nexus.snapshotRepoUrl=https://oss.sonatype.org/content/repositories/snapshots/
-```
-
+#### build.gradle setup
 Most of deployable's properties can alternatively be set or overridden directly in your `build.gradle`
 ```groovy
 apply plugin: 'java-library'
@@ -140,10 +150,12 @@ deployable {
 }
 ```
 
+#### Deploy
 Finally, deploy using
-`./gradlew uploadArchives` or the new deploy alias `./gradlew deploy`
+`./gradlew publish` or the new deploy alias `./gradlew deploy`
 
-Deployable also adds some basic support for maven's `provided` scope and `optional` flag via custom scopes...
+#### Default Dependency Mapping
+Deployable includes built-in mapping for dependencies declared in `api` and `implementation` configurations (into the dependency section of the maven pom output). We also add `mavenOptional`, `mavenProvided` and `mavenProvidedOptional` configurations which will also be mapped automatically.
 ```groovy
 dependencies {
     // api -> maven: 'compile'
@@ -163,7 +175,8 @@ dependencies {
 }
 ```
 
-To map dependencies of extra configurations use the `mavenDependencies` method...
+#### Customize Dependencies
+To map dependencies of other configurations to the maven pom use the `deployable.pom.dependencyConfigurations` block...
 ```groovy
 configurations {
     someCompileConfig
@@ -172,20 +185,25 @@ configurations {
     someProvidedOptionalConfig
 }
 
-mavenDependencies {
-    // map with configuration reference
-    map configurations.someCompileConfig, "compile"
+deployable {
+    pom {
+        dependencyConfigurations {
 
-    // map with configuration name (and ignore if it doesnt exist)
-    map "someProvidedConfig", "provided"
+            // clear all built-in mappings
+            clear()
 
-    // map optional configs using mapOptional
-    mapOptional configurations.someCompileOptionalConfig, "compile"
-    mapOptional "someProvidedOptionalConfig", "provided"
+            // remove a specific gradle configuration from being mapped to the maven pom
+            unmap "implementation"
 
-    // remove the mapping of a gradle configuration
-    unamp configurations.api
-    unmap "implementation"
+            // map configurations either by reference or just its name (if it might not exist)
+            map configurations.someCompileConfig, "compile"
+            map "someProvidedConfig", "provided"
+
+            // map optional configs using mapOptional
+            mapOptional configurations.someCompileOptionalConfig, "compile"
+            mapOptional "someProvidedOptionalConfig", "provided"
+        }
+    }
 }
 
 dependencies {
@@ -196,8 +214,39 @@ dependencies {
 }
 ```
 
+#### Customize Published Artifacts
+To modify or amend the actual publication or included artifacts (i.e. what jars will actually be signed and published), use the `deployable.publishing` block.
+```groovy
+deployable {
+    publishing {
+
+        // replace the main artifact published by this project
+        main {
+            artifact altJarTask
+        }
+
+        // add more artifacts or configuration to the publication
+        amend {
+            artifact extraDocsTask
+        }
+    }
+}
+```
+
+#### Customize POM as XML
+If you need to make some additional changes to the pom xml output at the last-mile, use the `deployable.pom.withXml {}` block
+```groovy
+deployable {
+    pom {
+        withXml {
+            appendNode("someNewNode")
+        }
+    }
+}
+```
+
 ### Why does it exist?
-This is my first gradle plugin and groovy project so it may be rough around the edges. There are probably better tools out there for your open source libraries, but this will be building block for upcoming episode6 open source projects.
+This was my first gradle plugin and groovy project so it is still rough around a few edges. The main goal here was to abstract away as much of the boilerplate of publishing a maven-deployable library as possible, and make it quick and painless to create and deploy new open-source libraries. Having an abstraction-layer on top of 3rd party tools also grants the flexibility to adapt and should enable future support for more types of repos without requiring changes to individual project configuration.
 
 ### License
 MIT: https://github.com/episode6/deployable/blob/master/LICENSE
