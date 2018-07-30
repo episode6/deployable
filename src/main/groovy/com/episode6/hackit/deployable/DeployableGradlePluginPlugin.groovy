@@ -3,7 +3,6 @@ package com.episode6.hackit.deployable
 import com.episode6.hackit.deployable.addon.GroovyDocAddonPlugin
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.api.publish.maven.tasks.PublishToMavenRepository
 
 /**
  * Plugin to make gradle plugins deployable
@@ -18,11 +17,11 @@ class DeployableGradlePluginPlugin implements Plugin<Project> {
       apply('java-gradle-plugin')
     }
 
-    // disable the java-gradle-plugin's build in publish tasks
-    project.tasks.withType(PublishToMavenRepository).whenTaskAdded { t ->
-      if (t.name.startsWith("publishPluginMaven")) {
-        t.enabled = false
-      }
+    project.afterEvaluate {
+      // disable the java-gradle-plugin's build in publish tasks
+      project.tasks.findByName("publishPluginMavenPublicationToMavenRepository")?.enabled = false
+      project.tasks.findByName("publishPluginMavenPublicationToMavenLocal")?.enabled = false
+      project.tasks.findByName("generatePomFileForPluginMavenPublication")?.enabled = false
     }
   }
 }

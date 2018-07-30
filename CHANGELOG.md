@@ -1,7 +1,7 @@
 # Deployable ChangeLog
 
 ### v0.2.1-SNAPSHOT - unreleased
-
+- Fix bug in `gradle-plugin` plugin
 
 ### v0.2.0-SNAPSHOT - released July 29, 2018
 - Re-write plugin to use `maven-publish` instead of old `maven` plugin
