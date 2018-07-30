@@ -3,7 +3,7 @@
 ### v0.2.2-SNAPSHOT - unreleased
 
 
-### v0.2.1-SNAPSHOT - unreleased
+### v0.2.1 - released July 29, 2018
 - Fix bug in `gradle-plugin` plugin
 
 ### v0.2.0-SNAPSHOT - released July 29, 2018
