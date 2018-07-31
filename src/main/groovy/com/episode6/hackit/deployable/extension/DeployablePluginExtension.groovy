@@ -14,7 +14,10 @@ class DeployablePluginExtension extends NestablePluginExtension {
       "deployable.nexus.username",
       "deployable.nexus.password",
       "deployable.nexus.releaseRepoUrl",
-      "deployable.nexus.snapshotRepoUrl"]
+      "deployable.nexus.snapshotRepoUrl",
+      "deployable.publication.includeSources",
+      "deployable.publication.includeDocs",
+  ]
 
   static class PomExtension extends NestablePluginExtension {
 
@@ -137,6 +140,9 @@ class DeployablePluginExtension extends NestablePluginExtension {
   }
 
   static class PublicationExtension extends NestablePluginExtension {
+
+    Boolean includeSources = null
+    Boolean includeDocs = null
 
     Closure main = {}
     final List<Closure> sourcesConfigurations = new LinkedList<>()
