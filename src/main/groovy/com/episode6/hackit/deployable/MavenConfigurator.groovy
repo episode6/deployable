@@ -80,7 +80,7 @@ class MavenConfigurator {
           }
 
           configureWithClosure(it, deployable.publication.main)
-          deployable.publication.additionalConfigurationClosures.each { closure ->
+          deployable.publication.amendedConfigurations.each { closure ->
             configureWithClosure(it, closure)
           }
 
