@@ -16,7 +16,7 @@ class GroovyDocAddonPlugin implements Plugin<Project>{
       from project.groovydoc
     }
 
-    project.deployable.publication.amend {
+    project.deployable.publication.amendDocs {
       artifact project.groovydocJar
     }
   }

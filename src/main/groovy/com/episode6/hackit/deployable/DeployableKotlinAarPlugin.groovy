@@ -37,9 +37,11 @@ class DeployableKotlinAarPlugin implements Plugin<Project> {
       main {
         artifact project.bundleRelease
       }
-      amend {
-        artifact project.javadocJar
+      amendSources {
         artifact project.androidReleaseSourcesJar
+      }
+      amendDocs {
+        artifact project.javadocJar
       }
     }
 

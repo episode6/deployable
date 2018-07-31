@@ -139,6 +139,8 @@ class DeployablePluginExtension extends NestablePluginExtension {
   static class PublicationExtension extends NestablePluginExtension {
 
     Closure main = {}
+    final List<Closure> sourcesConfigurations = new LinkedList<>()
+    final List<Closure> docsConfigurations = new LinkedList<>()
     final List<Closure> amendedConfigurations = new LinkedList<>()
 
     PublicationExtension(NestablePluginExtension parent) {
@@ -147,6 +149,20 @@ class DeployablePluginExtension extends NestablePluginExtension {
 
     MavenPublication main(Closure closure) {
       main = closure
+      // method return type fools IntelliJ into figuring out the right delegate for this closure,
+      // but we generate the publication and call the closure lazily, so we can't actually return it here
+      return null
+    }
+
+    MavenPublication amendSources(Closure closure) {
+      sourcesConfigurations.add(closure)
+      // method return type fools IntelliJ into figuring out the right delegate for this closure,
+      // but we generate the publication and call the closure lazily, so we can't actually return it here
+      return null
+    }
+
+    MavenPublication amendDocs(Closure closure) {
+      docsConfigurations.add(closure)
       // method return type fools IntelliJ into figuring out the right delegate for this closure,
       // but we generate the publication and call the closure lazily, so we can't actually return it here
       return null

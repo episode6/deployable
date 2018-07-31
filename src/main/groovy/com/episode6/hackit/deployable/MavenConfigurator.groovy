@@ -80,9 +80,9 @@ class MavenConfigurator {
           }
 
           configureWithClosure(it, deployable.publication.main)
-          deployable.publication.amendedConfigurations.each { closure ->
-            configureWithClosure(it, closure)
-          }
+          configureWithClosures(it, deployable.publication.sourcesConfigurations)
+          configureWithClosures(it, deployable.publication.docsConfigurations)
+          configureWithClosures(it, deployable.publication.amendedConfigurations)
 
           pom.withXml {
             def rootPom = asNode()
@@ -137,6 +137,12 @@ class MavenConfigurator {
         DeployablePlugin.isReleaseBuild(project) && project.gradle.taskGraph.hasTask("publishMavenArtifactsPublicationToMavenRepository")
       }
       sign project.publishing.publications.mavenArtifacts
+    }
+  }
+
+  private static void configureWithClosures(Object delegate, List<Closure> closures) {
+    closures.each {
+      configureWithClosure(delegate, it)
     }
   }
 

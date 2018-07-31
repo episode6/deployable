@@ -18,9 +18,11 @@ class DeployableAarPlugin implements Plugin<Project> {
       main {
         artifact project.bundleRelease
       }
-      amend {
-        artifact project.androidReleaseJavadocsJar
+      amendSources {
         artifact project.androidReleaseSourcesJar
+      }
+      amendDocs {
+        artifact project.androidReleaseJavadocsJar
       }
     }
 
