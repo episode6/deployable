@@ -39,6 +39,7 @@ class DeployableKotlinAarPlugin implements Plugin<Project> {
       }
       amend {
         artifact project.javadocJar
+        artifact project.androidReleaseSourcesJar
       }
     }
 
@@ -50,16 +51,10 @@ class DeployableKotlinAarPlugin implements Plugin<Project> {
         }
       }
 
-      def sourcesJarTask = project.task("android${variant.name.capitalize()}SourcesJar", type: Jar) {
+      project.task("android${variant.name.capitalize()}SourcesJar", type: Jar) {
         classifier = 'sources'
         from variant.javaCompile.source.collect() + project.android.sourceSets.main.java.srcDirs.collect() +
             project.android.sourceSets.findByName(variant.dirName)?.java?.srcDirs?.collect()
-      }
-
-      if (variant.name == "release") {
-        project.deployable.publication.amend {
-          artifact sourcesJarTask
-        }
       }
     }
   }

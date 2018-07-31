@@ -14,8 +14,14 @@ class DeployableAarPlugin implements Plugin<Project> {
     DeployablePlugin deployablePlugin = project.plugins.apply(DeployablePlugin)
     deployablePlugin.pomPackaging = "aar"
 
-    project.deployable.publication.main {
-      artifact project.bundleRelease
+    project.deployable.publication {
+      main {
+        artifact project.bundleRelease
+      }
+      amend {
+        artifact project.androidReleaseJavadocsJar
+        artifact project.androidReleaseSourcesJar
+      }
     }
 
     project.android.libraryVariants.all { variant ->
@@ -37,21 +43,14 @@ class DeployableAarPlugin implements Plugin<Project> {
         }
       }
 
-      def javadocJarTask = project.task("android${variant.name.capitalize()}JavadocsJar", type: Jar, dependsOn: javadocsTask) {
+      project.task("android${variant.name.capitalize()}JavadocsJar", type: Jar, dependsOn: javadocsTask) {
         classifier = 'javadoc'
         from javadocsTask
       }
 
-      def sourcesJarTask = project.task("android${variant.name.capitalize()}SourcesJar", type: Jar) {
+      project.task("android${variant.name.capitalize()}SourcesJar", type: Jar) {
         classifier = 'sources'
         from variant.javaCompile.source
-      }
-
-      if (variant.name == "release") {
-        project.deployable.publication.amend {
-          artifact javadocJarTask
-          artifact sourcesJarTask
-        }
       }
     }
   }
