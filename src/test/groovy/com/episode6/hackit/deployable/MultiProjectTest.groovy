@@ -385,6 +385,43 @@ include ':parentlib', ':childlib'
     LibType.KANDROID    | false | "implementation"
   }
 
+  def "test multi-project publication.main overrides"(String groupId, String versionName) {
+    given:
+    def v = configureSimpleMultiProject(groupId, versionName)
+    testProject.rootGradleBuildFile.text += """
+subprojects {
+  afterEvaluate {
+    deployable.publication.main {}
+  }
+}
+"""
+
+    when:
+    def result = testProject.executeGradleTask("deploy")
+
+    then:
+    result.task(":javalib:deploy").outcome == TaskOutcome.SUCCESS
+    v.javalibVerifier.verifyStandardOutputSkipMainArtifact()
+
+    result.task(":groovylib:deploy").outcome == TaskOutcome.SUCCESS
+    v.groovylibVerifier.verifyStandardOutputSkipMainArtifact()
+    v.groovylibVerifier.verifyJarFile("groovydoc")
+
+    result.task(":kotlinlib:deploy").outcome == TaskOutcome.SUCCESS
+    v.kotlinlibVerifier.verifyStandardOutputSkipMainArtifact()
+
+    result.task(":androidlib:deploy").outcome == TaskOutcome.SUCCESS
+    v.androidlibVerifier.verifyStandardOutputSkipMainArtifact("aar")
+
+    result.task(":kandroidlib:deploy").outcome == TaskOutcome.SUCCESS
+    v.kandroidlibVerifier.verifyStandardOutputSkipMainArtifact("aar")
+
+    where:
+    groupId                             | versionName
+    "com.multiproject.snapshot.example" | "0.0.1-SNAPSHOT"
+    "com.multiproject.release.example"  | "0.0.1"
+  }
+
   private static String getPackaging(LibType type) {
     switch (type) {
       case LibType.ANDROID:
