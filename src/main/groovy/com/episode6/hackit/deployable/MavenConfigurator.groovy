@@ -83,8 +83,12 @@ class MavenConfigurator {
 
           // Apply deployable plugin's publication configuration
           configureWithClosure(it, deployable.publication.main)
-          maybeConfigureWithClosures(it, deployable.publication.sourcesConfigurations, deployable.publication.includeSources)
-          maybeConfigureWithClosures(it, deployable.publication.docsConfigurations, deployable.publication.includeDocs)
+          if (deployable.publication.includeSources == null || deployable.publication.includeSources == true) {
+            configureWithClosures(it, deployable.publication.sourcesConfigurations)
+          }
+          if (deployable.publication.includeDocs == null || deployable.publication.includeDocs == true) {
+            configureWithClosures(it, deployable.publication.docsConfigurations)
+          }
           configureWithClosures(it, deployable.publication.amendedConfigurations)
 
           pom.withXml {
@@ -140,13 +144,6 @@ class MavenConfigurator {
         DeployablePlugin.isReleaseBuild(project) && project.gradle.taskGraph.hasTask("publishMavenArtifactsPublicationToMavenRepository")
       }
       sign project.publishing.publications.mavenArtifacts
-    }
-  }
-
-  // applys given closures to delegate if isEnables is either null or true
-  private static void maybeConfigureWithClosures(Object delegate, List<Closure> closures, Boolean isEnabled) {
-    if (isEnabled == null || isEnabled) {
-      configureWithClosures(delegate, closures)
     }
   }
 

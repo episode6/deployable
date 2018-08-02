@@ -422,6 +422,74 @@ subprojects {
     "com.multiproject.release.example"  | "0.0.1"
   }
 
+  def "test multi-project dont publish docs"(String groupId, String versionName) {
+    given:
+    def v = configureSimpleMultiProject(groupId, versionName)
+    testProject.rootGradlePropertiesFile << """
+
+deployable.publication.includeDocs=false
+"""
+
+    when:
+    def result = testProject.executeGradleTask("deploy")
+
+    then:
+    result.task(":javalib:deploy").outcome == TaskOutcome.SUCCESS
+    v.javalibVerifier.verifyStandardOutputSkipClassifiedJar("javadoc")
+
+    result.task(":groovylib:deploy").outcome == TaskOutcome.SUCCESS
+    v.groovylibVerifier.verifyStandardOutputSkipClassifiedJar("javadoc")
+    v.groovylibVerifier.verifyMissingJarFile("groovydoc")
+
+    result.task(":kotlinlib:deploy").outcome == TaskOutcome.SUCCESS
+    v.kotlinlibVerifier.verifyStandardOutputSkipClassifiedJar("javadoc")
+
+    result.task(":androidlib:deploy").outcome == TaskOutcome.SUCCESS
+    v.androidlibVerifier.verifyStandardOutputSkipClassifiedJar("javadoc", "aar")
+
+    result.task(":kandroidlib:deploy").outcome == TaskOutcome.SUCCESS
+    v.kandroidlibVerifier.verifyStandardOutputSkipClassifiedJar("javadoc", "aar")
+
+    where:
+    groupId                             | versionName
+    "com.multiproject.snapshot.example" | "0.0.1-SNAPSHOT"
+    "com.multiproject.release.example"  | "0.0.1"
+  }
+
+  def "test multi-project dont publish sources"(String groupId, String versionName) {
+    given:
+    def v = configureSimpleMultiProject(groupId, versionName)
+    testProject.rootGradlePropertiesFile << """
+
+deployable.publication.includeSources=false
+"""
+
+    when:
+    def result = testProject.executeGradleTask("deploy")
+
+    then:
+    result.task(":javalib:deploy").outcome == TaskOutcome.SUCCESS
+    v.javalibVerifier.verifyStandardOutputSkipClassifiedJar("sources")
+
+    result.task(":groovylib:deploy").outcome == TaskOutcome.SUCCESS
+    v.groovylibVerifier.verifyStandardOutputSkipClassifiedJar("sources")
+    v.groovylibVerifier.verifyJarFile("groovydoc")
+
+    result.task(":kotlinlib:deploy").outcome == TaskOutcome.SUCCESS
+    v.kotlinlibVerifier.verifyStandardOutputSkipClassifiedJar("sources")
+
+    result.task(":androidlib:deploy").outcome == TaskOutcome.SUCCESS
+    v.androidlibVerifier.verifyStandardOutputSkipClassifiedJar("sources", "aar")
+
+    result.task(":kandroidlib:deploy").outcome == TaskOutcome.SUCCESS
+    v.kandroidlibVerifier.verifyStandardOutputSkipClassifiedJar("sources", "aar")
+
+    where:
+    groupId                             | versionName
+    "com.multiproject.snapshot.example" | "0.0.1-SNAPSHOT"
+    "com.multiproject.release.example"  | "0.0.1"
+  }
+
   private static String getPackaging(LibType type) {
     switch (type) {
       case LibType.ANDROID:
