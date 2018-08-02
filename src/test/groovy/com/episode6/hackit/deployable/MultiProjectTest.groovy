@@ -142,11 +142,7 @@ ${deps}
 """
   }
 
-  @Rule
-  final IntegrationTestProject testProject = new IntegrationTestProject()
-
-  def "test multi-project deployables"(String groupId, String versionName) {
-    given:
+  private Map<String, MavenOutputVerifier> configureSimpleMultiProject(String groupId, String versionName, Map deps = [:]) {
     testProject.rootGradlePropertiesFile << testProject.testProperties.inGradlePropertiesFormat
     File javalib = testProject.newFolder("javalib")
     File groovylib = testProject.newFolder("groovylib")
@@ -157,11 +153,11 @@ ${deps}
 include ':javalib', ':groovylib', ':androidlib', ':kotlinlib', ':kandroidlib'
 """
     testProject.rootGradleBuildFile << rootBuildFile(groupId, versionName)
-    javalib.newFile("build.gradle") << javaBuildFile()
-    groovylib.newFile("build.gradle") << groovyBuildFile(projectDeps("javalib"))
-    kotlinlib.newFile("build.gradle") << kotlinBuildFile(projectDeps("javalib"))
-    androidlib.newFile("build.gradle") << androidBuildFile(projectDeps("javalib", "groovylib", "kotlinlib"))
-    kandroidlib.newFile("build.gradle") << kotlinAndroidBuildFile(projectDeps("javalib", "groovylib", "kotlinlib", "androidlib"))
+    javalib.newFile("build.gradle") << javaBuildFile() + deps.javalib
+    groovylib.newFile("build.gradle") << groovyBuildFile() + deps.groovylib
+    kotlinlib.newFile("build.gradle") << kotlinBuildFile() + deps.kotlinlib
+    androidlib.newFile("build.gradle") << androidBuildFile() + deps.androidlib
+    kandroidlib.newFile("build.gradle") << kotlinAndroidBuildFile() + deps.kandroidlib
 
     testProject.createNonEmptyJavaFile("${groupId}.javalib", "SampleJavaClass", javalib)
     testProject.createNonEmptyGroovyFile("${groupId}.groovylib", "SampleGroovyClass", groovylib)
@@ -170,61 +166,75 @@ include ':javalib', ':groovylib', ':androidlib', ':kotlinlib', ':kandroidlib'
     testProject.createNonEmptyKotlinFile("${groupId}.kandroidlib", "SampleKotlinAndroidClass", kandroidlib)
     androidlib.newFile("src", "main", "AndroidManifest.xml") << simpleAndroidManifest(groupId, "androidlib")
     kandroidlib.newFile("src", "main", "AndroidManifest.xml") << simpleAndroidManifest(groupId, "kandroidlib")
+    return [
+        javalibVerifier    : new MavenOutputVerifier(
+            groupId: groupId,
+            artifactId: "javalib",
+            versionName: versionName,
+            testProject: testProject),
+        groovylibVerifier  : new MavenOutputVerifier(
+            groupId: groupId,
+            artifactId: "groovylib",
+            versionName: versionName,
+            testProject: testProject),
+        kotlinlibVerifier  : new MavenOutputVerifier(
+            groupId: groupId,
+            artifactId: "kotlinlib",
+            versionName: versionName,
+            testProject: testProject),
+        androidlibVerifier : new MavenOutputVerifier(
+            groupId: groupId,
+            artifactId: "androidlib",
+            versionName: versionName,
+            testProject: testProject),
+        kandroidlibVerifier: new MavenOutputVerifier(
+            groupId: groupId,
+            artifactId: "kandroidlib",
+            versionName: versionName,
+            testProject: testProject)
+    ]
+  }
 
-    MavenOutputVerifier javalibVerifier = new MavenOutputVerifier(
-        groupId: groupId,
-        artifactId: "javalib",
-        versionName: versionName,
-        testProject: testProject)
-    MavenOutputVerifier groovylibVerifier = new MavenOutputVerifier(
-        groupId: groupId,
-        artifactId: "groovylib",
-        versionName: versionName,
-        testProject: testProject)
-    MavenOutputVerifier kotlinlibVerifier = new MavenOutputVerifier(
-        groupId: groupId,
-        artifactId: "kotlinlib",
-        versionName: versionName,
-        testProject: testProject)
-    MavenOutputVerifier androidlibVerifier = new MavenOutputVerifier(
-        groupId: groupId,
-        artifactId: "androidlib",
-        versionName: versionName,
-        testProject: testProject)
-    MavenOutputVerifier kandroidlibVerifier = new MavenOutputVerifier(
-        groupId: groupId,
-        artifactId: "kandroidlib",
-        versionName: versionName,
-        testProject: testProject)
+  @Rule
+  final IntegrationTestProject testProject = new IntegrationTestProject()
+
+  def "test multi-project deployables"(String groupId, String versionName) {
+    given:
+    def v = configureSimpleMultiProject(groupId, versionName, [
+        groovylib: deps("javalib"),
+        kotlinlib: deps("javalib"),
+        androidlib: deps("javalib", "groovylib", "kotlinlib"),
+        kandroidlib: deps("javalib", "groovylib", "kotlinlib", "androidlib"),
+    ])
 
     when:
     def result = testProject.executeGradleTask("deploy")
 
     then:
     result.task(":javalib:deploy").outcome == TaskOutcome.SUCCESS
-    javalibVerifier.verifyStandardOutput()
+    v.javalibVerifier.verifyStandardOutput()
 
     result.task(":groovylib:deploy").outcome == TaskOutcome.SUCCESS
-    groovylibVerifier.verifyStandardOutput()
-    groovylibVerifier.verifyJarFile("groovydoc")
-    groovylibVerifier.verifyPomDependency(groupId, "javalib", versionName, "runtime")
+    v.groovylibVerifier.verifyStandardOutput()
+    v.groovylibVerifier.verifyJarFile("groovydoc")
+    v.groovylibVerifier.verifyPomDependency(groupId, "javalib", versionName, "runtime")
 
     result.task(":kotlinlib:deploy").outcome == TaskOutcome.SUCCESS
-    kotlinlibVerifier.verifyStandardOutput()
-    kotlinlibVerifier.verifyPomDependency(groupId, "javalib", versionName, "runtime")
+    v.kotlinlibVerifier.verifyStandardOutput()
+    v.kotlinlibVerifier.verifyPomDependency(groupId, "javalib", versionName, "runtime")
 
     result.task(":androidlib:deploy").outcome == TaskOutcome.SUCCESS
-    androidlibVerifier.verifyStandardOutput("aar")
-    androidlibVerifier.verifyPomDependency(groupId, "javalib", versionName, "runtime")
-    androidlibVerifier.verifyPomDependency(groupId, "groovylib", versionName, "runtime")
-    androidlibVerifier.verifyPomDependency(groupId, "kotlinlib", versionName, "runtime")
+    v.androidlibVerifier.verifyStandardOutput("aar")
+    v.androidlibVerifier.verifyPomDependency(groupId, "javalib", versionName, "runtime")
+    v.androidlibVerifier.verifyPomDependency(groupId, "groovylib", versionName, "runtime")
+    v.androidlibVerifier.verifyPomDependency(groupId, "kotlinlib", versionName, "runtime")
 
     result.task(":kandroidlib:deploy").outcome == TaskOutcome.SUCCESS
-    kandroidlibVerifier.verifyStandardOutput("aar")
-    kandroidlibVerifier.verifyPomDependency(groupId, "javalib", versionName, "runtime")
-    kandroidlibVerifier.verifyPomDependency(groupId, "groovylib", versionName, "runtime")
-    kandroidlibVerifier.verifyPomDependency(groupId, "kotlinlib", versionName, "runtime")
-    kandroidlibVerifier.verifyPomDependency(groupId, "androidlib", versionName, "runtime")
+    v.kandroidlibVerifier.verifyStandardOutput("aar")
+    v.kandroidlibVerifier.verifyPomDependency(groupId, "javalib", versionName, "runtime")
+    v.kandroidlibVerifier.verifyPomDependency(groupId, "groovylib", versionName, "runtime")
+    v.kandroidlibVerifier.verifyPomDependency(groupId, "kotlinlib", versionName, "runtime")
+    v.kandroidlibVerifier.verifyPomDependency(groupId, "androidlib", versionName, "runtime")
 
     where:
     groupId                             | versionName
@@ -383,6 +393,15 @@ include ':parentlib', ':childlib'
       default:
         return "jar"
     }
+  }
+
+  private static String deps(String... dependentProjectNames) {
+    return """
+
+dependencies {
+${projectDeps(dependentProjectNames)}
+}
+"""
   }
 
   private static String projectDeps(String... dependentProjectNames) {
