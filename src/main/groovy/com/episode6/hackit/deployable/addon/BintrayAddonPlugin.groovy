@@ -5,6 +5,7 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 
 /**
+ * EXPERIMENTAL
  * Plugin that applies the bintray plugin for you and handles some of the default configuration
  * for data that is already present in deployable's config
  *
