@@ -14,10 +14,8 @@ repositories {
 apply plugin: 'groovy'
 apply plugin: 'com.episode6.hackit.gdmc'
 
-// actual project dependencies
-dependencies {
-  implementation 'com.episode6.hackit.nestable:nestable'
-}
+// apply project dependencies from shared file
+apply from: '../project-dependencies.gradle'
 
 // compile deps act as buildscript classpath deps for the main project
 dependencies {

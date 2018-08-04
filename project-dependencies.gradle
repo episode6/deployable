@@ -1,0 +1,4 @@
+// apply real project dependencies here, so they're applied to both buildSrc and the deployable project
+dependencies {
+  implementation 'com.episode6.hackit.nestable:nestable'
+}

@@ -25,10 +25,12 @@ configurations {
   alsoUnderTest
 }
 
+// apply project dependencies from shared file
+apply from: 'project-dependencies.gradle'
+
 dependencies {
   implementation localGroovy()
   implementation gradleApi()
-  implementation 'com.episode6.hackit.nestable:nestable'
 
   testImplementation("org.spockframework:spock-core")  {
     exclude module: 'groovy-all'
