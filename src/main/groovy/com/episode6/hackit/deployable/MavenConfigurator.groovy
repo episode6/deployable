@@ -83,10 +83,10 @@ class MavenConfigurator {
 
           // Apply deployable plugin's publication configuration
           configureWithClosure(it, deployable.publication.main)
-          if (deployable.publication.includeSources == null || deployable.publication.includeSources == true) {
+          if (isBoolNullOrTrue(deployable.publication.includeSources)) {
             configureWithClosures(it, deployable.publication.sourcesConfigurations)
           }
-          if (deployable.publication.includeDocs == null || deployable.publication.includeDocs == true) {
+          if (isBoolNullOrTrue(deployable.publication.includeDocs)) {
             configureWithClosures(it, deployable.publication.docsConfigurations)
           }
           configureWithClosures(it, deployable.publication.amendedConfigurations)
@@ -157,5 +157,9 @@ class MavenConfigurator {
     closure.setDelegate(delegate)
     closure.setResolveStrategy(Closure.DELEGATE_FIRST)
     closure.call()
+  }
+
+  def isBoolNullOrTrue(pluginValue) {
+    return pluginValue == null || pluginValue == true
   }
 }
