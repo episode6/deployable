@@ -1,0 +1,23 @@
+buildscript {
+  repositories {
+    jcenter()
+  }
+  dependencies {
+    classpath 'com.episode6.hackit.gdmc:gdmc:0.1.10'
+  }
+}
+
+repositories {
+    jcenter()
+}
+
+apply plugin: 'groovy'
+apply plugin: 'com.episode6.hackit.gdmc'
+
+// apply project dependencies from shared file
+apply from: '../project-dependencies.gradle'
+
+// compile deps act as buildscript classpath deps for the main project
+dependencies {
+  compile 'com.episode6.hackit.gdmc:gdmc'
+}
