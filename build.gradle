@@ -46,6 +46,7 @@ dependencies {
   alsoUnderTest 'org.jetbrains.kotlin:kotlin-gradle-plugin'
   alsoUnderTest 'org.jetbrains.dokka:dokka-gradle-plugin'
   alsoUnderTest 'org.jetbrains.dokka:dokka-android-gradle-plugin'
+  alsoUnderTest 'com.jfrog.bintray.gradle:gradle-bintray-plugin'
 }
 
 pluginUnderTestMetadata {
