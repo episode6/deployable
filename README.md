@@ -216,18 +216,48 @@ dependencies {
 }
 ```
 
+#### Excluding Sources and Docs
+By default, deployable configures and includes source and javadocs in generated publications. You can override this behavior either via `gradle.properties` or `build.gradle`
+```
+# gradle.properties
+
+deployable.publication.includeSources=false
+deployable.publication.includeDocs=false
+```
+
+```groovy
+// build.gradle
+
+deployable {
+    publication {
+        includeSources false
+        includeDocs false
+    }
+}
+```
+
 #### Customize Published Artifacts
-To modify or amend the actual publication or included artifacts (i.e. what jars will actually be signed and published), use the `deployable.publishing` block.
+To modify or amend the actual publication or included artifacts (i.e. what jars will actually be signed and published), use the `deployable.publication` block's main and amend methods to configure the MavenPublication lazily.
 ```groovy
 deployable {
-    publishing {
+    publication {
 
         // replace the main artifact published by this project
         main {
             artifact altJarTask
         }
 
-        // add more artifacts or configuration to the publication
+        // amend a sources artifact that won't be applied if includeSources == false
+        amendSources {
+            artifact altSourcesTask
+        }
+
+        // amend a docs artifact that won't be applied if includeDocs == false
+        amendDocs {
+            artifact altDocsJarTask
+        }
+
+        // amend artifacts or configuration to the publication that will always be applied
         amend {
             artifact extraDocsTask
         }

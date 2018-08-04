@@ -14,7 +14,10 @@ class DeployablePluginExtension extends NestablePluginExtension {
       "deployable.nexus.username",
       "deployable.nexus.password",
       "deployable.nexus.releaseRepoUrl",
-      "deployable.nexus.snapshotRepoUrl"]
+      "deployable.nexus.snapshotRepoUrl",
+      "deployable.publication.includeSources",
+      "deployable.publication.includeDocs",
+  ]
 
   static class PomExtension extends NestablePluginExtension {
 
@@ -138,8 +141,13 @@ class DeployablePluginExtension extends NestablePluginExtension {
 
   static class PublicationExtension extends NestablePluginExtension {
 
+    Boolean includeSources = null
+    Boolean includeDocs = null
+
     Closure main = {}
-    final List<Closure> additionalConfigurationClosures = new LinkedList<>()
+    final List<Closure> sourcesConfigurations = new LinkedList<>()
+    final List<Closure> docsConfigurations = new LinkedList<>()
+    final List<Closure> amendedConfigurations = new LinkedList<>()
 
     PublicationExtension(NestablePluginExtension parent) {
       super(parent, "publication")
@@ -152,8 +160,22 @@ class DeployablePluginExtension extends NestablePluginExtension {
       return null
     }
 
+    MavenPublication amendSources(Closure closure) {
+      sourcesConfigurations.add(closure)
+      // method return type fools IntelliJ into figuring out the right delegate for this closure,
+      // but we generate the publication and call the closure lazily, so we can't actually return it here
+      return null
+    }
+
+    MavenPublication amendDocs(Closure closure) {
+      docsConfigurations.add(closure)
+      // method return type fools IntelliJ into figuring out the right delegate for this closure,
+      // but we generate the publication and call the closure lazily, so we can't actually return it here
+      return null
+    }
+
     MavenPublication amend(Closure closure) {
-      additionalConfigurationClosures.add(closure)
+      amendedConfigurations.add(closure)
       // method return type fools IntelliJ into figuring out the right delegate for this closure,
       // but we generate the publication and call the closure lazily, so we can't actually return it here
       return null

@@ -58,6 +58,24 @@ class MavenOutputVerifier {
         verifyJarFile("javadoc")
   }
 
+  boolean verifyStandardOutputSkipClassifiedJar(String classifier, String artifactPackaging = "jar") {
+    assert verifyRootMavenMetaData() &&
+        verifyVersionSpecificMavenMetaData() &&
+        verifyPomData() &&
+        verifyJarFile(null, artifactPackaging)
+    if (classifier == "javadoc") {
+      assert verifyMissingJarFile("javadoc")
+    } else {
+      assert verifyJarFile("javadoc")
+    }
+    if (classifier == "sources") {
+      assert verifyMissingJarFile("sources")
+    } else {
+      assert verifyJarFile("sources")
+    }
+    return true
+  }
+
   boolean verifyRootMavenMetaData() {
     def mavenMetaData = getMavenProjectDir().newFile("maven-metadata.xml").asXml()
 
