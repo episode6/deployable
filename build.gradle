@@ -15,8 +15,8 @@ apply plugin: 'groovy'
 apply plugin: 'com.episode6.hackit.gdmc'
 apply plugin: com.episode6.hackit.deployable.DeployableGradlePluginPlugin
 
+// The plugin source code lives in 'buildSrc' so that we may apply it to ourselves in order to deploy
 sourceSets.main.groovy.srcDirs += 'buildSrc/src/main/groovy'
-
 
 configurations {
   // A place for dependencies that must be placed in the pluginClasspath for testing
