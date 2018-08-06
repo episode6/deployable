@@ -17,6 +17,21 @@ class BintrayAddonPlugin implements Plugin<Project> {
   @Override
   void apply(Project project) {
     project.plugins.apply('com.jfrog.bintray')
+
+    project.afterEvaluate {
+      project.bintray {
+        publications = ['mavenArtifacts']
+        pkg {
+          name = project.name
+          desc = project.deployable.pom.description
+          version {
+            name = project.version
+          }
+        }
+      }
+    }
+
+    project.tasks.deploy.dependsOn project.tasks.bintrayUpload
   }
 
 }
