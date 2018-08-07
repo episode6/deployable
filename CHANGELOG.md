@@ -1,9 +1,10 @@
 # Deployable ChangeLog
 
-### v0.2.2 - released August 6th, 2018
+### v0.2.2 - released August 7th, 2018
 - Add publication params for `includeSources` and `includeDocs`. If unset, default is true, so there should be no need to update existing projects. See [README for more info](README.md#excluding-sources-and-docs)
 - Add plugin publication configuration methods for `amendSources` and `amendDocs`. These configuration steps will be skipped if `includeSources` / `includeDocs` are false (respectively). See [README for more info](README.md#customize-published-artifacts)
 - Add experimental [bintray plugin](buildSrc/src/main/groovy/com/episode6/hackit/deployable/addon/BintrayAddonPlugin.groovy)
+- Add (optional) support for `deployable.pom.developer.email`
 
 ### v0.2.1 - released July 29, 2018
 - Fix bug in `gradle-plugin` plugin
