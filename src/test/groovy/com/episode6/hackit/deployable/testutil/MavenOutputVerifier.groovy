@@ -133,6 +133,9 @@ class MavenOutputVerifier {
     assert pom.developers.size() == 1
     assert pom.developers.developer.id.text() == expectedPom.developer.id
     assert pom.developers.developer.name.text() == expectedPom.developer.name
+    if (expectedPom.developer.email != null) {
+      assert pom.developers.developer.email.text() == expectedPom.developer.email
+    }
     assert pom.scm.connection.text() == expectedPom.scm.connection
     assert pom.scm.developerConnection.text() == expectedPom.scm.developerConnection
     assert pom.scm.url.text() == expectedPom.scm.url

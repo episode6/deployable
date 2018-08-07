@@ -11,6 +11,7 @@ import org.gradle.api.publish.maven.MavenPublication
  */
 class DeployablePluginExtension extends NestablePluginExtension {
   private static final String[] OPTIONAL_PROPERTIES = [
+      "deployable.pom.developer.email",
       "deployable.nexus.username",
       "deployable.nexus.password",
       "deployable.nexus.releaseRepoUrl",
@@ -44,6 +45,7 @@ class DeployablePluginExtension extends NestablePluginExtension {
     static class DeveloperExtension extends NestablePluginExtension {
       String id
       String name
+      String email
 
       DeveloperExtension(NestablePluginExtension parent) {
         super(parent, "developer")
