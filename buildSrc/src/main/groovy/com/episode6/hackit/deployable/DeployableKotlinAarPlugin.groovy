@@ -22,9 +22,11 @@ class DeployableKotlinAarPlugin implements Plugin<Project> {
       doFirst {
         classpath += project.files(project.android.bootClasspath)
       }
+      /* this link has been causing tests to be flaky, leave them out for now.
       externalDocumentationLink {
         url = new URL("http://developer.android.com/reference/")
       }
+      */
       reportUndocumented = false
     }
 
