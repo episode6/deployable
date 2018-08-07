@@ -1,5 +1,8 @@
 # Deployable ChangeLog
 
+### v0.2.3-SNAPSHOT - unreleased
+
+
 ### v0.2.2-SNAPSHOT - unreleased
 - Add publication params for `includeSources` and `includeDocs`. If unset, default is true, so there should be no need to update existing projects. See [README for more info](README.md#excluding-sources-and-docs)
 - Add plugin publication configuration methods for `amendSources` and `amendDocs`. These configuration steps will be skipped if `includeSources` / `includeDocs` are false (respectively). See [README for more info](README.md#customize-published-artifacts)
