@@ -18,16 +18,17 @@ class BintrayAddonPlugin implements Plugin<Project> {
   void apply(Project project) {
     project.plugins.apply('com.jfrog.bintray')
 
+    project.bintray {
+      pkg {
+        version {
+          name = project.version
+        }
+      }
+    }
+
     project.afterEvaluate {
       project.bintray {
         publications = ['mavenArtifacts']
-        pkg {
-          name = project.name
-          desc = project.deployable.pom.description
-          version {
-            name = project.version
-          }
-        }
       }
     }
 
