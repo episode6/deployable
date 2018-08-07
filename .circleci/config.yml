@@ -25,7 +25,7 @@ jobs:
       - checkout
       - run: git submodule sync
       - run: git submodule update --init
-      - run: ./gradlew org.gradle.daemon=false assemble
+      - run: ./gradlew -Dorg.gradle.daemon=false assemble
       - run: ./gradlew -Dorg.gradle.daemon=false check
       - run:
           name: Save test results
