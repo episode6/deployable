@@ -6,8 +6,9 @@ import org.gradle.api.Project
 
 /**
  * EXPERIMENTAL
- * Plugin that applies the bintray plugin for you and handles some of the default configuration
- * for data that is already present in deployable's config
+ * Plugin that applies the bintray plugin for you and handles configuring deployable's publication
+ * and the artifact's version name. Everything else should be configured manually via the bintray
+ * plugin for now, while this incubates
  *
  * Referenced as 'com.episode6.hackit.deployable.addon.bintray'
  */
