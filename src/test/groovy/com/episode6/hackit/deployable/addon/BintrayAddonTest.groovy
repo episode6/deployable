@@ -39,7 +39,7 @@ version = '${versionName}'
         testProject: testProject)
 
     when:
-    def result = testProject.executeGradleTask("deploy", '--stacktrace')
+    def result = testProject.failGradleTask('deploy')
 
     then:
     result.task(":jar").outcome == TaskOutcome.SUCCESS
@@ -48,9 +48,11 @@ version = '${versionName}'
     result.task(":sourcesJar").outcome == TaskOutcome.SUCCESS
     result.task(":validateDeployable").outcome == TaskOutcome.SUCCESS
     result.task(":signMavenArtifactsPublication").outcome == TaskOutcome.SUCCESS
-    result.task(":publishMavenArtifactsPublicationToMavenRepository").outcome == TaskOutcome.SUCCESS
+    result.task(":publishMavenArtifactsPublicationToMavenLocal").outcome == TaskOutcome.SUCCESS
     result.task(":bintrayUpload").outcome == TaskOutcome.SUCCESS
-    result.task(":deploy").outcome == TaskOutcome.SUCCESS
+    result.task(":bintrayPublish").outcome == TaskOutcome.FAILED
+    result.task(":deploy") == null
+    result.output.contains('Repository name, package name or version name are null for project')
     mavenOutputVerifier.verifyStandardOutput()
 
     where:
