@@ -49,6 +49,7 @@ version = '${versionName}'
     result.task(":validateDeployable").outcome == TaskOutcome.SUCCESS
     result.task(":signMavenArtifactsPublication").outcome == TaskOutcome.SUCCESS
     result.task(":publishMavenArtifactsPublicationToMavenRepository").outcome == TaskOutcome.SUCCESS
+    result.task(":bintrayUpload").outcome == TaskOutcome.SUCCESS
     result.task(":deploy").outcome == TaskOutcome.SUCCESS
     mavenOutputVerifier.verifyStandardOutput()
 
