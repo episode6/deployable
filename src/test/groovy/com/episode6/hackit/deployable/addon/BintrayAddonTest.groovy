@@ -53,7 +53,6 @@ version = '${versionName}'
     result.task(":bintrayPublish").outcome == TaskOutcome.FAILED
     result.task(":deploy") == null
     result.output.contains('Repository name, package name or version name are null for project')
-    mavenOutputVerifier.verifyStandardOutput()
 
     where:
     groupId                 | artifactId    | versionName
