@@ -61,6 +61,7 @@ class TestProperties {
     return builder.toString() + """
 
 org.gradle.daemon=false
+org.gradle.jvmargs=-Xmx1024m
 """
   }
 
