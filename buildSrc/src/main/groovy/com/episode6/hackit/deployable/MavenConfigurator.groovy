@@ -72,6 +72,9 @@ class MavenConfigurator {
               developer {
                 id = deployable.pom.developer.id
                 name = deployable.pom.developer.name
+                if (deployable.pom.developer.email != null) {
+                  email = deployable.pom.developer.email
+                }
               }
             }
             scm {
