@@ -43,6 +43,7 @@ deployable {
     developer {
       id "${deployable.pom.developer.id}"
       name "${deployable.pom.developer.name}"
+      email "${deployable.pom.developer.email}"
     }
   }
 
@@ -93,6 +94,7 @@ deployable {
         developer {
           id "DeveloperIdOVERRIDE"
           name "DeveloperNameOVERRIDE"
+          email "TestEmail@Nowhere.com"
         }
       }
 

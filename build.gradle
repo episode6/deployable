@@ -1,23 +1,5 @@
-buildscript {
-  ext {
-    // In order to deploy this plugin using itself, we must define all our external compile dependencies on
-    // the buildscript classpath as well as the normal dependency block.
-    // Put them here so we don't have to write them twice
-    compileDependencies = [
-        "com.episode6.hackit.nestable:nestable:0.0.1",
-    ]
-  }
-  repositories {
-    jcenter()
-  }
-  dependencies {
-    classpath compileDependencies
-    classpath 'com.episode6.hackit.gdmc:gdmc:0.1.9'
-  }
-}
-
 group = "com.episode6.hackit.deployable"
-version = "0.2.1"
+version = "0.2.2"
 
 wrapper {
   gradleVersion = "4.9"
@@ -30,16 +12,11 @@ repositories {
 }
 
 apply plugin: 'groovy'
-
-// Apply this plugin to itself so we don't need to duplicate the deploy logic.
-GroovyScriptEngine scriptEngine = new GroovyScriptEngine([
-      file('src/main/groovy').absolutePath,
-      file('src/main/resources').absolutePath
-    ].toArray(new String[2]),
-    this.class.classLoader)
-apply plugin: scriptEngine.loadScriptByName('com/episode6/hackit/deployable/DeployableGradlePluginPlugin.groovy')
-
 apply plugin: 'com.episode6.hackit.gdmc'
+apply plugin: com.episode6.hackit.deployable.DeployableGradlePluginPlugin
+
+// The plugin source code lives in 'buildSrc' so that we may apply it to ourselves in order to deploy
+sourceSets.main.groovy.srcDirs += 'buildSrc/src/main/groovy'
 
 configurations {
   // A place for dependencies that must be placed in the pluginClasspath for testing
@@ -48,10 +25,12 @@ configurations {
   alsoUnderTest
 }
 
+// apply project dependencies from shared file
+apply from: 'project-dependencies.gradle'
+
 dependencies {
   implementation localGroovy()
   implementation gradleApi()
-  implementation compileDependencies
 
   testImplementation("org.spockframework:spock-core")  {
     exclude module: 'groovy-all'
@@ -67,6 +46,7 @@ dependencies {
   alsoUnderTest 'org.jetbrains.kotlin:kotlin-gradle-plugin'
   alsoUnderTest 'org.jetbrains.dokka:dokka-gradle-plugin'
   alsoUnderTest 'org.jetbrains.dokka:dokka-android-gradle-plugin'
+  alsoUnderTest 'com.jfrog.bintray.gradle:gradle-bintray-plugin'
 }
 
 pluginUnderTestMetadata {

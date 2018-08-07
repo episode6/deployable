@@ -27,9 +27,11 @@ class DeployableJarPlugin implements Plugin<Project> {
       main {
         artifact project.jar
       }
-      amend {
-        artifact project.javadocJar
+      amendSources {
         artifact project.sourcesJar
+      }
+      amendDocs {
+        artifact project.javadocJar
       }
     }
   }

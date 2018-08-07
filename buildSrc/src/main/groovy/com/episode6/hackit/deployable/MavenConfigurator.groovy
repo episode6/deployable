@@ -50,6 +50,8 @@ class MavenConfigurator {
     project.publishing {
       publications {
         mavenArtifacts(MavenPublication) {
+
+          // Apply standard publication configuration
           groupId project.group
           artifactId project.name
           version project.version
@@ -70,6 +72,9 @@ class MavenConfigurator {
               developer {
                 id = deployable.pom.developer.id
                 name = deployable.pom.developer.name
+                if (deployable.pom.developer.email != null) {
+                  email = deployable.pom.developer.email
+                }
               }
             }
             scm {
@@ -79,10 +84,15 @@ class MavenConfigurator {
             }
           }
 
+          // Apply deployable plugin's publication configuration
           configureWithClosure(it, deployable.publication.main)
-          deployable.publication.additionalConfigurationClosures.each { closure ->
-            configureWithClosure(it, closure)
+          if (isBoolNullOrTrue(deployable.publication.includeSources)) {
+            configureWithClosures(it, deployable.publication.sourcesConfigurations)
           }
+          if (isBoolNullOrTrue(deployable.publication.includeDocs)) {
+            configureWithClosures(it, deployable.publication.docsConfigurations)
+          }
+          configureWithClosures(it, deployable.publication.amendedConfigurations)
 
           pom.withXml {
             def rootPom = asNode()
@@ -140,9 +150,19 @@ class MavenConfigurator {
     }
   }
 
+  private static void configureWithClosures(Object delegate, List<Closure> closures) {
+    closures.each {
+      configureWithClosure(delegate, it)
+    }
+  }
+
   private static void configureWithClosure(Object delegate, Closure closure) {
     closure.setDelegate(delegate)
     closure.setResolveStrategy(Closure.DELEGATE_FIRST)
     closure.call()
+  }
+
+  def isBoolNullOrTrue(pluginValue) {
+    return pluginValue == null || pluginValue == true
   }
 }
