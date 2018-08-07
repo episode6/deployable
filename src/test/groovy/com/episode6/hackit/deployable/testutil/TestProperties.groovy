@@ -58,7 +58,10 @@ class TestProperties {
     StringBuilder builder = new StringBuilder()
     builder = buildGradlePropertiesForNestedExtension(deployable, builder)
     builder = buildGradlePropertiesForKeyringBundle(builder)
-    return builder.toString()
+    return builder.toString() + """
+
+org.gradle.daemon=false
+"""
   }
 
   private StringBuilder buildGradlePropertiesForNestedExtension(NestablePluginExtension nestedExtension, StringBuilder stringBuilder) {
