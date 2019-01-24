@@ -35,7 +35,7 @@ class DeployableKotlinAarPlugin implements Plugin<Project> {
 
     project.deployable.publication {
       main {
-        artifact project.bundleRelease
+        artifact project.bundleReleaseAar
       }
       amendSources {
         artifact project.androidReleaseSourcesJar
@@ -49,13 +49,13 @@ class DeployableKotlinAarPlugin implements Plugin<Project> {
 
       project.tasks.dokka {
         doFirst {
-          classpath += project.files(variant.javaCompile.classpath)
+          classpath += project.files(variant.javaCompileProvider.get().classpath)
         }
       }
 
       project.task("android${variant.name.capitalize()}SourcesJar", type: Jar) {
         classifier = 'sources'
-        from variant.javaCompile.source.collect() + project.android.sourceSets.main.java.srcDirs.collect() +
+        from variant.javaCompileProvider.get().source.collect() + project.android.sourceSets.main.java.srcDirs.collect() +
             project.android.sourceSets.findByName(variant.dirName)?.java?.srcDirs?.collect()
       }
     }

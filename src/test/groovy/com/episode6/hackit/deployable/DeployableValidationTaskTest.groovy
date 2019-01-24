@@ -81,14 +81,14 @@ group = 'com.testing.example'
     def result = testProject.failGradleTask("validateDeployable")
 
     then:
-    result.task(":validateDeployable").outcome == TaskOutcome.FAILED
-    result.output.contains("deployable validation failure")
-    result.output.contains("Project Property: name")
+    // this is no longer legal in gradle, so validation never has a chance to run
+    result.task(":validateDeployable") == null
+    result.output.contains("The project name must not be empty")
   }
 
-  def "fail on missing all 3 project properties and a few deployable ones"() {
+  def "fail on missing 2 project properties and a few deployable ones"() {
     given:
-    testProject.rootProjectName = ""
+    testProject.rootProjectName = "proj-name"
     testProject.createNonEmptyJavaFile("com.testing.example")
     testProject.rootGradleBuildFile << BUILD_FILE_HEADER
     testProject.testProperties.deployable {
@@ -107,7 +107,6 @@ group = 'com.testing.example'
     then:
     result.task(":validateDeployable").outcome == TaskOutcome.FAILED
     result.output.contains("deployable validation failure")
-    result.output.contains("Project Property: name")
     result.output.contains("Project Property: version")
     result.output.contains("Project Property: group")
     result.output.contains("deployable.pom.description")

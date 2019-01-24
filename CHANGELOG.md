@@ -1,7 +1,8 @@
 # Deployable ChangeLog
 
 ### v0.2.3-SNAPSHOT - unreleased
-
+- Upgrade to gradle 5.1.1
+- Now tested with/supporting android gradle plugin 3.3.0
 
 ### v0.2.2 - released August 7th, 2018
 - Add publication params for `includeSources` and `includeDocs`. If unset, default is true, so there should be no need to update existing projects. See [README for more info](README.md#excluding-sources-and-docs)

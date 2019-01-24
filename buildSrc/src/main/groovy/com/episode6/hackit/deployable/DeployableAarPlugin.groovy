@@ -16,7 +16,7 @@ class DeployableAarPlugin implements Plugin<Project> {
 
     project.deployable.publication {
       main {
-        artifact project.bundleRelease
+        artifact project.bundleReleaseAar
       }
       amendSources {
         artifact project.androidReleaseSourcesJar
@@ -35,13 +35,16 @@ class DeployableAarPlugin implements Plugin<Project> {
         exclude '**/BuildConfig.java'
         exclude '**/R.java'
 
-        dependsOn variant.javaCompile
-        mustRunAfter variant.javaCompile
+        dependsOn variant.javaCompileProvider.get()
+        mustRunAfter variant.javaCompileProvider.get()
 
-        source = variant.javaCompile.source
+        println variant.javaCompileProvider.get().source
+
+        source = variant.javaCompileProvider.get().source.collect() + project.android.sourceSets.main.java.srcDirs.collect() +
+            project.android.sourceSets.findByName(variant.dirName)?.java?.srcDirs?.collect()
         doFirst {
           classpath += project.files(project.android.bootClasspath)
-          classpath += project.files(variant.javaCompile.classpath)
+          classpath += project.files(variant.javaCompileProvider.get().classpath)
         }
       }
 
@@ -52,7 +55,8 @@ class DeployableAarPlugin implements Plugin<Project> {
 
       project.task("android${variant.name.capitalize()}SourcesJar", type: Jar) {
         classifier = 'sources'
-        from variant.javaCompile.source
+        from variant.javaCompileProvider.get().source.collect() + project.android.sourceSets.main.java.srcDirs.collect() +
+            project.android.sourceSets.findByName(variant.dirName)?.java?.srcDirs?.collect()
       }
     }
   }
