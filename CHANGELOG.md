@@ -1,6 +1,6 @@
 # Deployable ChangeLog
 
-### v0.2.3-SNAPSHOT - unreleased
+### v0.2.3 - release March 6th, 2019
 - Upgrade to gradle 5.1.1
 - Now tested with/supporting android gradle plugin 3.3.0
 
