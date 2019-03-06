@@ -1,5 +1,5 @@
 group = "com.episode6.hackit.deployable"
-version = "0.2.3-SNAPSHOT"
+version = "0.2.3"
 
 wrapper {
   gradleVersion = "5.1.1"
