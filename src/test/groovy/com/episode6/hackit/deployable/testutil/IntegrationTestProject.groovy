@@ -27,6 +27,7 @@ class IntegrationTestProject extends TemporaryFolder {
     rootGradleBuildFile = newFile("build.gradle")
     rootGradlePropertiesFile = newFile("gradle.properties")
     rootGradleSettingFile = newFile("settings.gradle")
+    newFile("local.properties") << new File("./local.properties").text
 
     if (initMavenRepos) {
       setSnapshotMavenRepoDir(newFolder("mavenSnapshot"))
