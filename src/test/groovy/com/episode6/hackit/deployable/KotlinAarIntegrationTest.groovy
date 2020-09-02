@@ -57,7 +57,7 @@ dependencies {
  """
   }
 
-  @Rule final IntegrationTestProject testProject = new IntegrationTestProject()
+  @Rule IntegrationTestProject testProject = new IntegrationTestProject()
 
   def "verify aar deploy tasks and output"(String groupId, String artifactId, String versionName) {
     given:

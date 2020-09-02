@@ -58,7 +58,7 @@ deployable {
  """
   }
 
-  @Rule final IntegrationTestProject testProject = new IntegrationTestProject()
+  @Rule IntegrationTestProject testProject = new IntegrationTestProject()
 
   def "test override gradle.settings"(String groupId, String artifactId, String versionName) {
     given:
