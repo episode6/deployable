@@ -12,7 +12,7 @@ import spock.lang.Specification
  */
 class KotlinJarIntegrationTest extends Specification {
 
-  @Rule final IntegrationTestProject testProject = new IntegrationTestProject()
+  @Rule IntegrationTestProject testProject = new IntegrationTestProject()
 
   static final String CHOP_IMPORT = """
 import com.episode6.hackit.chop.Chop

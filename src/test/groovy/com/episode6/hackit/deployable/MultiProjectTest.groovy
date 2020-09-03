@@ -195,8 +195,7 @@ include ':javalib', ':groovylib', ':androidlib', ':kotlinlib', ':kandroidlib'
     ]
   }
 
-  @Rule
-  final IntegrationTestProject testProject = new IntegrationTestProject()
+  @Rule IntegrationTestProject testProject = new IntegrationTestProject()
 
   def "test multi-project deployables"(String groupId, String versionName) {
     given:

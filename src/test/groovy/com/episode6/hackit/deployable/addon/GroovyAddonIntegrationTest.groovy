@@ -28,7 +28,7 @@ dependencies {
  """
   }
 
-  @Rule final IntegrationTestProject testProject = new IntegrationTestProject()
+  @Rule IntegrationTestProject testProject = new IntegrationTestProject()
 
   def "verify groovy deploy tasks and output"(String groupId, String artifactId, String versionName) {
     given:

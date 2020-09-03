@@ -10,8 +10,7 @@ import spock.lang.Specification
  */
 class NoRepoTest extends Specification {
 
-  @Rule
-  final IntegrationTestProject testProject = new IntegrationTestProject(initMavenRepos: false)
+  @Rule IntegrationTestProject testProject = new IntegrationTestProject(initMavenRepos: false)
 
   private static String simpleBuildFile(
       String groupId,

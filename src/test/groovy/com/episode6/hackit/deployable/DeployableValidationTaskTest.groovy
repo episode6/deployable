@@ -27,7 +27,7 @@ version = '${versionName}'
  """
   }
 
-  @Rule final IntegrationTestProject testProject = new IntegrationTestProject()
+  @Rule IntegrationTestProject testProject = new IntegrationTestProject()
 
 
   def "fail on missing groupId"() {
