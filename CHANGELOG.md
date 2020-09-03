@@ -1,5 +1,8 @@
 # Deployable ChangeLog
 
+### v0.2.4 - release September 2nd, 2020
+- Upgrade to gradle v5.3 and gdmc v0.1.12
+
 ### v0.2.3 - release March 6th, 2019
 - Upgrade to gradle 5.1.1
 - Now tested with/supporting android gradle plugin 3.3.0
