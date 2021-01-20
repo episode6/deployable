@@ -18,6 +18,7 @@ class DeployablePluginExtension extends NestablePluginExtension {
       "deployable.nexus.snapshotRepoUrl",
       "deployable.publication.includeSources",
       "deployable.publication.includeDocs",
+      "deployable.taskThatOwnsThisObject",
   ]
 
   static class PomExtension extends NestablePluginExtension {

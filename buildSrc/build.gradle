@@ -19,5 +19,5 @@ apply from: '../project-dependencies.gradle'
 
 // compile deps act as buildscript classpath deps for the main project
 dependencies {
-  compile 'com.episode6.hackit.gdmc:gdmc'
+  implementation 'com.episode6.hackit.gdmc:gdmc'
 }

@@ -1,7 +1,7 @@
 package com.episode6.hackit.deployable
 
 import org.gradle.api.DefaultTask
-import org.gradle.api.Nullable
+import javax.annotation.Nullable
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.VerificationTask
