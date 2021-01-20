@@ -14,13 +14,13 @@ class DeployableJarPlugin implements Plugin<Project> {
     project.plugins.apply(DeployablePlugin).pomPackaging = "jar"
 
     project.task("javadocJar", type: Jar, dependsOn: project.javadoc) {
-      classifier = 'javadoc'
+      archiveClassifier = 'javadoc'
       from project.javadoc
     }
 
     project.task("sourcesJar", type: Jar) {
       from project.sourceSets.main.allSource
-      classifier = 'sources'
+      archiveClassifier = 'sources'
     }
 
     project.deployable.publication {

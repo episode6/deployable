@@ -29,7 +29,7 @@ class DeployableKotlinAarPlugin implements Plugin<Project> {
     }
 
     project.task("javadocJar", type: Jar, dependsOn: project.dokka) {
-      classifier = 'javadoc'
+      archiveClassifier = 'javadoc'
       from project.dokka
     }
 
@@ -54,7 +54,7 @@ class DeployableKotlinAarPlugin implements Plugin<Project> {
       }
 
       project.task("android${variant.name.capitalize()}SourcesJar", type: Jar) {
-        classifier = 'sources'
+        archiveClassifier = 'sources'
         from variant.javaCompileProvider.get().source.collect() + project.android.sourceSets.main.java.srcDirs.collect() +
             project.android.sourceSets.findByName(variant.dirName)?.java?.srcDirs?.collect()
       }

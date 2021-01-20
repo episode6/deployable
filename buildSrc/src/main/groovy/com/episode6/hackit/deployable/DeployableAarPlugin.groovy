@@ -49,12 +49,12 @@ class DeployableAarPlugin implements Plugin<Project> {
       }
 
       project.task("android${variant.name.capitalize()}JavadocsJar", type: Jar, dependsOn: javadocsTask) {
-        classifier = 'javadoc'
+        archiveClassifier = 'javadoc'
         from javadocsTask
       }
 
       project.task("android${variant.name.capitalize()}SourcesJar", type: Jar) {
-        classifier = 'sources'
+        archiveClassifier = 'sources'
         from variant.javaCompileProvider.get().source.collect() + project.android.sourceSets.main.java.srcDirs.collect() +
             project.android.sourceSets.findByName(variant.dirName)?.java?.srcDirs?.collect()
       }
