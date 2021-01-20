@@ -22,6 +22,7 @@ class DeployableGradlePluginPlugin implements Plugin<Project> {
       project.tasks.findByName("publishPluginMavenPublicationToMavenRepository")?.enabled = false
       project.tasks.findByName("publishPluginMavenPublicationToMavenLocal")?.enabled = false
       project.tasks.findByName("generatePomFileForPluginMavenPublication")?.enabled = false
+      project.tasks.findByName("generateMetadataFileForPluginMavenPublication")?.enabled = false
     }
   }
 }
