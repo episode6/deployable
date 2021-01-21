@@ -58,6 +58,8 @@ class TestProperties {
     StringBuilder builder = new StringBuilder()
     builder = buildGradlePropertiesForNestedExtension(deployable, builder)
     builder = buildGradlePropertiesForKeyringBundle(builder)
+        .append("\n")
+        .append("org.gradle.jvmargs=-XX:MaxMetaspaceSize=2048m")
     return builder.toString()
   }
 

@@ -12,25 +12,32 @@ class DeployableKotlinAarPlugin implements Plugin<Project> {
     DeployablePlugin deployablePlugin = project.plugins.apply(DeployablePlugin)
     deployablePlugin.pomPackaging = "aar"
 
-    project.plugins.apply('org.jetbrains.dokka-android')
+    project.plugins.apply('org.jetbrains.dokka')
 
     project.android.sourceSets.each {
       it.java.srcDirs += "src/${it.name}/kotlin"
     }
 
-    project.tasks.dokka {
-      doFirst {
-        classpath += project.files(project.android.bootClasspath)
+    project.tasks.dokkaHtml {
+//      doFirst {
+//        classpath += project.files(project.android.bootClasspath)
+//      }
+
+      dokkaSourceSets {
+        named("main") {
+          noAndroidSdkLink.set(false)
+        }
       }
-      externalDocumentationLink {
-        url = new URL("http://developer.android.com/reference/")
-      }
-      reportUndocumented = false
+//
+//      externalDocumentationLink {
+//        url = new URL("http://developer.android.com/reference/")
+//      }
+//      reportUndocumented = false
     }
 
-    project.task("javadocJar", type: Jar, dependsOn: project.dokka) {
+    project.task("javadocJar", type: Jar, dependsOn: project.dokkaHtml) {
       archiveClassifier = 'javadoc'
-      from project.dokka
+      from project.dokkaHtml
     }
 
     project.deployable.publication {
@@ -47,10 +54,10 @@ class DeployableKotlinAarPlugin implements Plugin<Project> {
 
     project.android.libraryVariants.all { variant ->
 
-      project.tasks.dokka {
-        doFirst {
-          classpath += project.files(variant.javaCompileProvider.get().classpath)
-        }
+      project.tasks.dokkaHtml {
+//        doFirst {
+//          classpath += project.files(variant.javaCompileProvider.get().classpath)
+//        }
       }
 
       project.task("android${variant.name.capitalize()}SourcesJar", type: Jar) {

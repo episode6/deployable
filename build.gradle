@@ -9,6 +9,7 @@ wrapper {
 repositories {
   jcenter()
   google()
+  mavenLocal()
 }
 
 apply plugin: 'groovy'
@@ -38,14 +39,13 @@ dependencies {
   testImplementation gradleTestKit()
   testImplementation("org.bouncycastle:bcpg-jdk15on")
   testImplementation("com.episode6.hackit.groovykit:gk-files")
-  testImplementation('com.episode6.hackit.gdmc:gdmc')
+  testImplementation('com.episode6.hackit.gdmc:gdmc:0.1.13-SNAPSHOT')
 
   // plugins used by integration tests
-  alsoUnderTest 'com.episode6.hackit.gdmc:gdmc'
+  alsoUnderTest 'com.episode6.hackit.gdmc:gdmc:0.1.13-SNAPSHOT'
   alsoUnderTest 'com.android.tools.build:gradle'
   alsoUnderTest 'org.jetbrains.kotlin:kotlin-gradle-plugin'
   alsoUnderTest 'org.jetbrains.dokka:dokka-gradle-plugin'
-  alsoUnderTest 'org.jetbrains.dokka:dokka-android-gradle-plugin'
   alsoUnderTest 'com.jfrog.bintray.gradle:gradle-bintray-plugin'
 }
 

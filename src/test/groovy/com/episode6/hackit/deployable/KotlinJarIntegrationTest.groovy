@@ -59,7 +59,7 @@ dependencies {
 
     then:
     result.task(":jar").outcome == TaskOutcome.SUCCESS
-    result.task(":dokka").outcome == TaskOutcome.SUCCESS
+    result.task(":dokkaHtml").outcome == TaskOutcome.SUCCESS
     result.task(":javadocJar").outcome == TaskOutcome.SUCCESS
     result.task(":sourcesJar").outcome == TaskOutcome.SUCCESS
     result.task(":validateDeployable").outcome == TaskOutcome.SUCCESS
@@ -87,7 +87,7 @@ dependencies {
 
     then:
     result.task(":jar").outcome == TaskOutcome.SUCCESS
-    result.task(":dokka").outcome == TaskOutcome.SUCCESS
+    result.task(":dokkaHtml").outcome == TaskOutcome.SUCCESS
     result.task(":javadocJar").outcome == TaskOutcome.SUCCESS
     result.task(":sourcesJar").outcome == TaskOutcome.SUCCESS
     result.task(":validateDeployable").outcome == TaskOutcome.SUCCESS

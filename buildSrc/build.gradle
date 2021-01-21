@@ -1,14 +1,16 @@
 buildscript {
   repositories {
     jcenter()
+    mavenLocal()
   }
   dependencies {
-    classpath 'com.episode6.hackit.gdmc:gdmc:0.1.12'
+    classpath 'com.episode6.hackit.gdmc:gdmc:0.1.13-SNAPSHOT'
   }
 }
 
 repositories {
-    jcenter()
+  jcenter()
+  mavenLocal()
 }
 
 apply plugin: 'groovy'
@@ -19,5 +21,5 @@ apply from: '../project-dependencies.gradle'
 
 // compile deps act as buildscript classpath deps for the main project
 dependencies {
-  implementation 'com.episode6.hackit.gdmc:gdmc'
+  implementation 'com.episode6.hackit.gdmc:gdmc:0.1.13-SNAPSHOT'
 }

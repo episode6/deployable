@@ -76,7 +76,7 @@ dependencies {
     def result = testProject.executeGradleTask("deploy")
 
     then:
-    result.task(":dokka").outcome == TaskOutcome.SUCCESS
+    result.task(":dokkaHtml").outcome == TaskOutcome.SUCCESS
     result.task(":javadocJar").outcome == TaskOutcome.SUCCESS
     result.task(":androidReleaseSourcesJar").outcome == TaskOutcome.SUCCESS
     result.task(":validateDeployable").outcome == TaskOutcome.SUCCESS

@@ -20,13 +20,13 @@ class DeployableKotlinJarPlugin implements Plugin<Project> {
     project.plugins.apply(DeployablePlugin).pomPackaging = "jar"
     project.plugins.apply('org.jetbrains.dokka')
 
-    project.tasks.dokka {
-      reportUndocumented = false
+    project.tasks.dokkaHtml {
+//      reportUndocumented = false
     }
 
-    project.task("javadocJar", type: Jar, dependsOn: project.dokka) {
+    project.task("javadocJar", type: Jar, dependsOn: project.dokkaHtml) {
       archiveClassifier = 'javadoc'
-      from project.dokka
+      from project.dokkaHtml
     }
 
     project.task("sourcesJar", type: Jar) {
